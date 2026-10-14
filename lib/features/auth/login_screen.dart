@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../core/constants/app_colors.dart';
 import '../../shared/providers/app_providers.dart';
@@ -21,6 +22,24 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   bool _obscurePassword = true;
   bool _isLoading = false;
   String? _errorMessage;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        try {
+          if (Supabase.instance.client.auth.currentUser != null) {
+            if (context.canPop()) {
+              context.pop();
+            } else {
+              context.go('/home');
+            }
+          }
+        } catch (_) {}
+      }
+    });
+  }
 
   @override
   void dispose() {
@@ -114,6 +133,33 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
+    ref.listen<AsyncValue<AuthState>>(authStateStreamProvider, (
+      previous,
+      next,
+    ) async {
+      final authState = next.value;
+      if (authState?.session != null && mounted) {
+        ref.invalidate(userProfileProvider);
+        final user = authState!.session!.user;
+        final profile = await ref
+            .read(authRepositoryProvider)
+            .getUserProfile(user.id);
+        if (profile != null && mounted) {
+          ref.read(customerNameProvider.notifier).setName(profile.fullName);
+          if (profile.phone != null) {
+            ref.read(customerPhoneProvider.notifier).setPhone(profile.phone);
+          }
+        }
+        if (context.mounted) {
+          if (context.canPop()) {
+            context.pop();
+          } else {
+            context.go('/home');
+          }
+        }
+      }
+    });
+
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(title: const Text('Customer Sign In'), elevation: 0),
