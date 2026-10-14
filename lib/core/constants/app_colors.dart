@@ -3,21 +3,29 @@ import 'package:flutter/material.dart';
 class AppColors {
   AppColors._();
 
-  // Primary Brand Greens
-  static const Color primary = Color(0xFF15803D); // Fresh Forest Green
-  static const Color primaryDark = Color(0xFF166534);
-  static const Color primaryLight = Color(0xFF22C55E);
-  static const Color primaryContainer = Color(0xFFDCFCE7);
-  static const Color onPrimaryContainer = Color(0xFF14532D);
+  // Primary Vegora Brand Greens (from Official Branding Board)
+  static const Color primary = Color(0xFF0B6B3A); // Deep Forest Green (#0B6B3A)
+  static const Color primaryDark = Color(0xFF074826);
+  static const Color primaryLight = Color(
+    0xFF4CAF50,
+  ); // Fresh Accent Green (#4CAF50)
+  static const Color primaryContainer = Color(
+    0xFFE8F5E9,
+  ); // Mint Background (#E8F5E9)
+  static const Color onPrimaryContainer = Color(0xFF0B6B3A);
 
   // Secondary & Accents
-  static const Color secondary = Color(0xFFD97706); // Warm Amber/Saffron
-  static const Color secondaryLight = Color(0xFFFEF3C7);
-  static const Color secondaryDark = Color(0xFFB45309);
-  static const Color accent = Color(0xFFEA580C); // Vibrant Carrot Orange
+  static const Color secondary = Color(
+    0xFFFF8A00,
+  ); // Vibrant Carrot Orange (#FF8A00)
+  static const Color secondaryLight = Color(0xFFFFE0B2);
+  static const Color secondaryDark = Color(0xFFE65100);
+  static const Color accent = Color(0xFFFF8A00); // Vibrant Carrot Orange
 
   // Backgrounds & Neutrals
-  static const Color background = Color(0xFFF8FAF6); // Warm subtle organic tint
+  static const Color background = Color(
+    0xFFF7FAF5,
+  ); // Subtle Mint/Organic White (#F7FAF5)
   static const Color surface = Colors.white;
   static const Color surfaceVariant = Color(0xFFF1F5F0);
   static const Color border = Color(0xFFE2E8F0);

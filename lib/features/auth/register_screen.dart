@@ -92,9 +92,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
             .setName(_nameController.text.trim());
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text(
-              'Account successfully created! Welcome to KisanFresh.',
-            ),
+            content: Text('Account successfully created! Welcome to Vegora.'),
             backgroundColor: AppColors.primary,
           ),
         );
@@ -115,7 +113,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(
                 content: Text(
-                  'Account successfully created! Welcome to KisanFresh.',
+                  'Account successfully created! Welcome to Vegora.',
                 ),
                 backgroundColor: AppColors.primary,
               ),
@@ -243,39 +241,50 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                     // Brand Icon
                     Center(
                       child: Container(
-                        width: 64,
-                        height: 64,
+                        width: 72,
+                        height: 72,
                         decoration: BoxDecoration(
-                          color: AppColors.primaryContainer,
+                          color: Colors.white,
                           borderRadius: BorderRadius.circular(18),
+                          boxShadow: [
+                            BoxShadow(
+                              color: AppColors.primary.withValues(alpha: 0.12),
+                              blurRadius: 16,
+                              offset: const Offset(0, 4),
+                            ),
+                          ],
                         ),
-                        child: const Icon(
-                          Icons.person_add_alt_1_rounded,
-                          size: 32,
+                        padding: const EdgeInsets.all(6),
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(12),
+                          child: Image.asset(
+                            'assets/branding/vegora_app_icon.jpg',
+                            fit: BoxFit.contain,
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 14),
+
+                    const Center(
+                      child: Text(
+                        'Join Vegora',
+                        style: TextStyle(
+                          fontSize: 26,
+                          fontWeight: FontWeight.w900,
                           color: AppColors.primary,
                         ),
                       ),
                     ),
-                    const SizedBox(height: 16),
-
+                    const SizedBox(height: 4),
                     const Center(
                       child: Text(
-                        'Join KisanFresh',
-                        style: TextStyle(
-                          fontSize: 24,
-                          fontWeight: FontWeight.bold,
-                          color: AppColors.textPrimary,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 6),
-                    const Center(
-                      child: Text(
-                        'Order freshly harvested vegetables from 5+ store hubs',
+                        'Freshness at Your Doorstep • From Local Farms',
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           fontSize: 13,
-                          color: AppColors.textSecondary,
+                          fontWeight: FontWeight.w600,
+                          color: AppColors.secondary,
                         ),
                       ),
                     ),

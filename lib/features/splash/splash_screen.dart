@@ -32,49 +32,55 @@ class SplashScreen extends ConsumerWidget {
 
               const Spacer(),
 
-              // Brand Icon Illustration
+              // Vegora Brand Logo
               Container(
-                width: 120,
-                height: 120,
+                width: 130,
+                height: 130,
                 decoration: BoxDecoration(
-                  color: AppColors.primaryContainer,
-                  shape: BoxShape.circle,
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(28),
                   boxShadow: [
                     BoxShadow(
-                      color: AppColors.primary.withValues(alpha: 0.15),
+                      color: AppColors.primary.withValues(alpha: 0.12),
                       blurRadius: 24,
-                      offset: const Offset(0, 10),
+                      offset: const Offset(0, 8),
                     ),
                   ],
                 ),
-                alignment: Alignment.center,
-                child: const Text('🥦', style: TextStyle(fontSize: 60)),
+                padding: const EdgeInsets.all(12),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(20),
+                  child: Image.asset(
+                    'assets/branding/vegora_app_icon.jpg',
+                    fit: BoxFit.contain,
+                  ),
+                ),
               ),
 
-              const SizedBox(height: 28),
+              const SizedBox(height: 24),
 
               // Brand Name
               const Text(
-                'KisanFresh',
+                'Vegora',
                 style: TextStyle(
-                  fontSize: 32,
+                  fontSize: 34,
                   fontWeight: FontWeight.w900,
-                  color: AppColors.primaryDark,
+                  color: AppColors.primary,
                   letterSpacing: -0.5,
                 ),
               ),
-              const SizedBox(height: 6),
+              const SizedBox(height: 4),
               const Text(
-                'MANDI EXPRESS • 5+ CITY HUBS',
+                'Freshness at Your Doorstep.',
                 style: TextStyle(
-                  fontSize: 12,
-                  fontWeight: FontWeight.w800,
+                  fontSize: 14,
+                  fontWeight: FontWeight.w700,
                   color: AppColors.secondary,
-                  letterSpacing: 1.5,
+                  letterSpacing: 0.5,
                 ),
               ),
 
-              const SizedBox(height: 16),
+              const SizedBox(height: 14),
 
               const Padding(
                 padding: EdgeInsets.symmetric(horizontal: 16),

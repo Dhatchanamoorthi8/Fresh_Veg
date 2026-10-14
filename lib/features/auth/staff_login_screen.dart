@@ -212,7 +212,7 @@ class _StaffLoginScreenState extends ConsumerState<StaffLoginScreen> {
                       textInputAction: TextInputAction.next,
                       decoration: InputDecoration(
                         labelText: 'Staff Email',
-                        hintText: 'staff@branch.kisanfresh.com',
+                        hintText: 'staff@branch.vegora.in',
                         prefixIcon: const Icon(Icons.email_outlined),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
@@ -312,7 +312,7 @@ class _StaffLoginScreenState extends ConsumerState<StaffLoginScreen> {
                     Center(
                       child: TextButton.icon(
                         icon: const Icon(Icons.shopping_bag_outlined, size: 16),
-                        label: const Text('Back to KisanFresh Store'),
+                        label: const Text('Back to Vegora Store'),
                         onPressed: () => context.go('/home'),
                       ),
                     ),

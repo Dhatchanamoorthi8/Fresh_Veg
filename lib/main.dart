@@ -16,5 +16,5 @@ void main() async {
     );
   }
 
-  runApp(const ProviderScope(child: KisanFreshApp()));
+  runApp(const ProviderScope(child: VegoraApp()));
 }

@@ -46,7 +46,7 @@ class AdminSettingsScreen extends ConsumerWidget {
                       ),
                     ),
                     title: Text(
-                      currentUser?.email ?? 'admin@kisanfresh.com',
+                      currentUser?.email ?? 'admin@vegora.in',
                       style: const TextStyle(fontWeight: FontWeight.bold),
                     ),
                     subtitle: Text(

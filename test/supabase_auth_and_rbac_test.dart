@@ -25,7 +25,7 @@ void main() {
     test('UserProfile JSON deserialization parses database roles and status correctly', () {
       final json = {
         'id': 'a1b2c3d4-e5f6-7890-abcd-ef1234567890',
-        'email': 'staff.indiranagar@kisanfresh.com',
+        'email': 'staff.indiranagar@vegora.in',
         'full_name': 'Ramesh Staff',
         'phone': '9876543210',
         'avatar_url': null,
@@ -37,7 +37,7 @@ void main() {
       final profile = UserProfile.fromJson(json);
 
       expect(profile.id, 'a1b2c3d4-e5f6-7890-abcd-ef1234567890');
-      expect(profile.email, 'staff.indiranagar@kisanfresh.com');
+      expect(profile.email, 'staff.indiranagar@vegora.in');
       expect(profile.fullName, 'Ramesh Staff');
       expect(profile.phone, '9876543210');
       expect(profile.role, AppUserRole.branchStaff);
@@ -50,7 +50,7 @@ void main() {
       () {
         final json = {
           'id': 'b2c3d4e5-f6a7-8901-bcde-f12345678901',
-          'email': 'deactivated.driver@kisanfresh.com',
+          'email': 'deactivated.driver@vegora.in',
           'full_name': 'Ex Driver',
           'role': 'delivery_staff',
           'is_active': false,

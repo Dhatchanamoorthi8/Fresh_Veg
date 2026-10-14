@@ -105,8 +105,8 @@ class _AdminLoginScreenState extends ConsumerState<AdminLoginScreen> {
 
   void _showBootstrapModal() {
     final formKey = GlobalKey<FormState>();
-    final nameCtrl = TextEditingController(text: 'KisanFresh System Admin');
-    final emailCtrl = TextEditingController(text: 'admin@kisanfresh.com');
+    final nameCtrl = TextEditingController(text: 'Vegora System Admin');
+    final emailCtrl = TextEditingController(text: 'admin@vegora.in');
     final passCtrl = TextEditingController();
     final secretCtrl = TextEditingController(
       text: 'KisanFresh_Bootstrap_2026_SecureAdmin!',
@@ -468,7 +468,7 @@ class _AdminLoginScreenState extends ConsumerState<AdminLoginScreen> {
                       textInputAction: TextInputAction.next,
                       decoration: InputDecoration(
                         labelText: 'Administrator Email',
-                        hintText: 'admin@kisanfresh.com',
+                        hintText: 'admin@vegora.in',
                         prefixIcon: const Icon(Icons.email_outlined),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
@@ -572,7 +572,7 @@ class _AdminLoginScreenState extends ConsumerState<AdminLoginScreen> {
                     Center(
                       child: TextButton.icon(
                         icon: const Icon(Icons.shopping_bag_outlined, size: 16),
-                        label: const Text('Back to KisanFresh Store'),
+                        label: const Text('Back to Vegora Store'),
                         onPressed: () => context.go('/home'),
                       ),
                     ),

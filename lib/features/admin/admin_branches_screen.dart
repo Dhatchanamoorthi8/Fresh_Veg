@@ -378,7 +378,7 @@ class _AdminBranchesScreenState extends ConsumerState<AdminBranchesScreen> {
                       keyboardType: TextInputType.emailAddress,
                       decoration: const InputDecoration(
                         labelText: 'Contact Email',
-                        hintText: 'manager.indiranagar@kisanfresh.com',
+                        hintText: 'manager.indiranagar@vegora.in',
                         border: OutlineInputBorder(),
                       ),
                       validator: (v) {

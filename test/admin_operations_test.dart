@@ -80,7 +80,7 @@ void main() {
         await tester.pumpAndSettle();
 
         // Check titles from menu items
-        expect(find.text('KisanFresh'), findsOneWidget);
+        expect(find.text('Vegora'), findsOneWidget);
         expect(find.text('Dashboard'), findsOneWidget);
         expect(find.text('Manage Branches'), findsOneWidget);
         expect(find.text('Manage Vegetables'), findsOneWidget);
@@ -133,7 +133,7 @@ void main() {
         await tester.pumpAndSettle();
 
         // Inside Drawer
-        expect(find.text('KisanFresh Admin Hub'), findsOneWidget);
+        expect(find.text('Vegora Admin Hub'), findsOneWidget);
         await tester.scrollUntilVisible(
           find.text('Switch to Customer Store'),
           100,
@@ -158,7 +158,7 @@ void main() {
         pincode: '400053',
         phone: '+91 98200 11223',
         managerName: 'Sunil Shinde',
-        contactEmail: 'andheri@kisanfresh.com',
+        contactEmail: 'andheri@vegora.in',
         openingHours: '6:00 AM - 10:00 PM',
         deliveryCoverage: 'Andheri West, Juhu, Versova',
         minOrderAmountPaise: 9900,
@@ -178,7 +178,7 @@ void main() {
       expect(json['state'], 'Maharashtra');
       expect(json['pincode'], '400053');
       expect(json['manager_name'], 'Sunil Shinde');
-      expect(json['contact_email'], 'andheri@kisanfresh.com');
+      expect(json['contact_email'], 'andheri@vegora.in');
       expect(json['is_active'], isTrue);
 
       final parsed = Branch.fromJson(json);
@@ -417,7 +417,7 @@ void main() {
     test('Only Administrator role is authorized for admin actions', () {
       const adminUser = UserProfile(
         id: 'u_admin_01',
-        email: 'admin@kisanfresh.com',
+        email: 'admin@vegora.in',
         fullName: 'System Administrator',
         role: AppUserRole.superAdmin,
         isActive: true,
@@ -433,7 +433,7 @@ void main() {
 
       const staffUser = UserProfile(
         id: 'u_staff_01',
-        email: 'staff@kisanfresh.com',
+        email: 'staff@vegora.in',
         fullName: 'Store Staff Member',
         role: AppUserRole.branchStaff,
         branchId: 'branch_blr_01',

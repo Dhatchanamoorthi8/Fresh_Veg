@@ -138,7 +138,7 @@ class AdminScaffold extends ConsumerWidget {
       builder: (ctx) => AlertDialog(
         title: const Text('Sign Out of Admin Console?'),
         content: const Text(
-          'Are you sure you want to log out of the KisanFresh administrative portal?',
+          'Are you sure you want to log out of the Vegora administrative portal?',
         ),
         actions: [
           TextButton(
@@ -300,15 +300,26 @@ class AdminScaffold extends ConsumerWidget {
               child: Row(
                 children: [
                   Container(
-                    padding: const EdgeInsets.all(8),
+                    width: 36,
+                    height: 36,
                     decoration: BoxDecoration(
-                      color: AppColors.primaryContainer,
-                      borderRadius: BorderRadius.circular(10),
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(8),
+                      boxShadow: [
+                        BoxShadow(
+                          color: AppColors.primary.withValues(alpha: 0.12),
+                          blurRadius: 6,
+                          offset: const Offset(0, 2),
+                        ),
+                      ],
                     ),
-                    child: const Icon(
-                      Icons.eco_rounded,
-                      color: AppColors.primary,
-                      size: 22,
+                    padding: const EdgeInsets.all(4),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(6),
+                      child: Image.asset(
+                        'assets/branding/vegora_app_icon.jpg',
+                        fit: BoxFit.contain,
+                      ),
                     ),
                   ),
                   const SizedBox(width: 12),
@@ -318,9 +329,9 @@ class AdminScaffold extends ConsumerWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: const [
                         Text(
-                          'KisanFresh',
+                          'Vegora',
                           style: TextStyle(
-                            fontSize: 17,
+                            fontSize: 18,
                             fontWeight: FontWeight.w900,
                             color: AppColors.primary,
                           ),
@@ -399,10 +410,10 @@ class AdminScaffold extends ConsumerWidget {
           UserAccountsDrawerHeader(
             decoration: const BoxDecoration(color: AppColors.primary),
             accountName: const Text(
-              'KisanFresh Admin Hub',
+              'Vegora Admin Hub',
               style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
             ),
-            accountEmail: const Text('admin@kisanfresh.com'),
+            accountEmail: const Text('admin@vegora.in'),
             currentAccountPicture: const CircleAvatar(
               backgroundColor: Colors.white,
               child: Icon(

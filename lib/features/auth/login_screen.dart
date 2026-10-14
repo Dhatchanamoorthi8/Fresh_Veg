@@ -172,28 +172,40 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 // Brand Header
+                // Brand Header with Vegora Logo
                 Center(
                   child: Container(
-                    padding: const EdgeInsets.all(16),
+                    width: 80,
+                    height: 80,
                     decoration: BoxDecoration(
-                      color: AppColors.primaryContainer.withValues(alpha: 0.5),
-                      shape: BoxShape.circle,
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(20),
+                      boxShadow: [
+                        BoxShadow(
+                          color: AppColors.primary.withValues(alpha: 0.12),
+                          blurRadius: 18,
+                          offset: const Offset(0, 6),
+                        ),
+                      ],
                     ),
-                    child: const Icon(
-                      Icons.eco_rounded,
-                      color: AppColors.primary,
-                      size: 48,
+                    padding: const EdgeInsets.all(8),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(14),
+                      child: Image.asset(
+                        'assets/branding/vegora_app_icon.jpg',
+                        fit: BoxFit.contain,
+                      ),
                     ),
                   ),
                 ),
-                const SizedBox(height: 16),
+                const SizedBox(height: 14),
                 const Center(
                   child: Text(
-                    'KisanFresh',
+                    'Vegora',
                     style: TextStyle(
-                      fontSize: 26,
-                      fontWeight: FontWeight.w800,
-                      color: AppColors.primaryDark,
+                      fontSize: 28,
+                      fontWeight: FontWeight.w900,
+                      color: AppColors.primary,
                       letterSpacing: -0.5,
                     ),
                   ),
@@ -201,14 +213,15 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 const SizedBox(height: 4),
                 const Center(
                   child: Text(
-                    'Fresh Farm Vegetables & Daily Groceries',
+                    'Freshness at Your Doorstep.',
                     style: TextStyle(
                       fontSize: 13,
-                      color: AppColors.textSecondary,
+                      fontWeight: FontWeight.w600,
+                      color: AppColors.secondary,
                     ),
                   ),
                 ),
-                const SizedBox(height: 28),
+                const SizedBox(height: 24),
 
                 // Card Container
                 Container(
