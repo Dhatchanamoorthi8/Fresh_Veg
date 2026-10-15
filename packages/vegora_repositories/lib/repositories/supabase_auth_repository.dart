@@ -111,10 +111,22 @@ class SupabaseAuthRepository {
   }
 
   /// Real Supabase Password Reset Email
-  Future<void> resetPasswordForEmail(String email) async {
+  Future<void> resetPasswordForEmail(String email, {String? redirectTo}) async {
     await _client.auth.resetPasswordForEmail(
       email.trim(),
-      redirectTo: kIsWeb ? null : 'io.supabase.kisanfresh://reset-callback',
+      redirectTo: redirectTo ?? (kIsWeb ? null : 'io.supabase.kisanfresh://reset-callback'),
+    );
+  }
+
+  /// Verify Recovery OTP (used for verifying 6-digit confirmation code from email)
+  Future<AuthResponse> verifyRecoveryOtp({
+    required String email,
+    required String token,
+  }) async {
+    return await _client.auth.verifyOTP(
+      email: email.trim(),
+      token: token.trim(),
+      type: OtpType.recovery,
     );
   }
 

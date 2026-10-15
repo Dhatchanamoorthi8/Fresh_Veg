@@ -200,12 +200,11 @@ class _DeliveryLoginScreenState extends ConsumerState<DeliveryLoginScreen> {
                           borderRadius: BorderRadius.circular(12),
                         ),
                       ),
-                      validator: (value) {
-                        if (value == null || value.trim().isEmpty) {
-                          return 'Please enter your delivery account email';
-                        }
-                        return null;
-                      },
+                      validator: (value) => EmailValidator.validate(
+                        value,
+                        fieldName: 'delivery account email',
+                        example: 'delivery@vegora.in',
+                      ),
                     ),
                     const SizedBox(height: 16),
 

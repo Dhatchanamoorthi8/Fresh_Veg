@@ -219,12 +219,11 @@ class _StaffLoginScreenState extends ConsumerState<StaffLoginScreen> {
                           borderRadius: BorderRadius.circular(12),
                         ),
                       ),
-                      validator: (value) {
-                        if (value == null || value.trim().isEmpty) {
-                          return 'Please enter your staff email';
-                        }
-                        return null;
-                      },
+                      validator: (value) => EmailValidator.validate(
+                        value,
+                        fieldName: 'staff email',
+                        example: 'staff@branch.vegora.in',
+                      ),
                     ),
                     const SizedBox(height: 16),
 
@@ -263,7 +262,7 @@ class _StaffLoginScreenState extends ConsumerState<StaffLoginScreen> {
                       alignment: Alignment.centerRight,
                       child: TextButton(
                         onPressed: () =>
-                            context.push('/customer/forgot-password'),
+                            context.push('/admin/forgot-password'),
                         child: const Text(
                           'Forgot Password?',
                           style: TextStyle(

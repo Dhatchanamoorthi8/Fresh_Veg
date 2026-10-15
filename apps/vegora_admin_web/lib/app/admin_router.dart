@@ -16,7 +16,9 @@ import '../features/admin/admin_reports_screen.dart';
 import '../features/admin/admin_settings_screen.dart';
 import '../features/admin/admin_staff_management_screen.dart';
 import '../features/admin/admin_vegetables_screen.dart';
+import '../features/auth/admin_forgot_password_screen.dart';
 import '../features/auth/admin_login_screen.dart';
+import '../features/auth/admin_reset_password_screen.dart';
 import '../features/auth/staff_login_screen.dart';
 import '../features/branch_staff/branch_staff_screen.dart';
 
@@ -34,6 +36,9 @@ class AdminAuthListenable extends ChangeNotifier {
     if (_sub != null) return;
     try {
       _sub = Supabase.instance.client.auth.onAuthStateChange.listen((data) {
+        if (data.event == AuthChangeEvent.passwordRecovery) {
+          adminRouter.go('/admin/reset-password');
+        }
         notifyListeners();
       });
     } catch (_) {}
@@ -68,8 +73,16 @@ final adminRouter = GoRouter(
       final isAuthenticated = user != null;
       final loc = state.matchedLocation;
 
-      final isAuthScreen = loc == '/admin/login' || loc == '/staff/login';
+      final isAuthScreen = loc == '/admin/login' ||
+          loc == '/staff/login' ||
+          loc == '/admin/forgot-password' ||
+          loc == '/admin/reset-password';
+
       if (isAuthenticated && isAuthScreen) {
+        // Allow resetting administrator password under recovery session
+        if (loc == '/admin/reset-password') {
+          return null;
+        }
         return '/admin';
       }
       if (!isAuthenticated && !isAuthScreen) {
@@ -86,6 +99,14 @@ final adminRouter = GoRouter(
     GoRoute(
       path: '/admin/login',
       builder: (context, state) => const AdminLoginScreen(),
+    ),
+    GoRoute(
+      path: '/admin/forgot-password',
+      builder: (context, state) => const AdminForgotPasswordScreen(),
+    ),
+    GoRoute(
+      path: '/admin/reset-password',
+      builder: (context, state) => const AdminResetPasswordScreen(),
     ),
     GoRoute(
       path: '/admin',

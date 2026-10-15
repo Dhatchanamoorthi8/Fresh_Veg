@@ -7,7 +7,8 @@ plugins {
 android {
     namespace = "com.vegora.vegora_customer"
     compileSdk = flutter.compileSdkVersion
-    ndkVersion = flutter.ndkVersion
+    val envNdk = System.getenv("ANDROID_NDK_VERSION")
+    ndkVersion = if (!envNdk.isNullOrBlank()) envNdk else flutter.ndkVersion
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17

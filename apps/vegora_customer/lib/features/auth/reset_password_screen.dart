@@ -40,14 +40,15 @@ class _ResetPasswordScreenState extends ConsumerState<ResetPasswordScreen> {
 
     try {
       final authRepo = ref.read(authRepositoryProvider);
-      await authRepo.updateUserPassword(_passwordController.text);
+      await authRepo.updateUserPassword(_passwordController.text.trim());
+      await authRepo.signOut();
 
       if (!mounted) return;
       setState(() => _isLoading = false);
 
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('Password updated successfully! You can now log in.'),
+          content: Text('Password updated successfully! You can now log in with your new password.'),
           backgroundColor: AppColors.primary,
         ),
       );

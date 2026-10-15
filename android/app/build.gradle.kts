@@ -7,7 +7,8 @@ plugins {
 android {
     namespace = "com.example.vegetable_shop"
     compileSdk = flutter.compileSdkVersion
-    ndkVersion = flutter.ndkVersion
+    val envNdk = System.getenv("ANDROID_NDK_VERSION")
+    ndkVersion = if (!envNdk.isNullOrBlank()) envNdk else flutter.ndkVersion
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17

@@ -285,16 +285,10 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                               borderRadius: BorderRadius.circular(12),
                             ),
                           ),
-                          validator: (val) {
-                            if (val == null || val.trim().isEmpty) {
-                              return 'Please enter your email address';
-                            }
-                            if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$')
-                                .hasMatch(val.trim())) {
-                              return 'Enter a valid email address';
-                            }
-                            return null;
-                          },
+                          validator: (val) => EmailValidator.validate(
+                            val,
+                            fieldName: 'email address',
+                          ),
                         ),
                         const SizedBox(height: 16),
 

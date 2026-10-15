@@ -7,6 +7,7 @@ import '../../shared/models/user_role.dart';
 import '../../shared/providers/app_providers.dart';
 import '../../shared/providers/auth_provider.dart';
 import '../../core/utils/auth_error_parser.dart';
+import '../../core/utils/email_validator.dart';
 import '../../app/router.dart';
 
 class AdminLoginScreen extends ConsumerStatefulWidget {
@@ -477,12 +478,11 @@ class _AdminLoginScreenState extends ConsumerState<AdminLoginScreen> {
                           borderRadius: BorderRadius.circular(12),
                         ),
                       ),
-                      validator: (value) {
-                        if (value == null || value.trim().isEmpty) {
-                          return 'Please enter your administrator email';
-                        }
-                        return null;
-                      },
+                      validator: (value) => EmailValidator.validate(
+                        value,
+                        fieldName: 'administrator email',
+                        example: 'admin@vegora.in',
+                      ),
                     ),
                     const SizedBox(height: 16),
 
@@ -523,7 +523,7 @@ class _AdminLoginScreenState extends ConsumerState<AdminLoginScreen> {
                       alignment: Alignment.centerRight,
                       child: TextButton(
                         onPressed: () =>
-                            context.push('/customer/forgot-password'),
+                            context.push('/admin/forgot-password'),
                         child: const Text(
                           'Forgot Password?',
                           style: TextStyle(

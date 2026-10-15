@@ -188,8 +188,10 @@ class _AdminLoginScreenState extends ConsumerState<AdminLoginScreen> {
                         isDense: true,
                         border: OutlineInputBorder(),
                       ),
-                      validator: (v) =>
-                          v?.trim().isEmpty == true ? 'Required' : null,
+                      validator: (v) => EmailValidator.validate(
+                        v,
+                        fieldName: 'admin email',
+                      ),
                     ),
                     const SizedBox(height: 12),
                     TextFormField(
@@ -297,50 +299,6 @@ class _AdminLoginScreenState extends ConsumerState<AdminLoginScreen> {
     );
   }
 
-  void _showForgotPasswordDialog() {
-    showDialog(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: Row(
-          children: const [
-            Icon(Icons.lock_reset_rounded, color: AppColors.primary),
-            SizedBox(width: 8),
-            Text('Admin Password Recovery'),
-          ],
-        ),
-        content: const Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'For enterprise security on administrative portals, credentials cannot be reset self-service from this public console.',
-              style: TextStyle(fontSize: 13, height: 1.4),
-            ),
-            SizedBox(height: 12),
-            Text(
-              '• Contact your Super Administrator for credentials recovery.\n• Or use the Supabase Project Dashboard under Authentication -> Users -> Send Password Reset Email.',
-              style: TextStyle(
-                fontSize: 12,
-                color: AppColors.textSecondary,
-                height: 1.4,
-              ),
-            ),
-          ],
-        ),
-        actions: [
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.primary,
-              foregroundColor: Colors.white,
-            ),
-            onPressed: () => Navigator.pop(ctx),
-            child: const Text('Understood'),
-          ),
-        ],
-      ),
-    );
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -564,16 +522,11 @@ class _AdminLoginScreenState extends ConsumerState<AdminLoginScreen> {
                           borderRadius: BorderRadius.circular(12),
                         ),
                       ),
-                      validator: (value) {
-                        if (value == null || value.trim().isEmpty) {
-                          return 'Please enter your administrator email';
-                        }
-                        if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$')
-                            .hasMatch(value.trim())) {
-                          return 'Enter a valid email address (e.g. admin@vegora.in)';
-                        }
-                        return null;
-                      },
+                      validator: (value) => EmailValidator.validate(
+                        value,
+                        fieldName: 'administrator email',
+                        example: 'admin@vegora.in',
+                      ),
                     ),
                     const SizedBox(height: 16),
 
@@ -616,7 +569,7 @@ class _AdminLoginScreenState extends ConsumerState<AdminLoginScreen> {
                     Align(
                       alignment: Alignment.centerRight,
                       child: TextButton(
-                        onPressed: _showForgotPasswordDialog,
+                        onPressed: () => context.push('/admin/forgot-password'),
                         child: const Text(
                           'Forgot Password?',
                           style: TextStyle(

@@ -35,6 +35,9 @@ class CustomerAuthListenable extends ChangeNotifier {
     if (_sub != null) return;
     try {
       _sub = Supabase.instance.client.auth.onAuthStateChange.listen((data) {
+        if (data.event == AuthChangeEvent.passwordRecovery) {
+          customerRouter.go('/customer/reset-password');
+        }
         notifyListeners();
       });
     } catch (_) {
@@ -92,8 +95,11 @@ final customerRouter = GoRouter(
           loc == '/customer/reset-password';
 
       // 1. Authenticated users:
-      // Redirect away from splash or auth forms directly to the storefront home.
       if (isAuthenticated) {
+        // Allow resetting password under recovery session
+        if (loc == '/customer/reset-password') {
+          return null;
+        }
         if (loc == '/' || isAuthRoute) {
           return '/home';
         }

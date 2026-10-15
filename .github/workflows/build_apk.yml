@@ -28,6 +28,24 @@ jobs:
           channel: 'stable'
           cache: true
 
+      - name: Detect and Configure Android NDK
+        run: |
+          echo "Checking pre-installed Android NDK versions on runner..."
+          ls -la /usr/local/lib/android/sdk/ndk/ || true
+          
+          # Clean any stale/partial download intermediates from previous runs or sdkmanager
+          rm -rf /usr/local/lib/android/sdk/.downloadIntermediates/ || true
+          
+          # Detect the latest pre-installed NDK version on the runner
+          DETECTED_NDK=$(ls -1 /usr/local/lib/android/sdk/ndk/ 2>/dev/null | grep -E '^[0-9]+' | sort -V | tail -n 1)
+          if [ -n "$DETECTED_NDK" ]; then
+            echo "Selected pre-installed NDK: $DETECTED_NDK"
+            echo "ANDROID_NDK_VERSION=$DETECTED_NDK" >> $GITHUB_ENV
+          else
+            echo "No pre-installed NDK detected, setting default stable NDK: 27.3.13750724"
+            echo "ANDROID_NDK_VERSION=27.3.13750724" >> $GITHUB_ENV
+          fi
+
       - name: Install Dependencies
         run: flutter pub get
 

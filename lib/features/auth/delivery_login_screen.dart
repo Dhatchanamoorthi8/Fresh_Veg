@@ -7,6 +7,7 @@ import '../../shared/models/user_role.dart';
 import '../../shared/providers/app_providers.dart';
 import '../../shared/providers/auth_provider.dart';
 import '../../core/utils/auth_error_parser.dart';
+import '../../core/utils/email_validator.dart';
 import '../../app/router.dart';
 
 class DeliveryLoginScreen extends ConsumerStatefulWidget {
@@ -204,12 +205,11 @@ class _DeliveryLoginScreenState extends ConsumerState<DeliveryLoginScreen> {
                           borderRadius: BorderRadius.circular(12),
                         ),
                       ),
-                      validator: (value) {
-                        if (value == null || value.trim().isEmpty) {
-                          return 'Please enter your delivery account email';
-                        }
-                        return null;
-                      },
+                      validator: (value) => EmailValidator.validate(
+                        value,
+                        fieldName: 'delivery account email',
+                        example: 'delivery@vegora.in',
+                      ),
                     ),
                     const SizedBox(height: 16),
 

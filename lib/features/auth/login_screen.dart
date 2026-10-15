@@ -7,6 +7,7 @@ import '../../core/constants/app_colors.dart';
 import '../../shared/providers/app_providers.dart';
 import '../../shared/providers/auth_provider.dart';
 import '../../core/utils/auth_error_parser.dart';
+import '../../core/utils/email_validator.dart';
 import '../../app/router.dart';
 
 class LoginScreen extends ConsumerStatefulWidget {
@@ -286,16 +287,10 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                               borderRadius: BorderRadius.circular(12),
                             ),
                           ),
-                          validator: (val) {
-                            if (val == null || val.trim().isEmpty) {
-                              return 'Please enter your email address';
-                            }
-                            if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$')
-                                .hasMatch(val.trim())) {
-                              return 'Enter a valid email address';
-                            }
-                            return null;
-                          },
+                          validator: (val) => EmailValidator.validate(
+                            val,
+                            fieldName: 'email address',
+                          ),
                         ),
                         const SizedBox(height: 16),
 

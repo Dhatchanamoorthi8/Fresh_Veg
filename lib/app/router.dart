@@ -16,7 +16,9 @@ import '../features/admin/admin_reports_screen.dart';
 import '../features/admin/admin_settings_screen.dart';
 import '../features/admin/admin_staff_management_screen.dart';
 import '../features/admin/admin_vegetables_screen.dart';
+import '../features/auth/admin_forgot_password_screen.dart';
 import '../features/auth/admin_login_screen.dart';
+import '../features/auth/admin_reset_password_screen.dart';
 import '../features/auth/delivery_login_screen.dart';
 import '../features/auth/forgot_password_screen.dart';
 import '../features/auth/login_screen.dart';
@@ -53,6 +55,9 @@ class AppAuthListenable extends ChangeNotifier {
     if (_sub != null) return;
     try {
       _sub = Supabase.instance.client.auth.onAuthStateChange.listen((data) {
+        if (data.event == AuthChangeEvent.passwordRecovery) {
+          appRouter.go('/customer/reset-password');
+        }
         notifyListeners();
       });
     } catch (_) {
@@ -110,8 +115,10 @@ final appRouter = GoRouter(
           loc == '/customer/reset-password';
 
       // 1. Authenticated users:
-      // Redirect away from splash or auth forms directly to the storefront home.
       if (isAuthenticated) {
+        if (loc == '/customer/reset-password' || loc == '/admin/reset-password') {
+          return null;
+        }
         if (loc == '/' || isAuthRoute) {
           return '/home';
         }
@@ -120,6 +127,8 @@ final appRouter = GoRouter(
       final isPublicAuth =
           loc == '/' ||
           loc == '/admin/login' ||
+          loc == '/admin/forgot-password' ||
+          loc == '/admin/reset-password' ||
           loc == '/staff/login' ||
           loc == '/delivery/login' ||
           loc == '/branches' ||
@@ -175,6 +184,16 @@ final appRouter = GoRouter(
       parentNavigatorKey: _rootNavigatorKey,
       path: '/admin/login',
       builder: (context, state) => const AdminLoginScreen(),
+    ),
+    GoRoute(
+      parentNavigatorKey: _rootNavigatorKey,
+      path: '/admin/forgot-password',
+      builder: (context, state) => const AdminForgotPasswordScreen(),
+    ),
+    GoRoute(
+      parentNavigatorKey: _rootNavigatorKey,
+      path: '/admin/reset-password',
+      builder: (context, state) => const AdminResetPasswordScreen(),
     ),
     GoRoute(
       parentNavigatorKey: _rootNavigatorKey,
