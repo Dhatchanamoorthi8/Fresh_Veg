@@ -1,0 +1,17 @@
+name: vegora_core
+description: Core tokens, theme, branding assets, and formatting utilities for Vegora.
+version: 1.0.0
+publish_to: 'none'
+
+environment:
+  sdk: ^3.13.5
+  flutter: ">=3.24.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  intl: ^0.20.3
+
+flutter:
+  assets:
+    - assets/branding/

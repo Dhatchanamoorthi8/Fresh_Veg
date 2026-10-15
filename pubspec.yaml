@@ -40,6 +40,16 @@ dependencies:
   supabase_flutter: ^2.18.3
   image_picker: ^1.2.4
 
+  # Local Monorepo Packages
+  vegora_core:
+    path: packages/vegora_core
+  vegora_models:
+    path: packages/vegora_models
+  vegora_repositories:
+    path: packages/vegora_repositories
+  vegora_ui:
+    path: packages/vegora_ui
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

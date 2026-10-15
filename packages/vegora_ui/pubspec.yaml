@@ -1,0 +1,21 @@
+name: vegora_ui
+description: Shared UI widgets, cards, and dialogs for Vegora.
+version: 1.0.0
+publish_to: 'none'
+
+environment:
+  sdk: ^3.13.5
+  flutter: ">=3.24.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_riverpod: ^3.4.3
+  go_router: ^18.0.2
+  intl: ^0.20.3
+  vegora_core:
+    path: ../vegora_core
+  vegora_models:
+    path: ../vegora_models
+  vegora_repositories:
+    path: ../vegora_repositories

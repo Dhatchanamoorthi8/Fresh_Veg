@@ -1,0 +1,14 @@
+name: vegora_models
+description: Domain models, entities, and enums for Vegora.
+version: 1.0.0
+publish_to: 'none'
+
+environment:
+  sdk: ^3.13.5
+  flutter: ">=3.24.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  vegora_core:
+    path: ../vegora_core

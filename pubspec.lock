@@ -762,6 +762,34 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.4.0"
+  vegora_core:
+    dependency: "direct main"
+    description:
+      path: "packages/vegora_core"
+      relative: true
+    source: path
+    version: "1.0.0"
+  vegora_models:
+    dependency: "direct main"
+    description:
+      path: "packages/vegora_models"
+      relative: true
+    source: path
+    version: "1.0.0"
+  vegora_repositories:
+    dependency: "direct main"
+    description:
+      path: "packages/vegora_repositories"
+      relative: true
+    source: path
+    version: "1.0.0"
+  vegora_ui:
+    dependency: "direct main"
+    description:
+      path: "packages/vegora_ui"
+      relative: true
+    source: path
+    version: "1.0.0"
   vm_service:
     dependency: transitive
     description:

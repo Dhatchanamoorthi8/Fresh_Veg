@@ -1,0 +1,41 @@
+name: vegora_admin_web
+description: "Vegora Admin & Store Staff Web Console."
+publish_to: 'none'
+
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.13.5
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  cupertino_icons: ^1.0.8
+  flutter_riverpod: ^3.4.3
+  go_router: ^18.0.2
+  intl: ^0.20.3
+  supabase_flutter: ^2.18.3
+  image_picker: ^1.2.4
+
+  # Local Monorepo Packages
+  vegora_core:
+    path: ../../packages/vegora_core
+  vegora_models:
+    path: ../../packages/vegora_models
+  vegora_repositories:
+    path: ../../packages/vegora_repositories
+  vegora_ui:
+    path: ../../packages/vegora_ui
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+
+flutter:
+  uses-material-design: true
+
+  assets:
+    - assets/branding/
+    - assets/images/
