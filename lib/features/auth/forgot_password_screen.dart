@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../core/constants/app_colors.dart';
+import '../../core/utils/auth_error_parser.dart';
 import '../../shared/providers/app_providers.dart';
 
 class ForgotPasswordScreen extends ConsumerStatefulWidget {
@@ -48,7 +49,7 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
       if (!mounted) return;
       setState(() {
         _isLoading = false;
-        _errorMessage = e.toString().replaceAll('Exception:', '').trim();
+        _errorMessage = AuthErrorParser.parse(e);
       });
     }
   }

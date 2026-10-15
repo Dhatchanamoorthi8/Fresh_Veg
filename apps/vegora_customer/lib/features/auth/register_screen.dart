@@ -164,18 +164,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
   }
 
   String _parseAuthError(Object error) {
-    final str = error.toString().toLowerCase();
-    if (str.contains('user already registered') ||
-        str.contains('already exists')) {
-      return 'An account with this email already exists. Please log in.';
-    }
-    if (str.contains('password')) {
-      return 'Password must be at least 6 characters long.';
-    }
-    if (str.contains('network') || str.contains('socketexception')) {
-      return 'Network connection error. Please check your internet connection.';
-    }
-    return 'Registration failed: ${error.toString().replaceAll("Exception:", "").trim()}';
+    return AuthErrorParser.parse(error);
   }
 
   @override

@@ -6,6 +6,8 @@ import 'package:vegora_core/vegora_core.dart';
 import 'package:vegora_models/vegora_models.dart';
 import 'package:vegora_repositories/vegora_repositories.dart';
 
+import '../../app/admin_router.dart';
+
 class AdminLoginScreen extends ConsumerStatefulWidget {
   const AdminLoginScreen({super.key});
 
@@ -92,12 +94,13 @@ class _AdminLoginScreenState extends ConsumerState<AdminLoginScreen> {
       if (!mounted) return;
       setState(() => _isLoading = false);
 
+      AdminAuthListenable.instance.notify();
       context.go('/admin');
     } catch (e) {
       if (!mounted) return;
       setState(() {
         _isLoading = false;
-        _errorMessage = e.toString().replaceAll('Exception:', '').trim();
+        _errorMessage = AuthErrorParser.parse(e);
       });
     }
   }
@@ -294,6 +297,51 @@ class _AdminLoginScreenState extends ConsumerState<AdminLoginScreen> {
     );
   }
 
+  void _showForgotPasswordDialog() {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        title: Row(
+          children: const [
+            Icon(Icons.lock_reset_rounded, color: AppColors.primary),
+            SizedBox(width: 8),
+            Text('Admin Password Recovery'),
+          ],
+        ),
+        content: const Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'For enterprise security on administrative portals, credentials cannot be reset self-service from this public console.',
+              style: TextStyle(fontSize: 13, height: 1.4),
+            ),
+            SizedBox(height: 12),
+            Text(
+              '• Contact your Super Administrator for credentials recovery.\n• Or use the Supabase Project Dashboard under Authentication -> Users -> Send Password Reset Email.',
+              style: TextStyle(
+                fontSize: 12,
+                color: AppColors.textSecondary,
+                height: 1.4,
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.primary,
+              foregroundColor: Colors.white,
+            ),
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('Understood'),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -428,31 +476,74 @@ class _AdminLoginScreenState extends ConsumerState<AdminLoginScreen> {
                     // Error Box
                     if (_errorMessage != null) ...[
                       Container(
-                        padding: const EdgeInsets.all(12),
+                        padding: const EdgeInsets.all(14),
                         decoration: BoxDecoration(
                           color: AppColors.errorContainer,
-                          borderRadius: BorderRadius.circular(10),
+                          borderRadius: BorderRadius.circular(12),
                           border: Border.all(
-                            color: AppColors.error.withValues(alpha: 0.3),
+                            color: AppColors.error.withValues(alpha: 0.35),
                           ),
                         ),
                         child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            const Icon(
-                              Icons.gpp_bad_rounded,
-                              color: AppColors.error,
-                              size: 20,
-                            ),
-                            const SizedBox(width: 10),
-                            Expanded(
-                              child: Text(
-                                _errorMessage!,
-                                style: const TextStyle(
-                                  color: AppColors.error,
-                                  fontSize: 13,
-                                  fontWeight: FontWeight.w500,
-                                ),
+                            const Padding(
+                              padding: EdgeInsets.only(top: 2),
+                              child: Icon(
+                                Icons.error_outline_rounded,
+                                color: AppColors.error,
+                                size: 20,
                               ),
+                            ),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    _errorMessage!,
+                                    style: const TextStyle(
+                                      color: AppColors.error,
+                                      fontSize: 13,
+                                      fontWeight: FontWeight.w600,
+                                      height: 1.35,
+                                    ),
+                                  ),
+                                  if (_errorMessage!.contains('Invalid email address') && _bootstrapAvailable) ...[
+                                    const SizedBox(height: 8),
+                                    const Text(
+                                      'First time setting up? The database has no administrator provisioned yet.',
+                                      style: TextStyle(
+                                        fontSize: 11,
+                                        color: AppColors.textSecondary,
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 6),
+                                    OutlinedButton.icon(
+                                      style: OutlinedButton.styleFrom(
+                                        foregroundColor: Colors.amber.shade900,
+                                        side: BorderSide(color: Colors.amber.shade600),
+                                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                                        visualDensity: VisualDensity.compact,
+                                      ),
+                                      icon: const Icon(Icons.key_rounded, size: 14),
+                                      label: const Text(
+                                        'Provision Root Administrator Now',
+                                        style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold),
+                                      ),
+                                      onPressed: _showBootstrapModal,
+                                    ),
+                                  ],
+                                ],
+                              ),
+                            ),
+                            IconButton(
+                              icon: const Icon(Icons.close_rounded, size: 16),
+                              color: AppColors.error,
+                              padding: EdgeInsets.zero,
+                              constraints: const BoxConstraints(),
+                              onPressed: () => setState(() => _errorMessage = null),
                             ),
                           ],
                         ),
@@ -476,6 +567,10 @@ class _AdminLoginScreenState extends ConsumerState<AdminLoginScreen> {
                       validator: (value) {
                         if (value == null || value.trim().isEmpty) {
                           return 'Please enter your administrator email';
+                        }
+                        if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$')
+                            .hasMatch(value.trim())) {
+                          return 'Enter a valid email address (e.g. admin@vegora.in)';
                         }
                         return null;
                       },
@@ -509,6 +604,9 @@ class _AdminLoginScreenState extends ConsumerState<AdminLoginScreen> {
                         if (value == null || value.isEmpty) {
                           return 'Please enter your password';
                         }
+                        if (value.length < 6) {
+                          return 'Password must be at least 6 characters';
+                        }
                         return null;
                       },
                     ),
@@ -518,8 +616,7 @@ class _AdminLoginScreenState extends ConsumerState<AdminLoginScreen> {
                     Align(
                       alignment: Alignment.centerRight,
                       child: TextButton(
-                        onPressed: () =>
-                            context.push('/customer/forgot-password'),
+                        onPressed: _showForgotPasswordDialog,
                         child: const Text(
                           'Forgot Password?',
                           style: TextStyle(
@@ -567,13 +664,31 @@ class _AdminLoginScreenState extends ConsumerState<AdminLoginScreen> {
                     ),
                     const SizedBox(height: 24),
 
-                    // Return to customer app
-                    Center(
-                      child: TextButton.icon(
-                        icon: const Icon(Icons.shopping_bag_outlined, size: 16),
-                        label: const Text('Back to Vegora Store'),
-                        onPressed: () => context.go('/home'),
-                      ),
+                    // Portal Navigation Links
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        TextButton.icon(
+                          icon: const Icon(Icons.storefront_rounded, size: 16),
+                          label: const Text('Store Staff Portal'),
+                          onPressed: () => context.go('/staff/login'),
+                        ),
+                        const Padding(
+                          padding: EdgeInsets.symmetric(horizontal: 4),
+                          child: Text('•', style: TextStyle(color: AppColors.border)),
+                        ),
+                        TextButton.icon(
+                          icon: const Icon(Icons.refresh_rounded, size: 16),
+                          label: const Text('Clear Form'),
+                          onPressed: () {
+                            setState(() {
+                              _errorMessage = null;
+                              _emailController.clear();
+                              _passwordController.clear();
+                            });
+                          },
+                        ),
+                      ],
                     ),
                   ],
                 ),

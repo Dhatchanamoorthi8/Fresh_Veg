@@ -7,6 +7,8 @@ import 'package:vegora_models/vegora_models.dart';
 import 'package:vegora_repositories/vegora_repositories.dart';
 import 'package:vegora_ui/vegora_ui.dart';
 
+import '../../app/customer_router.dart';
+
 class ProfileScreen extends ConsumerWidget {
   const ProfileScreen({super.key});
 
@@ -387,12 +389,15 @@ class ProfileScreen extends ConsumerWidget {
                 label: const Text('Sign Out'),
                 onPressed: () async {
                   await ref.read(authRepositoryProvider).signOut();
+                  ref.read(customerNameProvider.notifier).setName('');
                   ref.read(customerPhoneProvider.notifier).setPhone(null);
                   ref.invalidate(userProfileProvider);
+                  CustomerAuthListenable.instance.notify();
                   if (context.mounted) {
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(content: Text('Successfully signed out.')),
                     );
+                    context.go('/login');
                   }
                 },
               ),

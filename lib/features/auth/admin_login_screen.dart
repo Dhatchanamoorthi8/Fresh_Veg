@@ -6,6 +6,8 @@ import '../../core/constants/app_colors.dart';
 import '../../shared/models/user_role.dart';
 import '../../shared/providers/app_providers.dart';
 import '../../shared/providers/auth_provider.dart';
+import '../../core/utils/auth_error_parser.dart';
+import '../../app/router.dart';
 
 class AdminLoginScreen extends ConsumerStatefulWidget {
   const AdminLoginScreen({super.key});
@@ -93,12 +95,13 @@ class _AdminLoginScreenState extends ConsumerState<AdminLoginScreen> {
       if (!mounted) return;
       setState(() => _isLoading = false);
 
+      AppAuthListenable.instance.notify();
       context.go('/admin');
     } catch (e) {
       if (!mounted) return;
       setState(() {
         _isLoading = false;
-        _errorMessage = e.toString().replaceAll('Exception:', '').trim();
+        _errorMessage = AuthErrorParser.parse(e);
       });
     }
   }

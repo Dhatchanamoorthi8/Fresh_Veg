@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -20,6 +21,43 @@ import '../features/profile/profile_screen.dart';
 import '../features/splash/splash_screen.dart';
 import 'customer_shell.dart';
 
+/// Listenable that notifies GoRouter whenever the Supabase authentication
+/// session changes (sign in, sign out, token refresh).
+class CustomerAuthListenable extends ChangeNotifier {
+  static final CustomerAuthListenable instance = CustomerAuthListenable._();
+  CustomerAuthListenable._() {
+    _trySubscribe();
+  }
+
+  StreamSubscription<AuthState>? _sub;
+
+  void _trySubscribe() {
+    if (_sub != null) return;
+    try {
+      _sub = Supabase.instance.client.auth.onAuthStateChange.listen((data) {
+        notifyListeners();
+      });
+    } catch (_) {
+      // Supabase uninitialized yet
+    }
+  }
+
+  void initialize() {
+    _trySubscribe();
+    notifyListeners();
+  }
+
+  void notify() {
+    notifyListeners();
+  }
+
+  @override
+  void dispose() {
+    _sub?.cancel();
+    super.dispose();
+  }
+}
+
 final GlobalKey<NavigatorState> _rootNavigatorKey = GlobalKey<NavigatorState>(
   debugLabel: 'root',
 );
@@ -39,25 +77,38 @@ final GlobalKey<NavigatorState> _shellNavigatorProfile =
 final customerRouter = GoRouter(
   navigatorKey: _rootNavigatorKey,
   initialLocation: '/',
+  refreshListenable: CustomerAuthListenable.instance,
   redirect: (context, state) {
     try {
       final supabaseUser = Supabase.instance.client.auth.currentUser;
       final isAuthenticated = supabaseUser != null;
       final loc = state.matchedLocation;
 
-      final isPublicAuth =
-          loc == '/' ||
+      final isAuthRoute =
           loc == '/login' ||
           loc == '/customer/login' ||
           loc == '/customer/register' ||
           loc == '/customer/forgot-password' ||
-          loc == '/customer/reset-password' ||
-          loc == '/branches' ||
-          loc == '/home' ||
-          loc == '/catalog' ||
-          loc.startsWith('/product/');
+          loc == '/customer/reset-password';
 
-      if (!isAuthenticated && !isPublicAuth) {
+      // 1. Authenticated users:
+      // Redirect away from splash or auth forms directly to the storefront home.
+      if (isAuthenticated) {
+        if (loc == '/' || isAuthRoute) {
+          return '/home';
+        }
+      }
+
+      // 2. Unauthenticated users:
+      // Protect private customer accounts: profile, orders, checkout, tracking
+      final isProtected =
+          loc == '/profile' ||
+          loc == '/orders' ||
+          loc == '/checkout' ||
+          loc == '/order-confirmation' ||
+          loc.startsWith('/tracking/');
+
+      if (!isAuthenticated && isProtected) {
         return '/login';
       }
     } catch (_) {

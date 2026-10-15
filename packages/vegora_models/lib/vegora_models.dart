@@ -1,4 +1,4 @@
-library vegora_models;
+library;
 
 export 'models/branch.dart';
 export 'models/cart.dart';

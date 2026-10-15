@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -19,12 +20,48 @@ import '../features/auth/admin_login_screen.dart';
 import '../features/auth/staff_login_screen.dart';
 import '../features/branch_staff/branch_staff_screen.dart';
 
+/// Listenable that notifies GoRouter whenever the Supabase authentication
+/// session changes in the Admin Web portal.
+class AdminAuthListenable extends ChangeNotifier {
+  static final AdminAuthListenable instance = AdminAuthListenable._();
+  AdminAuthListenable._() {
+    _trySubscribe();
+  }
+
+  StreamSubscription<AuthState>? _sub;
+
+  void _trySubscribe() {
+    if (_sub != null) return;
+    try {
+      _sub = Supabase.instance.client.auth.onAuthStateChange.listen((data) {
+        notifyListeners();
+      });
+    } catch (_) {}
+  }
+
+  void initialize() {
+    _trySubscribe();
+    notifyListeners();
+  }
+
+  void notify() {
+    notifyListeners();
+  }
+
+  @override
+  void dispose() {
+    _sub?.cancel();
+    super.dispose();
+  }
+}
+
 final GlobalKey<NavigatorState> _adminNavigatorKey =
     GlobalKey<NavigatorState>(debugLabel: 'adminRoot');
 
 final adminRouter = GoRouter(
   navigatorKey: _adminNavigatorKey,
   initialLocation: '/admin',
+  refreshListenable: AdminAuthListenable.instance,
   redirect: (context, state) {
     try {
       final user = Supabase.instance.client.auth.currentUser;
@@ -32,6 +69,9 @@ final adminRouter = GoRouter(
       final loc = state.matchedLocation;
 
       final isAuthScreen = loc == '/admin/login' || loc == '/staff/login';
+      if (isAuthenticated && isAuthScreen) {
+        return '/admin';
+      }
       if (!isAuthenticated && !isAuthScreen) {
         return '/admin/login';
       }

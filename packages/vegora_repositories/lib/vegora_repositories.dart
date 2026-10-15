@@ -1,4 +1,4 @@
-library vegora_repositories;
+library;
 
 export 'repositories/branch_repository.dart';
 export 'repositories/catalog_repository.dart';

@@ -1,4 +1,4 @@
-library vegora_ui;
+library;
 
 export 'widgets/branch_switch_dialog.dart';
 export 'widgets/empty_state_view.dart';

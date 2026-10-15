@@ -5,11 +5,41 @@ import 'package:go_router/go_router.dart';
 import 'package:vegora_core/vegora_core.dart';
 import 'package:vegora_repositories/vegora_repositories.dart';
 
-class SplashScreen extends ConsumerWidget {
+import 'package:supabase_flutter/supabase_flutter.dart';
+
+class SplashScreen extends ConsumerStatefulWidget {
   const SplashScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<SplashScreen> createState() => _SplashScreenState();
+}
+
+class _SplashScreenState extends ConsumerState<SplashScreen> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      try {
+        if (Supabase.instance.client.auth.currentUser != null) {
+          context.go('/home');
+        }
+      } catch (_) {}
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    // If auth state updates to authenticated, immediately navigate to /home
+    final user = ref.watch(currentSupabaseUserProvider);
+    if (user != null) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) {
+          context.go('/home');
+        }
+      });
+    }
+
     return Scaffold(
       backgroundColor: Colors.white,
       body: SafeArea(
@@ -21,7 +51,7 @@ class SplashScreen extends ConsumerWidget {
               Align(
                 alignment: Alignment.topRight,
                 child: TextButton.icon(
-                  onPressed: () => context.push('/login'),
+                  onPressed: () => context.go('/login'),
                   icon: const Icon(Icons.login_rounded, size: 18),
                   label: const Text(
                     'Sign In',
@@ -116,14 +146,7 @@ class SplashScreen extends ConsumerWidget {
                 width: double.infinity,
                 height: 52,
                 child: ElevatedButton(
-                  onPressed: () {
-                    final user = ref.read(currentSupabaseUserProvider);
-                    if (user != null) {
-                      context.go('/home');
-                    } else {
-                      context.push('/login');
-                    }
-                  },
+                  onPressed: () => context.go('/home'),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.primary,
                     shape: RoundedRectangleBorder(
@@ -154,7 +177,7 @@ class SplashScreen extends ConsumerWidget {
                 width: double.infinity,
                 height: 48,
                 child: OutlinedButton(
-                  onPressed: () => context.push('/login'),
+                  onPressed: () => context.go('/login'),
                   style: OutlinedButton.styleFrom(
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(14),

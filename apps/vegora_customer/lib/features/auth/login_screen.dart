@@ -6,6 +6,8 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:vegora_core/vegora_core.dart';
 import 'package:vegora_repositories/vegora_repositories.dart';
 
+import '../../app/customer_router.dart';
+
 class LoginScreen extends ConsumerStatefulWidget {
   const LoginScreen({super.key});
 
@@ -29,11 +31,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       if (mounted) {
         try {
           if (Supabase.instance.client.auth.currentUser != null) {
-            if (context.canPop()) {
-              context.pop();
-            } else {
-              context.go('/home');
-            }
+            context.go('/home');
           }
         } catch (_) {}
       }
@@ -77,11 +75,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       if (!mounted) return;
       setState(() => _isLoading = false);
 
-      if (context.canPop()) {
-        context.pop();
-      } else {
-        context.go('/home');
-      }
+      CustomerAuthListenable.instance.notify();
+      context.go('/home');
     } catch (e) {
       if (!mounted) return;
       setState(() {
@@ -116,18 +111,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   }
 
   String _parseAuthError(dynamic error) {
-    final msg = error.toString();
-    if (msg.contains('Invalid login credentials')) {
-      return 'Incorrect email address or password. Please verify and retry.';
-    }
-    if (msg.contains('Email not confirmed')) {
-      return 'Your email address has not been confirmed yet. Please check your inbox.';
-    }
-    return msg
-        .replaceAll('AuthApiException', '')
-        .replaceAll('Exception: ', '')
-        .replaceAll('(', '')
-        .replaceAll(')', '');
+    return AuthErrorParser.parse(error);
   }
 
   @override
@@ -150,11 +134,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
           }
         }
         if (context.mounted) {
-          if (context.canPop()) {
-            context.pop();
-          } else {
-            context.go('/home');
-          }
+          CustomerAuthListenable.instance.notify();
+          context.go('/home');
         }
       }
     });

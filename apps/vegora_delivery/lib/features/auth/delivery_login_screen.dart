@@ -79,7 +79,7 @@ class _DeliveryLoginScreenState extends ConsumerState<DeliveryLoginScreen> {
       if (!mounted) return;
       setState(() {
         _isLoading = false;
-        _errorMessage = e.toString().replaceAll('Exception:', '').trim();
+        _errorMessage = AuthErrorParser.parse(e);
       });
     }
   }

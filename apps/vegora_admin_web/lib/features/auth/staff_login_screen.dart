@@ -6,6 +6,8 @@ import 'package:vegora_core/vegora_core.dart';
 import 'package:vegora_models/vegora_models.dart';
 import 'package:vegora_repositories/vegora_repositories.dart';
 
+import '../../app/admin_router.dart';
+
 class StaffLoginScreen extends ConsumerStatefulWidget {
   const StaffLoginScreen({super.key});
 
@@ -90,12 +92,13 @@ class _StaffLoginScreenState extends ConsumerState<StaffLoginScreen> {
       if (!mounted) return;
       setState(() => _isLoading = false);
 
+      AdminAuthListenable.instance.notify();
       context.go('/staff');
     } catch (e) {
       if (!mounted) return;
       setState(() {
         _isLoading = false;
-        _errorMessage = e.toString().replaceAll('Exception:', '').trim();
+        _errorMessage = AuthErrorParser.parse(e);
       });
     }
   }
@@ -307,12 +310,30 @@ class _StaffLoginScreenState extends ConsumerState<StaffLoginScreen> {
                     ),
                     const SizedBox(height: 24),
 
-                    Center(
-                      child: TextButton.icon(
-                        icon: const Icon(Icons.shopping_bag_outlined, size: 16),
-                        label: const Text('Back to Vegora Store'),
-                        onPressed: () => context.go('/home'),
-                      ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        TextButton.icon(
+                          icon: const Icon(Icons.admin_panel_settings_rounded, size: 16),
+                          label: const Text('Admin Console Login'),
+                          onPressed: () => context.go('/admin/login'),
+                        ),
+                        const Padding(
+                          padding: EdgeInsets.symmetric(horizontal: 4),
+                          child: Text('•', style: TextStyle(color: AppColors.border)),
+                        ),
+                        TextButton.icon(
+                          icon: const Icon(Icons.refresh_rounded, size: 16),
+                          label: const Text('Clear Form'),
+                          onPressed: () {
+                            setState(() {
+                              _errorMessage = null;
+                              _emailController.clear();
+                              _passwordController.clear();
+                            });
+                          },
+                        ),
+                      ],
                     ),
                   ],
                 ),

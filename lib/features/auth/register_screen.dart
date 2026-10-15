@@ -6,6 +6,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../core/constants/app_colors.dart';
 import '../../shared/providers/app_providers.dart';
 import '../../shared/providers/auth_provider.dart';
+import '../../core/utils/auth_error_parser.dart';
 
 class RegisterScreen extends ConsumerStatefulWidget {
   const RegisterScreen({super.key});
@@ -165,18 +166,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
   }
 
   String _parseAuthError(Object error) {
-    final str = error.toString().toLowerCase();
-    if (str.contains('user already registered') ||
-        str.contains('already exists')) {
-      return 'An account with this email already exists. Please log in.';
-    }
-    if (str.contains('password')) {
-      return 'Password must be at least 6 characters long.';
-    }
-    if (str.contains('network') || str.contains('socketexception')) {
-      return 'Network connection error. Please check your internet connection.';
-    }
-    return 'Registration failed: ${error.toString().replaceAll("Exception:", "").trim()}';
+    return AuthErrorParser.parse(error);
   }
 
   @override

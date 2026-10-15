@@ -7,6 +7,7 @@ import '../../shared/models/user_role.dart';
 import '../../shared/providers/app_providers.dart';
 import '../../shared/providers/auth_provider.dart';
 import '../../shared/widgets/role_picker_sheet.dart';
+import '../../app/router.dart';
 
 class ProfileScreen extends ConsumerWidget {
   const ProfileScreen({super.key});
@@ -388,12 +389,15 @@ class ProfileScreen extends ConsumerWidget {
                 label: const Text('Sign Out'),
                 onPressed: () async {
                   await ref.read(authRepositoryProvider).signOut();
+                  ref.read(customerNameProvider.notifier).setName('');
                   ref.read(customerPhoneProvider.notifier).setPhone(null);
                   ref.invalidate(userProfileProvider);
+                  AppAuthListenable.instance.notify();
                   if (context.mounted) {
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(content: Text('Successfully signed out.')),
                     );
+                    context.go('/login');
                   }
                 },
               ),
