@@ -9,7 +9,6 @@ import '../../shared/providers/app_providers.dart';
 import '../../shared/providers/branch_provider.dart';
 import '../../shared/widgets/empty_state_view.dart';
 import '../../shared/widgets/product_card.dart';
-import '../../shared/widgets/role_picker_sheet.dart';
 
 enum SortOption { popularity, priceLowToHigh, priceHighToLow, nameAZ }
 
@@ -48,12 +47,6 @@ class _CatalogScreenState extends ConsumerState<CatalogScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Vegetable & Fruit Mandi'),
-        actions: const [
-          Padding(
-            padding: EdgeInsets.only(right: 8),
-            child: RoleIndicatorBadge(),
-          ),
-        ],
       ),
       body: Column(
         children: [

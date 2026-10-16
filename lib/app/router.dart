@@ -131,12 +131,9 @@ final appRouter = GoRouter(
           loc == '/admin/reset-password' ||
           loc == '/staff/login' ||
           loc == '/delivery/login' ||
-          loc == '/branches' ||
-          loc == '/home' ||
-          loc == '/catalog' ||
-          loc.startsWith('/product/');
+          loc == '/branches';
 
-      // Guard protected operations
+      // Guard customer shopping & account operations: require authentication
       if (!isAuthenticated && !isPublicAuth && !isAuthRoute) {
         return '/login';
       }

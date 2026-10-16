@@ -762,6 +762,13 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.4.0"
+  vegora_admin_web:
+    dependency: "direct dev"
+    description:
+      path: "apps/vegora_admin_web"
+      relative: true
+    source: path
+    version: "1.0.0+1"
   vegora_core:
     dependency: "direct main"
     description:
@@ -769,6 +776,20 @@ packages:
       relative: true
     source: path
     version: "1.0.0"
+  vegora_customer:
+    dependency: "direct dev"
+    description:
+      path: "apps/vegora_customer"
+      relative: true
+    source: path
+    version: "1.0.0+1"
+  vegora_delivery:
+    dependency: "direct dev"
+    description:
+      path: "apps/vegora_delivery"
+      relative: true
+    source: path
+    version: "1.0.0+1"
   vegora_models:
     dependency: "direct main"
     description:

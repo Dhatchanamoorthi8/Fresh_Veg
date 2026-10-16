@@ -19,6 +19,8 @@ class Branch {
   final bool isOpen;
   final bool isAcceptingOrders;
   final bool isActive;
+  final double? latitude;
+  final double? longitude;
   final DateTime? createdAt;
 
   const Branch({
@@ -42,6 +44,8 @@ class Branch {
     this.isOpen = true,
     this.isAcceptingOrders = true,
     this.isActive = true,
+    this.latitude,
+    this.longitude,
     this.createdAt,
   });
 
@@ -73,6 +77,8 @@ class Branch {
       isOpen: json['is_open'] as bool? ?? true,
       isAcceptingOrders: json['is_accepting_orders'] as bool? ?? true,
       isActive: json['is_active'] as bool? ?? true,
+      latitude: (json['latitude'] as num?)?.toDouble(),
+      longitude: (json['longitude'] as num?)?.toDouble(),
       createdAt: json['created_at'] != null
           ? DateTime.tryParse(json['created_at'] as String)
           : null,
@@ -101,6 +107,8 @@ class Branch {
       'is_open': isOpen,
       'is_accepting_orders': isAcceptingOrders,
       'is_active': isActive,
+      if (latitude != null) 'latitude': latitude,
+      if (longitude != null) 'longitude': longitude,
     };
   }
 
@@ -125,6 +133,8 @@ class Branch {
     bool? isOpen,
     bool? isAcceptingOrders,
     bool? isActive,
+    double? latitude,
+    double? longitude,
     DateTime? createdAt,
   }) {
     return Branch(
@@ -151,6 +161,8 @@ class Branch {
       isOpen: isOpen ?? this.isOpen,
       isAcceptingOrders: isAcceptingOrders ?? this.isAcceptingOrders,
       isActive: isActive ?? this.isActive,
+      latitude: latitude ?? this.latitude,
+      longitude: longitude ?? this.longitude,
       createdAt: createdAt ?? this.createdAt,
     );
   }

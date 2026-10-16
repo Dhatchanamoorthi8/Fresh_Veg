@@ -83,6 +83,27 @@ class _BranchSelectionScreenState extends ConsumerState<BranchSelectionScreen> {
                           color: AppColors.textSecondary,
                         ),
                       ),
+                      if (currentBranch.latitude != null && currentBranch.longitude != null) ...[
+                        const SizedBox(height: 3),
+                        Row(
+                          children: [
+                            const Icon(
+                              Icons.my_location_rounded,
+                              size: 11,
+                              color: AppColors.primaryDark,
+                            ),
+                            const SizedBox(width: 4),
+                            Text(
+                              'Store DB GPS: ${currentBranch.latitude!.toStringAsFixed(4)}° N, ${currentBranch.longitude!.toStringAsFixed(4)}° E',
+                              style: const TextStyle(
+                                fontSize: 11,
+                                fontWeight: FontWeight.w600,
+                                color: AppColors.primaryDark,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
                     ],
                   ),
                 ),
@@ -288,6 +309,27 @@ class _BranchSelectionScreenState extends ConsumerState<BranchSelectionScreen> {
                         ),
                       ],
                     ),
+                    if (branch.latitude != null && branch.longitude != null) ...[
+                      const SizedBox(height: 4),
+                      Row(
+                        children: [
+                          const Icon(
+                            Icons.my_location_rounded,
+                            size: 12,
+                            color: AppColors.primary,
+                          ),
+                          const SizedBox(width: 4),
+                          Text(
+                            'GPS: ${branch.latitude!.toStringAsFixed(4)}° N, ${branch.longitude!.toStringAsFixed(4)}° E',
+                            style: const TextStyle(
+                              fontSize: 11,
+                              fontWeight: FontWeight.w600,
+                              color: AppColors.primaryDark,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
                     const SizedBox(height: 6),
                     Row(
                       children: [
@@ -346,23 +388,76 @@ class _BranchSelectionScreenState extends ConsumerState<BranchSelectionScreen> {
     CustomerAddress currentAddress,
     cart,
   ) {
-    final addresses = ref.watch(branchRepositoryProvider);
+    final addressesAsync = ref.watch(customerAddressesProvider);
+    final currentBranch = ref.watch(selectedBranchProvider);
 
-    return FutureBuilder<List<CustomerAddress>>(
-      future: addresses.getSavedAddresses(),
-      builder: (context, snapshot) {
-        if (!snapshot.hasData) {
-          return const Center(child: CircularProgressIndicator());
+    return addressesAsync.when(
+      loading: () => const Center(child: CircularProgressIndicator()),
+      error: (error, _) => Center(
+        child: Padding(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Icon(Icons.cloud_off_rounded, size: 40),
+              const SizedBox(height: 12),
+              const Text('Could not load your saved addresses.'),
+              TextButton(
+                onPressed: () => ref.invalidate(customerAddressesProvider),
+                child: const Text('Try again'),
+              ),
+            ],
+          ),
+        ),
+      ),
+      data: (list) {
+        if (list.isEmpty) {
+          return Center(
+            child: Padding(
+              padding: const EdgeInsets.all(24),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Icon(
+                    Icons.location_on_outlined,
+                    size: 52,
+                    color: AppColors.primary,
+                  ),
+                  const SizedBox(height: 12),
+                  const Text(
+                    'No delivery addresses yet',
+                    style: TextStyle(fontSize: 17, fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(height: 6),
+                  const Text(
+                    'Add an address to see nearby delivery options.',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(color: AppColors.textSecondary),
+                  ),
+                  const SizedBox(height: 16),
+                  FilledButton.icon(
+                    onPressed: () => _addAddress(context, list),
+                    icon: const Icon(Icons.add_location_alt_outlined),
+                    label: const Text('Add delivery address'),
+                  ),
+                ],
+              ),
+            ),
+          );
         }
-
-        final list = snapshot.data!;
-        final currentBranch = ref.watch(selectedBranchProvider);
 
         return ListView.separated(
           padding: const EdgeInsets.all(16),
-          itemCount: list.length,
+          itemCount: list.length + 1,
           separatorBuilder: (context, index) => const SizedBox(height: 12),
           itemBuilder: (context, index) {
+            if (index == list.length) {
+              return OutlinedButton.icon(
+                onPressed: () => _addAddress(context, list),
+                icon: const Icon(Icons.add),
+                label: const Text('Add another address'),
+              );
+            }
             final addr = list[index];
             final isSelected = addr.id == currentAddress.id;
 
@@ -498,6 +593,40 @@ class _BranchSelectionScreenState extends ConsumerState<BranchSelectionScreen> {
                               color: AppColors.textMuted,
                             ),
                           ),
+                          if (addr.latitude != null && addr.longitude != null) ...[
+                            const SizedBox(height: 5),
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 6,
+                                vertical: 2,
+                              ),
+                              decoration: BoxDecoration(
+                                color: AppColors.primaryContainer.withValues(
+                                  alpha: 0.6,
+                                ),
+                                borderRadius: BorderRadius.circular(4),
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  const Icon(
+                                    Icons.my_location_rounded,
+                                    size: 11,
+                                    color: AppColors.primaryDark,
+                                  ),
+                                  const SizedBox(width: 4),
+                                  Text(
+                                    'Lat: ${addr.latitude!.toStringAsFixed(4)}, Long: ${addr.longitude!.toStringAsFixed(4)}',
+                                    style: const TextStyle(
+                                      fontSize: 10,
+                                      fontWeight: FontWeight.w600,
+                                      color: AppColors.primaryDark,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
                         ],
                       ),
                     ),
@@ -516,6 +645,362 @@ class _BranchSelectionScreenState extends ConsumerState<BranchSelectionScreen> {
           },
         );
       },
+    );
+  }
+
+  Future<void> _addAddress(
+    BuildContext context,
+    List<CustomerAddress> existingAddresses,
+  ) async {
+    final address = await _showAddAddressDialog(
+      context,
+      makeDefault: existingAddresses.isEmpty,
+    );
+    if (address == null || !context.mounted) return;
+
+    try {
+      final eligibleBranch = await ref
+          .read(branchRepositoryProvider)
+          .getEligibleBranchForAddress(address);
+
+      final finalAddress = address.copyWith(
+        eligibleBranchId: eligibleBranch.id,
+      );
+
+      await ref.read(branchRepositoryProvider).saveAddress(finalAddress);
+      ref.invalidate(customerAddressesProvider);
+      ref.read(selectedAddressProvider.notifier).setAddress(finalAddress);
+      ref.read(selectedBranchProvider.notifier).setBranch(eligibleBranch);
+
+      if (!context.mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            'Delivery address saved! Fulfilling from ${eligibleBranch.name}',
+          ),
+        ),
+      );
+    } catch (error) {
+      if (!context.mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Could not save address: $error')),
+      );
+    }
+  }
+
+  Future<CustomerAddress?> _showAddAddressDialog(
+    BuildContext context, {
+    required bool makeDefault,
+  }) async {
+    final formKey = GlobalKey<FormState>();
+    final currentBranch = ref.read(selectedBranchProvider);
+    final branches = ref.read(branchesListProvider).value ??
+        MockBranchRepository.sampleBranches;
+
+    final labelController = TextEditingController(text: 'Home');
+    final addressController = TextEditingController();
+    final areaController = TextEditingController();
+    final landmarkController = TextEditingController();
+    final pinCodeController = TextEditingController();
+
+    Branch? selectedDbBranch;
+    double? selectedLat;
+    double? selectedLng;
+
+    final result = await showDialog<CustomerAddress>(
+      context: context,
+      builder: (dialogContext) => StatefulBuilder(
+        builder: (context, setDialogState) {
+          void applyStoreBranch(Branch branch) {
+            setDialogState(() {
+              selectedDbBranch = branch;
+              addressController.text = branch.address;
+              areaController.text = branch.area;
+              if (branch.pincode.isNotEmpty) {
+                pinCodeController.text = branch.pincode;
+              }
+              selectedLat = branch.latitude;
+              selectedLng = branch.longitude;
+            });
+          }
+
+          return AlertDialog(
+            title: const Text('Add delivery address'),
+            content: Form(
+              key: formKey,
+              child: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Store DB Location & GPS Coordinates Selector
+                    Container(
+                      padding: const EdgeInsets.all(10),
+                      margin: const EdgeInsets.only(bottom: 12),
+                      decoration: BoxDecoration(
+                        color: AppColors.primaryContainer.withValues(
+                          alpha: 0.35,
+                        ),
+                        borderRadius: BorderRadius.circular(10),
+                        border: Border.all(
+                          color: AppColors.primaryLight.withValues(alpha: 0.5),
+                        ),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            children: [
+                              const Icon(
+                                Icons.store_mall_directory_rounded,
+                                size: 16,
+                                color: AppColors.primaryDark,
+                              ),
+                              const SizedBox(width: 6),
+                              const Text(
+                                'Pick Store Location (DB)',
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.bold,
+                                  color: AppColors.primaryDark,
+                                ),
+                              ),
+                              const Spacer(),
+                              if (selectedLat != null && selectedLng != null)
+                                Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 6,
+                                    vertical: 2,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: AppColors.primary,
+                                    borderRadius: BorderRadius.circular(4),
+                                  ),
+                                  child: const Text(
+                                    'GPS LOCKED',
+                                    style: TextStyle(
+                                      fontSize: 9,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                ),
+                            ],
+                          ),
+                          const SizedBox(height: 8),
+
+                          // Quick 1-tap button to use CURRENT fulfillment store
+                          InkWell(
+                            onTap: () => applyStoreBranch(currentBranch),
+                            borderRadius: BorderRadius.circular(8),
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 10,
+                                vertical: 6,
+                              ),
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(8),
+                                border: Border.all(
+                                  color: selectedDbBranch?.id == currentBranch.id
+                                      ? AppColors.primary
+                                      : AppColors.border,
+                                  width: selectedDbBranch?.id == currentBranch.id
+                                      ? 1.5
+                                      : 1,
+                                ),
+                              ),
+                              child: Row(
+                                children: [
+                                  const Icon(
+                                    Icons.my_location_rounded,
+                                    size: 15,
+                                    color: AppColors.primary,
+                                  ),
+                                  const SizedBox(width: 6),
+                                  Expanded(
+                                    child: Text(
+                                      'Use Current Store: ${currentBranch.name}',
+                                      style: const TextStyle(
+                                        fontSize: 11,
+                                        fontWeight: FontWeight.bold,
+                                        color: AppColors.textPrimary,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+
+                          // Dropdown to pick ANY branch from the database
+                          DropdownButtonFormField<Branch>(
+                            initialValue: selectedDbBranch,
+                            isExpanded: true,
+                            decoration: InputDecoration(
+                              labelText: 'Or Pick Any Store from DB',
+                              labelStyle: const TextStyle(fontSize: 11),
+                              contentPadding: const EdgeInsets.symmetric(
+                                horizontal: 8,
+                                vertical: 8,
+                              ),
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              filled: true,
+                              fillColor: Colors.white,
+                            ),
+                            hint: const Text(
+                              'Choose store...',
+                              style: TextStyle(fontSize: 11),
+                            ),
+                            items: branches.map((b) {
+                              return DropdownMenuItem<Branch>(
+                                value: b,
+                                child: Text(
+                                  '${b.name} (${b.latitude?.toStringAsFixed(4)}, ${b.longitude?.toStringAsFixed(4)})',
+                                  overflow: TextOverflow.ellipsis,
+                                  style: const TextStyle(fontSize: 11),
+                                ),
+                              );
+                            }).toList(),
+                            onChanged: (b) {
+                              if (b != null) {
+                                applyStoreBranch(b);
+                              }
+                            },
+                          ),
+
+                          // Active Coordinates Info Banner
+                          if (selectedLat != null && selectedLng != null) ...[
+                            const SizedBox(height: 6),
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 8,
+                                vertical: 4,
+                              ),
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(6),
+                                border: Border.all(
+                                  color: AppColors.primary.withValues(
+                                    alpha: 0.3,
+                                  ),
+                                ),
+                              ),
+                              child: Row(
+                                children: [
+                                  const Icon(
+                                    Icons.gps_fixed_rounded,
+                                    size: 13,
+                                    color: AppColors.primary,
+                                  ),
+                                  const SizedBox(width: 6),
+                                  Expanded(
+                                    child: Text(
+                                      'Lat: ${selectedLat!.toStringAsFixed(6)} | Long: ${selectedLng!.toStringAsFixed(6)}',
+                                      style: const TextStyle(
+                                        fontSize: 10,
+                                        fontWeight: FontWeight.bold,
+                                        color: AppColors.primaryDark,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ],
+                      ),
+                    ),
+
+                    _addressField(labelController, 'Label (Home, Office)'),
+                    _addressField(
+                      addressController,
+                      'Full address',
+                      maxLines: 2,
+                    ),
+                    _addressField(areaController, 'Area'),
+                    _addressField(
+                      landmarkController,
+                      'Landmark (optional)',
+                      required: false,
+                    ),
+                    _addressField(
+                      pinCodeController,
+                      'PIN code',
+                      keyboardType: TextInputType.number,
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(dialogContext),
+                child: const Text('Cancel'),
+              ),
+              FilledButton(
+                onPressed: () {
+                  if (!formKey.currentState!.validate()) return;
+                  final branch = selectedDbBranch ?? currentBranch;
+                  Navigator.pop(
+                    dialogContext,
+                    CustomerAddress(
+                      id: 'addr_demo_${DateTime.now().microsecondsSinceEpoch}',
+                      label: labelController.text.trim(),
+                      fullAddress: addressController.text.trim(),
+                      area: areaController.text.trim(),
+                      landmark: landmarkController.text.trim(),
+                      pinCode: pinCodeController.text.trim(),
+                      eligibleBranchId: branch.id,
+                      isDefault: makeDefault,
+                      latitude: selectedLat ?? branch.latitude,
+                      longitude: selectedLng ?? branch.longitude,
+                    ),
+                  );
+                },
+                child: const Text('Save address'),
+              ),
+            ],
+          );
+        },
+      ),
+    );
+
+    labelController.dispose();
+    addressController.dispose();
+    areaController.dispose();
+    landmarkController.dispose();
+    pinCodeController.dispose();
+    return result;
+  }
+
+  Widget _addressField(
+    TextEditingController controller,
+    String label, {
+    bool required = true,
+    int maxLines = 1,
+    TextInputType? keyboardType,
+  }) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 10),
+      child: TextFormField(
+        controller: controller,
+        maxLines: maxLines,
+        keyboardType: keyboardType,
+        decoration: InputDecoration(
+          labelText: label,
+          border: const OutlineInputBorder(),
+          isDense: true,
+        ),
+        validator: required
+            ? (value) => value == null || value.trim().isEmpty
+                ? 'Please enter ${label.toLowerCase()}'
+                : null
+            : null,
+      ),
     );
   }
 

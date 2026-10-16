@@ -4,10 +4,13 @@ abstract class BranchRepository {
   Future<List<Branch>> getBranches();
   Future<Branch?> getBranchById(String id);
   Future<List<CustomerAddress>> getSavedAddresses();
+  Future<void> saveAddress(CustomerAddress address);
   Future<Branch> getEligibleBranchForAddress(CustomerAddress address);
 }
 
 class MockBranchRepository implements BranchRepository {
+  static final List<CustomerAddress> _addresses = List.of(sampleAddresses);
+
   static const List<Branch> sampleBranches = [
     Branch(
       id: 'branch_blr_01',
@@ -15,6 +18,7 @@ class MockBranchRepository implements BranchRepository {
       area: 'Indiranagar',
       address: 'Shop 14, 100 Feet Road, HAL 2nd Stage, Indiranagar',
       phone: '+91 80 4123 9901',
+      pincode: '560038',
       openingHours: '6:30 AM - 10:00 PM',
       deliveryCoverage: 'Indiranagar, Domlur, HAL, Ulsoor, Old Airport Rd',
       estimatedDeliveryMinutes: 25,
@@ -23,6 +27,8 @@ class MockBranchRepository implements BranchRepository {
       standardDeliveryFeePaise: 2900,
       isOpen: true,
       isAcceptingOrders: true,
+      latitude: 12.9784,
+      longitude: 77.6408,
     ),
     Branch(
       id: 'branch_blr_02',
@@ -30,6 +36,7 @@ class MockBranchRepository implements BranchRepository {
       area: 'Koramangala',
       address: 'Plot 42, 80 Feet Road, 4th Block, Koramangala',
       phone: '+91 80 4123 9902',
+      pincode: '560034',
       openingHours: '6:00 AM - 10:30 PM',
       deliveryCoverage: 'Koramangala (Blocks 1-8), Ejipura, SG Palya, ST Bed',
       estimatedDeliveryMinutes: 20,
@@ -38,6 +45,8 @@ class MockBranchRepository implements BranchRepository {
       standardDeliveryFeePaise: 2500,
       isOpen: true,
       isAcceptingOrders: true,
+      latitude: 12.9352,
+      longitude: 77.6245,
     ),
     Branch(
       id: 'branch_blr_03',
@@ -45,6 +54,7 @@ class MockBranchRepository implements BranchRepository {
       area: 'Whitefield',
       address: 'No. 8, ITPL Main Road, Prestige Ozone Junction, Whitefield',
       phone: '+91 80 4123 9903',
+      pincode: '560066',
       openingHours: '7:00 AM - 10:00 PM',
       deliveryCoverage: 'Whitefield, Kadugodi, Hope Farm, Hoodi, Brookefield',
       estimatedDeliveryMinutes: 35,
@@ -53,6 +63,8 @@ class MockBranchRepository implements BranchRepository {
       standardDeliveryFeePaise: 3500,
       isOpen: true,
       isAcceptingOrders: true,
+      latitude: 12.9698,
+      longitude: 77.7499,
     ),
     Branch(
       id: 'branch_blr_04',
@@ -60,6 +72,7 @@ class MockBranchRepository implements BranchRepository {
       area: 'Jayanagar',
       address: 'Opp. BDA Complex, 9th Main Road, 4th Block, Jayanagar',
       phone: '+91 80 4123 9904',
+      pincode: '560011',
       openingHours: '6:00 AM - 9:30 PM',
       deliveryCoverage:
           'Jayanagar (Blocks 1-9), JP Nagar, Basavanagudi, Tilaknagar',
@@ -69,6 +82,8 @@ class MockBranchRepository implements BranchRepository {
       standardDeliveryFeePaise: 2900,
       isOpen: true,
       isAcceptingOrders: true,
+      latitude: 12.9308,
+      longitude: 77.5838,
     ),
     Branch(
       id: 'branch_blr_05',
@@ -76,6 +91,7 @@ class MockBranchRepository implements BranchRepository {
       area: 'Malleshwaram',
       address: 'Cross 8, Sampige Road, Near 8th Cross Circle, Malleshwaram',
       phone: '+91 80 4123 9905',
+      pincode: '560003',
       openingHours: '6:30 AM - 9:30 PM',
       deliveryCoverage: 'Malleshwaram, Rajajinagar, Sadashivanagar, Vyalikaval',
       estimatedDeliveryMinutes: 30,
@@ -84,6 +100,8 @@ class MockBranchRepository implements BranchRepository {
       standardDeliveryFeePaise: 2900,
       isOpen: true,
       isAcceptingOrders: true,
+      latitude: 13.0031,
+      longitude: 77.5694,
     ),
     Branch(
       id: 'branch_blr_06',
@@ -91,6 +109,7 @@ class MockBranchRepository implements BranchRepository {
       area: 'HSR Layout',
       address: 'Building 12, 27th Main Road, Sector 1, HSR Layout',
       phone: '+91 80 4123 9906',
+      pincode: '560102',
       openingHours: '6:30 AM - 10:00 PM',
       deliveryCoverage: 'HSR Layout (Sectors 1-7), Haralur, Bellandur, Agara',
       estimatedDeliveryMinutes: 25,
@@ -99,6 +118,8 @@ class MockBranchRepository implements BranchRepository {
       standardDeliveryFeePaise: 2900,
       isOpen: true,
       isAcceptingOrders: true,
+      latitude: 12.9121,
+      longitude: 77.6446,
     ),
   ];
 
@@ -112,6 +133,8 @@ class MockBranchRepository implements BranchRepository {
       pinCode: '560038',
       eligibleBranchId: 'branch_blr_01',
       isDefault: true,
+      latitude: 12.9784,
+      longitude: 77.6408,
     ),
     CustomerAddress(
       id: 'addr_02',
@@ -122,6 +145,8 @@ class MockBranchRepository implements BranchRepository {
       pinCode: '560034',
       eligibleBranchId: 'branch_blr_02',
       isDefault: false,
+      latitude: 12.9352,
+      longitude: 77.6245,
     ),
     CustomerAddress(
       id: 'addr_03',
@@ -132,6 +157,8 @@ class MockBranchRepository implements BranchRepository {
       pinCode: '560055',
       eligibleBranchId: 'branch_blr_05',
       isDefault: false,
+      latitude: 13.0031,
+      longitude: 77.5694,
     ),
   ];
 
@@ -150,7 +177,17 @@ class MockBranchRepository implements BranchRepository {
 
   @override
   Future<List<CustomerAddress>> getSavedAddresses() async {
-    return sampleAddresses;
+    return List.unmodifiable(_addresses);
+  }
+
+  @override
+  Future<void> saveAddress(CustomerAddress address) async {
+    if (address.isDefault) {
+      for (var index = 0; index < _addresses.length; index++) {
+        _addresses[index] = _addresses[index].copyWith(isDefault: false);
+      }
+    }
+    _addresses.add(address);
   }
 
   @override

@@ -10,7 +10,6 @@ import '../../shared/models/order_status.dart';
 import '../../shared/providers/order_provider.dart';
 import '../../shared/widgets/empty_state_view.dart';
 import '../../shared/widgets/order_status_badge.dart';
-import '../../shared/widgets/role_picker_sheet.dart';
 
 class OrdersScreen extends ConsumerStatefulWidget {
   const OrdersScreen({super.key});
@@ -50,12 +49,6 @@ class _OrdersScreenState extends ConsumerState<OrdersScreen>
     return Scaffold(
       appBar: AppBar(
         title: const Text('My Orders'),
-        actions: const [
-          Padding(
-            padding: EdgeInsets.only(right: 8),
-            child: RoleIndicatorBadge(),
-          ),
-        ],
         bottom: TabBar(
           controller: _tabController,
           labelColor: AppColors.primary,

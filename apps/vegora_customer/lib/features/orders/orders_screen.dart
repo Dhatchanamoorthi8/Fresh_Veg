@@ -46,12 +46,6 @@ class _OrdersScreenState extends ConsumerState<OrdersScreen>
     return Scaffold(
       appBar: AppBar(
         title: const Text('My Orders'),
-        actions: const [
-          Padding(
-            padding: EdgeInsets.only(right: 8),
-            child: RoleIndicatorBadge(),
-          ),
-        ],
         bottom: TabBar(
           controller: _tabController,
           labelColor: AppColors.primary,

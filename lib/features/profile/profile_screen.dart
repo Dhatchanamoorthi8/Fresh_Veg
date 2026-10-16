@@ -6,7 +6,6 @@ import '../../core/constants/app_colors.dart';
 import '../../shared/models/user_role.dart';
 import '../../shared/providers/app_providers.dart';
 import '../../shared/providers/auth_provider.dart';
-import '../../shared/widgets/role_picker_sheet.dart';
 import '../../app/router.dart';
 
 class ProfileScreen extends ConsumerWidget {
@@ -22,12 +21,6 @@ class ProfileScreen extends ConsumerWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text('My Account'),
-        actions: const [
-          Padding(
-            padding: EdgeInsets.only(right: 8),
-            child: RoleIndicatorBadge(),
-          ),
-        ],
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
@@ -321,56 +314,60 @@ class ProfileScreen extends ConsumerWidget {
             const SizedBox(height: 10),
 
             // Profile Options Menu
-            Container(
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: AppColors.border),
-              ),
-              child: Column(
-                children: [
-                  _buildTile(
-                    icon: Icons.pin_drop_outlined,
-                    title: 'Saved Delivery Addresses',
-                    subtitle:
-                        'Current: ${currentAddress.label} (${currentAddress.area})',
-                    onTap: () => context.push('/branches'),
-                  ),
-                  const Divider(height: 1),
-                  _buildTile(
-                    icon: Icons.receipt_long_outlined,
-                    title: 'Order History',
-                    subtitle: 'Track past orders and receipts',
-                    onTap: () => context.go('/orders'),
-                  ),
-                  const Divider(height: 1),
-                  _buildTile(
-                    icon: Icons.storefront_outlined,
-                    title: 'Explore 5+ City Store Hubs',
-                    subtitle: 'View branch timings, coverage & addresses',
-                    onTap: () => context.push('/branches'),
-                  ),
-                  const Divider(height: 1),
-                  _buildTile(
-                    icon: Icons.notifications_none_rounded,
-                    title: 'Notification Preferences',
-                    subtitle: 'Order updates and morning harvest alerts',
-                    onTap: () {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('Notifications simulated: Enabled'),
-                        ),
-                      );
-                    },
-                  ),
-                  const Divider(height: 1),
-                  _buildTile(
-                    icon: Icons.help_outline_rounded,
-                    title: 'Help & FAQ',
-                    subtitle: 'Multi-branch ordering rules and delivery times',
-                    onTap: () => _showHelpDialog(context),
-                  ),
-                ],
+            Material(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(16),
+              clipBehavior: Clip.antiAlias,
+              child: Container(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(color: AppColors.border),
+                ),
+                child: Column(
+                  children: [
+                    _buildTile(
+                      icon: Icons.pin_drop_outlined,
+                      title: 'Saved Delivery Addresses',
+                      subtitle:
+                          'Current: ${currentAddress.label} (${currentAddress.area})',
+                      onTap: () => context.push('/branches'),
+                    ),
+                    const Divider(height: 1),
+                    _buildTile(
+                      icon: Icons.receipt_long_outlined,
+                      title: 'Order History',
+                      subtitle: 'Track past orders and receipts',
+                      onTap: () => context.go('/orders'),
+                    ),
+                    const Divider(height: 1),
+                    _buildTile(
+                      icon: Icons.storefront_outlined,
+                      title: 'Explore 5+ City Store Hubs',
+                      subtitle: 'View branch timings, coverage & addresses',
+                      onTap: () => context.push('/branches'),
+                    ),
+                    const Divider(height: 1),
+                    _buildTile(
+                      icon: Icons.notifications_none_rounded,
+                      title: 'Notification Preferences',
+                      subtitle: 'Order updates and morning harvest alerts',
+                      onTap: () {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('Notifications simulated: Enabled'),
+                          ),
+                        );
+                      },
+                    ),
+                    const Divider(height: 1),
+                    _buildTile(
+                      icon: Icons.help_outline_rounded,
+                      title: 'Help & FAQ',
+                      subtitle: 'Multi-branch ordering rules and delivery times',
+                      onTap: () => _showHelpDialog(context),
+                    ),
+                  ],
+                ),
               ),
             ),
 

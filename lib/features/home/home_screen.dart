@@ -11,7 +11,6 @@ import '../../shared/providers/auth_provider.dart';
 import '../../shared/providers/branch_provider.dart';
 import '../../shared/providers/cart_provider.dart';
 import '../../shared/widgets/product_card.dart';
-import '../../shared/widgets/role_picker_sheet.dart';
 
 class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
@@ -85,7 +84,6 @@ class HomeScreen extends ConsumerWidget {
                                 ),
                               ],
                             ),
-                            const RoleIndicatorBadge(),
                           ],
                         ),
                         const SizedBox(height: 10),

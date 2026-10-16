@@ -128,14 +128,14 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
               const SizedBox(height: 32),
 
               // Feature Badges
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
+              Wrap(
+                alignment: WrapAlignment.center,
+                spacing: 8,
+                runSpacing: 8,
                 children: [
-                  _buildBadge(Icons.storefront_rounded, '5+ Local Branches'),
-                  const SizedBox(width: 12),
+                  _buildBadge(Icons.storefront_rounded, '5+ Branches'),
                   _buildBadge(Icons.timer_outlined, '30 Min Express'),
-                  const SizedBox(width: 12),
-                  _buildBadge(Icons.eco_outlined, 'Mandi Fresh'),
+                  _buildBadge(Icons.eco_outlined, 'Farm Fresh'),
                 ],
               ),
 
@@ -146,7 +146,15 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
                 width: double.infinity,
                 height: 52,
                 child: ElevatedButton(
-                  onPressed: () => context.go('/home'),
+                  onPressed: () {
+                    final isAuthenticated =
+                        Supabase.instance.client.auth.currentUser != null;
+                    if (isAuthenticated) {
+                      context.go('/home');
+                    } else {
+                      context.go('/login');
+                    }
+                  },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.primary,
                     shape: RoundedRectangleBorder(

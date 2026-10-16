@@ -29,12 +29,6 @@ class OrderTrackingScreen extends ConsumerWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text('Order ${order.orderNumber}'),
-        actions: const [
-          Padding(
-            padding: EdgeInsets.only(right: 8),
-            child: RoleIndicatorBadge(),
-          ),
-        ],
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),

@@ -8,7 +8,6 @@ import '../../shared/models/order.dart';
 import '../../shared/models/order_status.dart';
 import '../../shared/providers/order_provider.dart';
 import '../../shared/widgets/order_status_badge.dart';
-import '../../shared/widgets/role_picker_sheet.dart';
 
 class OrderTrackingScreen extends ConsumerWidget {
   final String orderId;
@@ -32,12 +31,6 @@ class OrderTrackingScreen extends ConsumerWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text('Order ${order.orderNumber}'),
-        actions: const [
-          Padding(
-            padding: EdgeInsets.only(right: 8),
-            child: RoleIndicatorBadge(),
-          ),
-        ],
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),

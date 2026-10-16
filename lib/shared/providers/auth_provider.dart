@@ -60,7 +60,15 @@ class CustomerPhoneNotifier extends Notifier<String?> {
   @override
   String? build() {
     final profile = ref.watch(userProfileProvider).value;
-    return profile?.phone;
+    if (profile?.phone != null && profile!.phone!.trim().isNotEmpty) {
+      return profile.phone!.trim();
+    }
+    final user = ref.watch(currentSupabaseUserProvider);
+    final metaPhone = user?.userMetadata?['phone'] as String? ?? user?.phone;
+    if (metaPhone != null && metaPhone.trim().isNotEmpty) {
+      return metaPhone.trim();
+    }
+    return null;
   }
 
   void setPhone(String? phone) {
@@ -77,9 +85,27 @@ class CustomerNameNotifier extends Notifier<String> {
   @override
   String build() {
     final profile = ref.watch(userProfileProvider).value;
-    return profile?.fullName.isNotEmpty == true
-        ? profile!.fullName
-        : 'Customer';
+    if (profile != null &&
+        profile.fullName.trim().isNotEmpty &&
+        profile.fullName.trim() != 'Customer') {
+      return profile.fullName.trim();
+    }
+    final user = ref.watch(currentSupabaseUserProvider);
+    final metaName = user?.userMetadata?['full_name'] as String? ??
+        user?.userMetadata?['name'] as String?;
+    if (metaName != null && metaName.trim().isNotEmpty) {
+      return metaName.trim();
+    }
+    if (profile?.fullName.trim().isNotEmpty == true) {
+      return profile!.fullName.trim();
+    }
+    if (user?.email != null && user!.email!.isNotEmpty) {
+      final emailPrefix = user.email!.split('@').first.trim();
+      if (emailPrefix.isNotEmpty) {
+        return emailPrefix;
+      }
+    }
+    return 'Customer';
   }
 
   void setName(String name) {
@@ -87,12 +113,10 @@ class CustomerNameNotifier extends Notifier<String> {
   }
 }
 
-/// Customer addresses from Supabase
+/// Customer addresses from repository
 final customerAddressesProvider = FutureProvider<List<CustomerAddress>>((
   ref,
 ) async {
-  final user = ref.watch(currentSupabaseUserProvider);
-  if (user == null) return [];
   final branchRepo = ref.watch(branchRepositoryProvider);
   return branchRepo.getSavedAddresses();
 });

@@ -192,6 +192,54 @@ class SupabaseAuthRepository {
         .eq('id', userId);
   }
 
+  /// Ensures user profile is synced from authenticated user session metadata
+  Future<void> syncCustomerSession(User user) async {
+    try {
+      final metadataName = user.userMetadata?['full_name'] as String? ??
+          user.userMetadata?['name'] as String? ??
+          user.email?.split('@').first ??
+          'Customer';
+      final avatarUrl = user.userMetadata?['avatar_url'] as String? ??
+          user.userMetadata?['picture'] as String?;
+
+      final existing = await _client
+          .from('profiles')
+          .select('id, full_name')
+          .eq('id', user.id)
+          .maybeSingle();
+
+      if (existing == null) {
+        try {
+          final payload = <String, dynamic>{
+            'id': user.id,
+            'full_name': metadataName,
+            'email': user.email,
+          };
+          if (avatarUrl != null) {
+            payload['avatar_url'] = avatarUrl;
+          }
+          await _client.from('profiles').insert(payload);
+        } catch (_) {}
+      } else {
+        final existingName = (existing['full_name'] as String?)?.trim();
+        if (existingName == null || existingName.isEmpty || existingName == 'Customer') {
+          try {
+            final updatePayload = <String, dynamic>{
+              'full_name': metadataName,
+              'updated_at': DateTime.now().toIso8601String(),
+            };
+            if (avatarUrl != null) {
+              updatePayload['avatar_url'] = avatarUrl;
+            }
+            await _client.from('profiles').update(updatePayload).eq('id', user.id);
+          } catch (_) {}
+        }
+      }
+    } catch (e) {
+      debugPrint('syncCustomerSession error: $e');
+    }
+  }
+
   /// Get role for current user
   Future<AppUserRole> getUserRole(String userId) async {
     try {

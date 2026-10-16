@@ -44,12 +44,6 @@ class _CatalogScreenState extends ConsumerState<CatalogScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Vegetable & Fruit Mandi'),
-        actions: const [
-          Padding(
-            padding: EdgeInsets.only(right: 8),
-            child: RoleIndicatorBadge(),
-          ),
-        ],
       ),
       body: Column(
         children: [

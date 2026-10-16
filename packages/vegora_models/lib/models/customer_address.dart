@@ -7,6 +7,8 @@ class CustomerAddress {
   final String pinCode;
   final String eligibleBranchId;
   final bool isDefault;
+  final double? latitude;
+  final double? longitude;
 
   const CustomerAddress({
     required this.id,
@@ -17,6 +19,8 @@ class CustomerAddress {
     required this.pinCode,
     required this.eligibleBranchId,
     this.isDefault = false,
+    this.latitude,
+    this.longitude,
   });
 
   factory CustomerAddress.fromJson(Map<String, dynamic> json) {
@@ -30,6 +34,8 @@ class CustomerAddress {
       eligibleBranchId:
           json['eligible_branch_id'] as String? ?? 'branch_blr_01',
       isDefault: json['is_default'] as bool? ?? false,
+      latitude: (json['latitude'] as num?)?.toDouble(),
+      longitude: (json['longitude'] as num?)?.toDouble(),
     );
   }
 
@@ -43,6 +49,8 @@ class CustomerAddress {
       'pincode': pinCode,
       'is_default': isDefault,
     };
+    if (latitude != null) map['latitude'] = latitude;
+    if (longitude != null) map['longitude'] = longitude;
     if (userId != null) {
       map['user_id'] = userId;
     }
@@ -58,6 +66,8 @@ class CustomerAddress {
     String? pinCode,
     String? eligibleBranchId,
     bool? isDefault,
+    double? latitude,
+    double? longitude,
   }) {
     return CustomerAddress(
       id: id ?? this.id,
@@ -68,6 +78,8 @@ class CustomerAddress {
       pinCode: pinCode ?? this.pinCode,
       eligibleBranchId: eligibleBranchId ?? this.eligibleBranchId,
       isDefault: isDefault ?? this.isDefault,
+      latitude: latitude ?? this.latitude,
+      longitude: longitude ?? this.longitude,
     );
   }
 }

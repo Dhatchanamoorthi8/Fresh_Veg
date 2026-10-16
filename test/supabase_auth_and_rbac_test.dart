@@ -143,7 +143,7 @@ void main() {
 
   group('3. Customer Login Screen Authentication UI Tests', () {
     testWidgets(
-      'Login screen presents Email/Password, Google button, and Portal links',
+      'Login screen presents Email/Password, Google button, and ensures Staff/Admin portals are excluded for customer monorepo',
       (tester) async {
         await tester.pumpWidget(
           const ProviderScope(child: MaterialApp(home: LoginScreen())),
@@ -159,10 +159,11 @@ void main() {
         expect(find.text('Register here'), findsOneWidget);
         expect(find.text('Forgot Password?'), findsOneWidget);
 
-        // Dedicated Portal Navigation
-        expect(find.text('Staff Login'), findsOneWidget);
-        expect(find.text('Delivery Partner'), findsOneWidget);
-        expect(find.text('Admin Console'), findsOneWidget);
+        // Dedicated Monorepo Separation: Staff & Admin logins MUST NOT be present
+        expect(find.text('Staff Login'), findsNothing);
+        expect(find.text('Delivery Partner'), findsNothing);
+        expect(find.text('Admin Console'), findsNothing);
+        expect(find.text('Store Operations & Staff Access'), findsNothing);
 
         // Verify NO phone OTP button or demo login button exists
         expect(find.text('Send OTP'), findsNothing);

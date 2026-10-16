@@ -79,7 +79,6 @@ class HomeScreen extends ConsumerWidget {
                                 ),
                               ],
                             ),
-                            const RoleIndicatorBadge(),
                           ],
                         ),
                         const SizedBox(height: 10),

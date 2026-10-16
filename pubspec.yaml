@@ -54,6 +54,13 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
 
+  vegora_customer:
+    path: apps/vegora_customer
+  vegora_admin_web:
+    path: apps/vegora_admin_web
+  vegora_delivery:
+    path: apps/vegora_delivery
+
   # The "flutter_lints" package below contains a set of recommended lints to
   # encourage good coding practices. The lint set provided by the package is
   # activated in the `analysis_options.yaml` file located at the root of your
@@ -74,7 +81,6 @@ flutter:
 
   assets:
     - assets/branding/
-    - assets/images/
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images

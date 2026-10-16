@@ -106,15 +106,9 @@ final customerRouter = GoRouter(
       }
 
       // 2. Unauthenticated users:
-      // Protect private customer accounts: profile, orders, checkout, tracking
-      final isProtected =
-          loc == '/profile' ||
-          loc == '/orders' ||
-          loc == '/checkout' ||
-          loc == '/order-confirmation' ||
-          loc.startsWith('/tracking/');
-
-      if (!isAuthenticated && isProtected) {
+      // Guard all customer shopping and account pages: require authentication
+      final isPublic = loc == '/' || isAuthRoute || loc == '/branches';
+      if (!isAuthenticated && !isPublic) {
         return '/login';
       }
     } catch (_) {
