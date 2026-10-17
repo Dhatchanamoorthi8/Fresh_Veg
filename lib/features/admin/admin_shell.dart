@@ -26,93 +26,117 @@ class AdminMenuItem {
   final String title;
   final IconData icon;
   final String route;
+  final String group;
 
   const AdminMenuItem({
     required this.section,
     required this.title,
     required this.icon,
     required this.route,
+    required this.group,
   });
 }
 
 const List<AdminMenuItem> adminMenuItems = [
+  // OVERVIEW
   AdminMenuItem(
     section: AdminMenuSection.dashboard,
     title: 'Dashboard',
-    icon: Icons.dashboard_rounded,
+    icon: Icons.grid_view_rounded,
     route: '/admin',
-  ),
-  AdminMenuItem(
-    section: AdminMenuSection.branches,
-    title: 'Manage Branches',
-    icon: Icons.store_rounded,
-    route: '/admin/branches',
-  ),
-  AdminMenuItem(
-    section: AdminMenuSection.vegetables,
-    title: 'Manage Vegetables',
-    icon: Icons.eco_rounded,
-    route: '/admin/vegetables',
-  ),
-  AdminMenuItem(
-    section: AdminMenuSection.categories,
-    title: 'Categories',
-    icon: Icons.category_rounded,
-    route: '/admin/categories',
-  ),
-  AdminMenuItem(
-    section: AdminMenuSection.inventory,
-    title: 'Branch Inventory',
-    icon: Icons.inventory_2_rounded,
-    route: '/admin/inventory',
-  ),
-  AdminMenuItem(
-    section: AdminMenuSection.prices,
-    title: 'Price Management',
-    icon: Icons.price_change_rounded,
-    route: '/admin/prices',
-  ),
-  AdminMenuItem(
-    section: AdminMenuSection.promotions,
-    title: 'Discounts & Promotions',
-    icon: Icons.local_offer_rounded,
-    route: '/admin/promotions',
+    group: 'OVERVIEW',
   ),
   AdminMenuItem(
     section: AdminMenuSection.orders,
     title: 'Customer Orders',
     icon: Icons.receipt_long_rounded,
     route: '/admin/orders',
+    group: 'OVERVIEW',
   ),
+
+  // STORES & CATALOG
+  AdminMenuItem(
+    section: AdminMenuSection.branches,
+    title: 'Manage Branches',
+    icon: Icons.storefront_rounded,
+    route: '/admin/branches',
+    group: 'STORES & CATALOG',
+  ),
+  AdminMenuItem(
+    section: AdminMenuSection.vegetables,
+    title: 'Manage Vegetables',
+    icon: Icons.eco_rounded,
+    route: '/admin/vegetables',
+    group: 'STORES & CATALOG',
+  ),
+  AdminMenuItem(
+    section: AdminMenuSection.categories,
+    title: 'Categories',
+    icon: Icons.category_rounded,
+    route: '/admin/categories',
+    group: 'STORES & CATALOG',
+  ),
+  AdminMenuItem(
+    section: AdminMenuSection.inventory,
+    title: 'Branch Inventory',
+    icon: Icons.inventory_2_rounded,
+    route: '/admin/inventory',
+    group: 'STORES & CATALOG',
+  ),
+
+  // PRICING & PROMOTIONS
+  AdminMenuItem(
+    section: AdminMenuSection.prices,
+    title: 'Price Management',
+    icon: Icons.price_change_rounded,
+    route: '/admin/prices',
+    group: 'PRICING & OFFERS',
+  ),
+  AdminMenuItem(
+    section: AdminMenuSection.promotions,
+    title: 'Discounts & Promotions',
+    icon: Icons.local_offer_rounded,
+    route: '/admin/promotions',
+    group: 'PRICING & OFFERS',
+  ),
+
+  // FLEET & OPERATIONS
   AdminMenuItem(
     section: AdminMenuSection.staff,
     title: 'Branch Staff',
     icon: Icons.badge_rounded,
     route: '/admin/staff',
+    group: 'FLEET & STAFF',
   ),
   AdminMenuItem(
     section: AdminMenuSection.deliveryAgents,
     title: 'Delivery Agents',
     icon: Icons.delivery_dining_rounded,
     route: '/admin/delivery-agents',
+    group: 'FLEET & STAFF',
   ),
   AdminMenuItem(
     section: AdminMenuSection.deliveryAssignments,
-    title: 'Delivery Assignments',
+    title: 'Delivery Dispatch',
     icon: Icons.assignment_ind_rounded,
     route: '/admin/delivery-assignments',
+    group: 'FLEET & STAFF',
   ),
+
+  // ANALYTICS & SYSTEM
   AdminMenuItem(
     section: AdminMenuSection.reports,
     title: 'Sales Reports',
     icon: Icons.bar_chart_rounded,
     route: '/admin/reports',
+    group: 'ANALYTICS & CONFIG',
   ),
   AdminMenuItem(
     section: AdminMenuSection.settings,
     title: 'Settings',
     icon: Icons.settings_rounded,
     route: '/admin/settings',
+    group: 'ANALYTICS & CONFIG',
   ),
 ];
 
@@ -211,63 +235,123 @@ class AdminScaffold extends ConsumerWidget {
 
   Widget _buildDesktopTopBar(BuildContext context, WidgetRef ref) {
     return Container(
-      height: 64,
+      height: 60,
       padding: const EdgeInsets.symmetric(horizontal: 24),
-      decoration: BoxDecoration(
-        color: AppColors.surface,
+      decoration: const BoxDecoration(
+        color: Colors.white,
         border: Border(
-          bottom: BorderSide(color: AppColors.neutral200, width: 1),
+          bottom: BorderSide(color: Color(0xFFE2E8F0), width: 1),
         ),
       ),
       child: Row(
         children: [
-          Text(
-            title,
-            style: const TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.w800,
-              color: AppColors.neutral900,
-            ),
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Text(
+                'Vegora Admin',
+                style: TextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w500,
+                  color: Color(0xFF64748B),
+                ),
+              ),
+              const Padding(
+                padding: EdgeInsets.symmetric(horizontal: 8),
+                child: Text('/', style: TextStyle(color: Color(0xFFCBD5E1), fontSize: 13)),
+              ),
+              Text(
+                title,
+                style: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w700,
+                  color: Color(0xFF0F172A),
+                ),
+              ),
+            ],
           ),
           const Spacer(),
           ...?actions,
-          const SizedBox(width: 12),
+          const SizedBox(width: 14),
+          // Live Network Status
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
             decoration: BoxDecoration(
-              color: AppColors.primaryContainer.withValues(alpha: 0.4),
-              borderRadius: BorderRadius.circular(20),
-              border: Border.all(
-                color: AppColors.primary.withValues(alpha: 0.3),
-              ),
+              color: const Color(0xFFECFDF5),
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: const Color(0xFFA7F3D0)),
             ),
-            child: Row(
+            child: const Row(
               mainAxisSize: MainAxisSize.min,
-              children: const [
-                Icon(Icons.shield_rounded, size: 16, color: AppColors.primary),
+              children: [
+                CircleAvatar(
+                  radius: 3.5,
+                  backgroundColor: Color(0xFF10B981),
+                ),
                 SizedBox(width: 6),
                 Text(
-                  'Super Admin',
+                  'Network Online',
                   style: TextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.bold,
-                    color: AppColors.primary,
+                    fontSize: 11,
+                    fontWeight: FontWeight.w700,
+                    color: Color(0xFF065F46),
                   ),
                 ),
               ],
             ),
           ),
           const SizedBox(width: 12),
-          IconButton(
-            icon: const Icon(
-              Icons.storefront_rounded,
-              color: AppColors.neutral700,
+          // Super Admin profile pill
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+            decoration: BoxDecoration(
+              color: const Color(0xFFF8FAFC),
+              borderRadius: BorderRadius.circular(20),
+              border: Border.all(color: const Color(0xFFE2E8F0)),
             ),
-            tooltip: 'View Customer Storefront',
-            onPressed: () => context.go('/home'),
+            child: const Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                CircleAvatar(
+                  radius: 11,
+                  backgroundColor: Color(0xFF0B6B3A),
+                  child: Text(
+                    'A',
+                    style: TextStyle(
+                      fontSize: 10,
+                      fontWeight: FontWeight.w800,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+                SizedBox(width: 8),
+                Text(
+                  'Super Admin',
+                  style: TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w700,
+                    color: Color(0xFF1E293B),
+                  ),
+                ),
+              ],
+            ),
           ),
+          const SizedBox(width: 10),
+          OutlinedButton.icon(
+            onPressed: () => context.go('/home'),
+            icon: const Icon(Icons.storefront_rounded, size: 15),
+            label: const Text('Storefront', style: TextStyle(fontSize: 12)),
+            style: OutlinedButton.styleFrom(
+              foregroundColor: AppColors.neutral800,
+              side: const BorderSide(color: Color(0xFFE2E8F0)),
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
+              visualDensity: VisualDensity.compact,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+            ),
+          ),
+          const SizedBox(width: 6),
           IconButton(
-            icon: const Icon(Icons.logout_rounded, color: AppColors.error),
+            icon: const Icon(Icons.logout_rounded, color: AppColors.error, size: 19),
             tooltip: 'Logout',
             onPressed: () => _handleLogout(context, ref),
           ),
@@ -278,12 +362,12 @@ class AdminScaffold extends ConsumerWidget {
 
   Widget _buildSidebar(BuildContext context, WidgetRef ref) {
     return Material(
-      color: AppColors.surface,
+      color: Colors.white,
       child: Container(
-        width: 260,
-        decoration: BoxDecoration(
+        width: 250,
+        decoration: const BoxDecoration(
           border: Border(
-            right: BorderSide(color: AppColors.neutral200, width: 1),
+            right: BorderSide(color: Color(0xFFE2E8F0), width: 1),
           ),
         ),
         child: Column(
@@ -292,9 +376,9 @@ class AdminScaffold extends ConsumerWidget {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
               alignment: Alignment.centerLeft,
-              decoration: BoxDecoration(
+              decoration: const BoxDecoration(
                 border: Border(
-                  bottom: BorderSide(color: AppColors.neutral200, width: 1),
+                  bottom: BorderSide(color: Color(0xFFE2E8F0), width: 1),
                 ),
               ),
               child: Row(
@@ -331,17 +415,18 @@ class AdminScaffold extends ConsumerWidget {
                         Text(
                           'Vegora',
                           style: TextStyle(
-                            fontSize: 18,
+                            fontSize: 17,
                             fontWeight: FontWeight.w900,
-                            color: AppColors.primary,
+                            color: Color(0xFF0B6B3A),
+                            letterSpacing: -0.3,
                           ),
                         ),
                         Text(
-                          'Operations Portal',
+                          'Operations Console',
                           style: TextStyle(
                             fontSize: 11,
                             fontWeight: FontWeight.w600,
-                            color: AppColors.neutral600,
+                            color: Color(0xFF64748B),
                           ),
                           overflow: TextOverflow.ellipsis,
                         ),
@@ -352,7 +437,7 @@ class AdminScaffold extends ConsumerWidget {
               ),
             ),
 
-            // Menu List
+            // Grouped Menu List
             Expanded(
               child: SingleChildScrollView(
                 padding: const EdgeInsets.symmetric(
@@ -360,37 +445,38 @@ class AdminScaffold extends ConsumerWidget {
                   horizontal: 10,
                 ),
                 child: Column(
-                  children: [
-                    for (final item in adminMenuItems)
-                      _buildNavItem(context, item),
-                  ],
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: _buildGroupedNavList(context),
                 ),
               ),
             ),
 
-            // Logout Item at bottom
+            // Footer Logout
             Container(
               padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
+              decoration: const BoxDecoration(
                 border: Border(
-                  top: BorderSide(color: AppColors.neutral200, width: 1),
+                  top: BorderSide(color: Color(0xFFE2E8F0), width: 1),
                 ),
               ),
               child: Material(
                 color: Colors.transparent,
                 child: ListTile(
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10),
+                    borderRadius: BorderRadius.circular(8),
                   ),
+                  dense: true,
                   leading: const Icon(
                     Icons.logout_rounded,
                     color: AppColors.error,
+                    size: 19,
                   ),
                   title: const Text(
-                    'Logout',
+                    'Sign Out',
                     style: TextStyle(
                       fontWeight: FontWeight.w700,
                       color: AppColors.error,
+                      fontSize: 13,
                     ),
                   ),
                   onTap: () => _handleLogout(context, ref),
@@ -403,12 +489,40 @@ class AdminScaffold extends ConsumerWidget {
     );
   }
 
+  List<Widget> _buildGroupedNavList(BuildContext context) {
+    final widgets = <Widget>[];
+    String? currentGroup;
+
+    for (final item in adminMenuItems) {
+      if (item.group != currentGroup) {
+        currentGroup = item.group;
+        widgets.add(
+          Padding(
+            padding: const EdgeInsets.only(left: 10, top: 14, bottom: 5),
+            child: Text(
+              currentGroup,
+              style: const TextStyle(
+                fontSize: 10,
+                fontWeight: FontWeight.w800,
+                color: Color(0xFF94A3B8), // Slate-400
+                letterSpacing: 0.8,
+              ),
+            ),
+          ),
+        );
+      }
+      widgets.add(_buildNavItem(context, item));
+    }
+
+    return widgets;
+  }
+
   Widget _buildDrawer(BuildContext context, WidgetRef ref) {
     return Drawer(
       child: Column(
         children: [
           UserAccountsDrawerHeader(
-            decoration: const BoxDecoration(color: AppColors.primary),
+            decoration: const BoxDecoration(color: Color(0xFF0B6B3A)),
             accountName: const Text(
               'Vegora Admin Hub',
               style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
@@ -418,7 +532,7 @@ class AdminScaffold extends ConsumerWidget {
               backgroundColor: Colors.white,
               child: Icon(
                 Icons.admin_panel_settings_rounded,
-                color: AppColors.primary,
+                color: Color(0xFF0B6B3A),
                 size: 36,
               ),
             ),
@@ -477,11 +591,12 @@ class AdminScaffold extends ConsumerWidget {
       padding: const EdgeInsets.only(bottom: 2),
       child: Material(
         color: isSelected
-            ? AppColors.primary.withValues(alpha: 0.12)
+            ? const Color(0xFFECFDF5) // Emerald-50
             : Colors.transparent,
-        borderRadius: BorderRadius.circular(10),
+        borderRadius: BorderRadius.circular(8),
         child: InkWell(
-          borderRadius: BorderRadius.circular(10),
+          borderRadius: BorderRadius.circular(8),
+          hoverColor: const Color(0xFFF8FAFC),
           onTap: () {
             if (isDrawer) Navigator.pop(context);
             if (!isSelected) {
@@ -489,36 +604,33 @@ class AdminScaffold extends ConsumerWidget {
             }
           },
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 11),
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 9),
             child: Row(
               children: [
                 Icon(
                   item.icon,
-                  size: 20,
-                  color: isSelected ? AppColors.primary : AppColors.neutral700,
+                  size: 19,
+                  color: isSelected ? const Color(0xFF0B6B3A) : const Color(0xFF64748B),
                 ),
-                const SizedBox(width: 14),
+                const SizedBox(width: 12),
                 Expanded(
                   child: Text(
                     item.title,
                     style: TextStyle(
-                      fontSize: 13.5,
-                      fontWeight: isSelected
-                          ? FontWeight.w800
-                          : FontWeight.w600,
-                      color: isSelected
-                          ? AppColors.primary
-                          : AppColors.neutral800,
+                      fontSize: 13,
+                      fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+                      color: isSelected ? const Color(0xFF0B6B3A) : const Color(0xFF1E293B),
+                      letterSpacing: -0.1,
                     ),
                   ),
                 ),
                 if (isSelected)
                   Container(
-                    width: 4,
-                    height: 18,
-                    decoration: BoxDecoration(
-                      color: AppColors.primary,
-                      borderRadius: BorderRadius.circular(4),
+                    width: 6,
+                    height: 6,
+                    decoration: const BoxDecoration(
+                      color: Color(0xFF0B6B3A),
+                      shape: BoxShape.circle,
                     ),
                   ),
               ],

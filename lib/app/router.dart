@@ -39,6 +39,7 @@ import '../features/orders/orders_screen.dart';
 import '../features/profile/profile_screen.dart';
 import '../features/splash/splash_screen.dart';
 import '../shared/models/order.dart';
+import '../shared/models/user_role.dart';
 import 'customer_shell.dart';
 
 /// Listenable that notifies GoRouter whenever the Supabase authentication
@@ -50,18 +51,61 @@ class AppAuthListenable extends ChangeNotifier {
   }
 
   StreamSubscription<AuthState>? _sub;
+  bool isPasswordRecovery = false;
+  AppUserRole currentRole = AppUserRole.customer;
+
+  void setRole(AppUserRole role) {
+    if (currentRole != role) {
+      currentRole = role;
+      notifyListeners();
+    }
+  }
 
   void _trySubscribe() {
     if (_sub != null) return;
     try {
-      _sub = Supabase.instance.client.auth.onAuthStateChange.listen((data) {
+      _sub = Supabase.instance.client.auth.onAuthStateChange.listen((data) async {
         if (data.event == AuthChangeEvent.passwordRecovery) {
+          isPasswordRecovery = true;
           appRouter.go('/customer/reset-password');
+        } else if (data.session?.user != null) {
+          _fetchAndSetRole(data.session!.user.id);
+        } else {
+          currentRole = AppUserRole.customer;
         }
         notifyListeners();
       });
     } catch (_) {
       // Supabase uninitialized yet
+    }
+  }
+
+  Future<void> _fetchAndSetRole(String userId) async {
+    try {
+      final rolesRes = await Supabase.instance.client
+          .from('user_roles')
+          .select('role')
+          .eq('user_id', userId);
+
+      final roleList = (rolesRes as List)
+          .map((r) => r['role'] as String?)
+          .whereType<String>()
+          .toList();
+
+      if (roleList.contains('delivery_staff')) {
+        currentRole = AppUserRole.deliveryStaff;
+      } else if (roleList.contains('branch_staff')) {
+        currentRole = AppUserRole.branchStaff;
+      } else if (roleList.contains('super_admin')) {
+        currentRole = AppUserRole.superAdmin;
+      } else if (roleList.contains('branch_admin')) {
+        currentRole = AppUserRole.branchAdmin;
+      } else {
+        currentRole = AppUserRole.customer;
+      }
+      notifyListeners();
+    } catch (_) {
+      // Supabase uninitialized or offline
     }
   }
 
@@ -116,11 +160,24 @@ final appRouter = GoRouter(
 
       // 1. Authenticated users:
       if (isAuthenticated) {
-        if (loc == '/customer/reset-password' || loc == '/admin/reset-password') {
+        if (AppAuthListenable.instance.isPasswordRecovery ||
+            loc == '/customer/reset-password' ||
+            loc == '/admin/reset-password') {
           return null;
         }
         if (loc == '/' || isAuthRoute) {
-          return '/home';
+          final role = AppAuthListenable.instance.currentRole;
+          switch (role) {
+            case AppUserRole.deliveryStaff:
+              return '/delivery';
+            case AppUserRole.branchStaff:
+              return '/staff';
+            case AppUserRole.superAdmin:
+              return '/admin';
+            case AppUserRole.branchAdmin:
+            case AppUserRole.customer:
+              return '/home';
+          }
         }
       }
 

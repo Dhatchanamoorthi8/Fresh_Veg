@@ -8,6 +8,7 @@ import '../../shared/models/order.dart';
 import '../../shared/models/order_status.dart';
 import '../../shared/providers/order_provider.dart';
 import '../../shared/widgets/order_status_badge.dart';
+import '../../shared/widgets/product_image_view.dart';
 
 class OrderTrackingScreen extends ConsumerWidget {
   final String orderId;
@@ -286,9 +287,13 @@ class OrderTrackingScreen extends ConsumerWidget {
                       padding: const EdgeInsets.symmetric(vertical: 6),
                       child: Row(
                         children: [
-                          Text(
-                            item.product.emoji,
-                            style: const TextStyle(fontSize: 20),
+                          ProductImageView(
+                            imageUrl: item.product.imageUrl,
+                            fallbackEmoji: item.product.emoji,
+                            width: 28,
+                            height: 28,
+                            borderRadius: BorderRadius.circular(6),
+                            emojiSize: 18,
                           ),
                           const SizedBox(width: 10),
                           Expanded(

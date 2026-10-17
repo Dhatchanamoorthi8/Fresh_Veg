@@ -118,14 +118,26 @@ class SupabaseAuthRepository {
     );
   }
 
-  /// Verify Recovery OTP (used for verifying 6-digit confirmation code from email)
+  /// Verify Recovery OTP or Token (supports 6-digit code, token string, or pasted URL)
   Future<AuthResponse> verifyRecoveryOtp({
     required String email,
     required String token,
   }) async {
+    String cleanToken = token.trim();
+    if (cleanToken.contains('token=')) {
+      final uri = Uri.tryParse(cleanToken);
+      if (uri != null && uri.queryParameters.containsKey('token')) {
+        cleanToken = uri.queryParameters['token']!;
+      } else {
+        final match = RegExp(r'[?&#]token=([^&#]+)').firstMatch(cleanToken);
+        if (match != null) {
+          cleanToken = Uri.decodeComponent(match.group(1)!);
+        }
+      }
+    }
     return await _client.auth.verifyOTP(
       email: email.trim(),
-      token: token.trim(),
+      token: cleanToken,
       type: OtpType.recovery,
     );
   }

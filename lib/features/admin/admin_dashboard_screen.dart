@@ -182,39 +182,41 @@ class _AdminDashboardScreenState extends ConsumerState<AdminDashboardScreen> {
             children: [
               ElevatedButton.icon(
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.primary,
+                  backgroundColor: const Color(0xFF0B6B3A),
                   foregroundColor: Colors.white,
                   padding: const EdgeInsets.symmetric(
                     horizontal: 16,
                     vertical: 12,
                   ),
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10),
+                    borderRadius: BorderRadius.circular(8),
                   ),
+                  elevation: 0,
                 ),
                 icon: const Icon(Icons.add_business_rounded, size: 18),
                 label: const Text(
-                  '+ Add Branch',
-                  style: TextStyle(fontWeight: FontWeight.bold),
+                  'Add Branch',
+                  style: TextStyle(fontWeight: FontWeight.w700, fontSize: 13),
                 ),
                 onPressed: () => context.go('/admin/branches'),
               ),
               ElevatedButton.icon(
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.teal.shade700,
+                  backgroundColor: const Color(0xFF0F766E),
                   foregroundColor: Colors.white,
                   padding: const EdgeInsets.symmetric(
                     horizontal: 16,
                     vertical: 12,
                   ),
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10),
+                    borderRadius: BorderRadius.circular(8),
                   ),
+                  elevation: 0,
                 ),
                 icon: const Icon(Icons.eco_rounded, size: 18),
                 label: const Text(
-                  '+ Add Vegetable',
-                  style: TextStyle(fontWeight: FontWeight.bold),
+                  'Add Vegetable',
+                  style: TextStyle(fontWeight: FontWeight.w700, fontSize: 13),
                 ),
                 onPressed: () => context.go('/admin/vegetables'),
               ),

@@ -276,16 +276,19 @@ class SupabaseCatalogRepository implements CatalogRepository {
         final bId = entry.key;
         final inv = entry.value;
 
-        await _client.from('branch_inventory').upsert({
-          'branch_id': bId,
-          'product_id': newProduct.id,
-          'price_paise': inv.pricePaise ?? newProduct.basePricePaise,
-          'stock_quantity': inv.stockQuantity,
-          'low_stock_threshold': inv.lowStockThreshold,
-          'is_available': inv.isAvailable,
-          'is_active': true,
-          'updated_at': DateTime.now().toIso8601String(),
-        });
+        await _client.from('branch_inventory').upsert(
+          {
+            'branch_id': bId,
+            'product_id': newProduct.id,
+            'price_paise': inv.pricePaise ?? newProduct.basePricePaise,
+            'stock_quantity': inv.stockQuantity,
+            'low_stock_threshold': inv.lowStockThreshold,
+            'is_available': inv.isAvailable,
+            'is_active': true,
+            'updated_at': DateTime.now().toIso8601String(),
+          },
+          onConflict: 'branch_id, product_id',
+        );
       }
 
       return newProduct;
@@ -340,16 +343,19 @@ class SupabaseCatalogRepository implements CatalogRepository {
     required bool isAvailable,
   }) async {
     try {
-      await _client.from('branch_inventory').upsert({
-        'branch_id': branchId,
-        'product_id': productId,
-        'price_paise': pricePaise,
-        'stock_quantity': stockQuantity,
-        'low_stock_threshold': lowStockThreshold,
-        'is_available': isAvailable,
-        'is_active': true,
-        'updated_at': DateTime.now().toIso8601String(),
-      });
+      await _client.from('branch_inventory').upsert(
+        {
+          'branch_id': branchId,
+          'product_id': productId,
+          'price_paise': pricePaise,
+          'stock_quantity': stockQuantity,
+          'low_stock_threshold': lowStockThreshold,
+          'is_available': isAvailable,
+          'is_active': true,
+          'updated_at': DateTime.now().toIso8601String(),
+        },
+        onConflict: 'branch_id, product_id',
+      );
     } catch (e) {
       debugPrint('Error updating branch inventory pricing and stock: $e');
       rethrow;

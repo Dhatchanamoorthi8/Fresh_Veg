@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../../core/constants/app_colors.dart';
 import '../../core/utils/auth_error_parser.dart';
 import '../../shared/providers/app_providers.dart';
+import '../../app/router.dart';
 
 class ResetPasswordScreen extends ConsumerStatefulWidget {
   const ResetPasswordScreen({super.key});
@@ -42,6 +43,7 @@ class _ResetPasswordScreenState extends ConsumerState<ResetPasswordScreen> {
     try {
       final authRepo = ref.read(authRepositoryProvider);
       await authRepo.updateUserPassword(_passwordController.text.trim());
+      AppAuthListenable.instance.isPasswordRecovery = false;
       await authRepo.signOut();
 
       if (!mounted) return;

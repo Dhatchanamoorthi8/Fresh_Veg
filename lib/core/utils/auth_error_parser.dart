@@ -1,12 +1,38 @@
-/// Enterprise-grade authentication and authorization error parser.
-/// Maps Supabase auth exceptions, HTTP status codes, network errors,
-/// and custom domain exceptions into human-friendly, localized error messages.
+import 'package:supabase_flutter/supabase_flutter.dart';
+
+/// Enterprise-grade authentication, authorization, and database error parser.
+/// Maps Supabase auth exceptions, PostgreSQL errors, HTTP status codes,
+/// network timeouts, and domain exceptions into human-friendly, localized error messages.
 class AuthErrorParser {
   AuthErrorParser._();
 
   /// Parses any error into a clean, human-friendly message for presentation in UI.
   static String parse(dynamic error, {String? defaultMessage}) {
     if (error == null) return '';
+
+    // Direct typed handling for PostgrestException
+    if (error is PostgrestException) {
+      final msg = error.message.toLowerCase();
+      if (error.code == '23505' || msg.contains('already exists') || msg.contains('unique constraint')) {
+        return 'An account with this email address already exists. Please choose a different email.';
+      }
+      if (error.code == '42501' || msg.contains('access denied') || msg.contains('unauthorized') || msg.contains('permission denied')) {
+        return 'Access denied: You do not have administrative privileges to perform this action.';
+      }
+      if (msg.contains('password') && (msg.contains('6') || msg.contains('least'))) {
+        return 'Password must be at least 6 characters long.';
+      }
+      if (msg.contains('branch assignment is required')) {
+        return 'Please select a store branch to assign this staff member.';
+      }
+      if (error.message.isNotEmpty &&
+          !msg.contains('column') &&
+          !msg.contains('relation') &&
+          !msg.contains('syntax error')) {
+        return error.message;
+      }
+      return 'A database operation failed. System updates have been applied. Please try again.';
+    }
 
     final raw = error.toString().trim();
 
@@ -27,8 +53,9 @@ class AuthErrorParser {
     // User already registered
     if (raw.contains('user_already_exists') ||
         raw.contains('already registered') ||
+        raw.contains('already exists') ||
         raw.contains('User already registered')) {
-      return 'An account with this email address already exists. Please sign in instead.';
+      return 'An account with this email address already exists. Please choose a different email.';
     }
 
     // User not found
@@ -41,17 +68,20 @@ class AuthErrorParser {
         raw.contains('rate_limit') ||
         raw.contains('over_email_send_rate_limit') ||
         raw.contains('Too many requests')) {
-      return 'Too many sign-in attempts. For security reasons, please wait a moment before trying again.';
+      return 'Too many attempts. For security reasons, please wait a moment before trying again.';
     }
 
     // Weak password
     if (raw.contains('weak_password') ||
-        raw.contains('Password should be at least')) {
+        raw.contains('Password should be at least') ||
+        raw.contains('Password must be at least')) {
       return 'Password is too weak. Please choose a password with at least 6 characters.';
     }
 
     // Domain: Access Denied / Unauthorized Role
     if (raw.contains('Access Denied') ||
+        raw.contains('Access denied') ||
+        raw.contains('Unauthorized') ||
         raw.contains('administrator privileges') ||
         raw.contains('store staff') ||
         raw.contains('delivery partner')) {
@@ -84,6 +114,9 @@ class AuthErrorParser {
         .replaceAll(RegExp(r',\s*statusCode:\s*\d+.*?\)', dotAll: true), '')
         .replaceAll(RegExp(r'AuthException\(.*?message:\s*'), '')
         .replaceAll(RegExp(r'PostgrestException\(.*?message:\s*'), '')
+        .replaceAll(RegExp(r',\s*code:\s*[^,]+', dotAll: true), '')
+        .replaceAll(RegExp(r',\s*details:\s*[^,]*', dotAll: true), '')
+        .replaceAll(RegExp(r',\s*hint:\s*[^)]*', dotAll: true), '')
         .replaceAll('Exception:', '')
         .replaceAll('ClientException:', '')
         .replaceAll('AuthApiException:', '')

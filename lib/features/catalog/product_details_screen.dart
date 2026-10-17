@@ -10,6 +10,7 @@ import '../../shared/providers/branch_provider.dart';
 import '../../shared/providers/cart_provider.dart';
 import '../../shared/widgets/branch_switch_dialog.dart';
 import '../../shared/widgets/product_card.dart';
+import '../../shared/widgets/product_image_view.dart';
 
 class ProductDetailsScreen extends ConsumerWidget {
   final String productId;
@@ -76,14 +77,16 @@ class ProductDetailsScreen extends ConsumerWidget {
                 // Top Hero Showcase
                 Container(
                   width: double.infinity,
-                  height: 220,
+                  height: 240,
                   color: AppColors.surfaceVariant.withValues(alpha: 0.6),
                   alignment: Alignment.center,
                   child: Hero(
                     tag: 'product_${product.id}',
-                    child: Text(
-                      product.emoji,
-                      style: const TextStyle(fontSize: 100),
+                    child: ProductImageView(
+                      imageUrl: product.imageUrl,
+                      fallbackEmoji: product.emoji,
+                      fit: BoxFit.contain,
+                      emojiSize: 96,
                     ),
                   ),
                 ),

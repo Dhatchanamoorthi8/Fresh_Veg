@@ -10,6 +10,7 @@ import '../../shared/providers/branch_provider.dart';
 import '../../shared/providers/order_provider.dart';
 import '../../shared/widgets/empty_state_view.dart';
 import '../../shared/widgets/order_status_badge.dart';
+import '../../shared/widgets/product_image_view.dart';
 import '../../shared/widgets/role_picker_sheet.dart';
 
 class BranchStaffScreen extends ConsumerStatefulWidget {
@@ -626,9 +627,13 @@ class _BranchStaffScreenState extends ConsumerState<BranchStaffScreen> {
                         padding: const EdgeInsets.symmetric(vertical: 8),
                         child: Row(
                           children: [
-                            Text(
-                              item.product.emoji,
-                              style: const TextStyle(fontSize: 24),
+                            ProductImageView(
+                              imageUrl: item.product.imageUrl,
+                              fallbackEmoji: item.product.emoji,
+                              width: 32,
+                              height: 32,
+                              borderRadius: BorderRadius.circular(6),
+                              emojiSize: 22,
                             ),
                             const SizedBox(width: 12),
                             Expanded(

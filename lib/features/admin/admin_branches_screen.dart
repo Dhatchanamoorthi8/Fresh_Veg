@@ -6,6 +6,8 @@ import '../../shared/models/branch.dart';
 import '../../shared/providers/app_providers.dart';
 import '../../shared/repositories/supabase_branch_repository.dart';
 import 'admin_shell.dart';
+import 'widgets/admin_status_badge.dart';
+import 'widgets/admin_table_container.dart';
 
 class AdminBranchesScreen extends ConsumerStatefulWidget {
   const AdminBranchesScreen({super.key});
@@ -20,6 +22,8 @@ class _AdminBranchesScreenState extends ConsumerState<AdminBranchesScreen> {
   List<Branch> _branches = [];
   String _searchQuery = '';
   String _statusFilter = 'ALL'; // 'ALL', 'ACTIVE', 'INACTIVE'
+  int _currentPage = 1;
+  int _rowsPerPage = 10;
 
   @override
   void initState() {
@@ -739,40 +743,61 @@ class _AdminBranchesScreenState extends ConsumerState<AdminBranchesScreen> {
                   ),
                 ),
                 const SizedBox(width: 14),
-                DropdownButton<String>(
-                  value: _statusFilter,
-                  items: const [
-                    DropdownMenuItem(value: 'ALL', child: Text('All Branches')),
-                    DropdownMenuItem(
-                      value: 'ACTIVE',
-                      child: Text('Active Only'),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 2),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(color: AppColors.neutral300),
+                  ),
+                  child: DropdownButtonHideUnderline(
+                    child: DropdownButton<String>(
+                      value: _statusFilter,
+                      style: const TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.neutral800,
+                      ),
+                      items: const [
+                        DropdownMenuItem(value: 'ALL', child: Text('All Branches')),
+                        DropdownMenuItem(
+                          value: 'ACTIVE',
+                          child: Text('Active Only'),
+                        ),
+                        DropdownMenuItem(
+                          value: 'INACTIVE',
+                          child: Text('Inactive Only'),
+                        ),
+                      ],
+                      onChanged: (v) {
+                        if (v != null) {
+                          setState(() {
+                            _statusFilter = v;
+                            _currentPage = 1;
+                          });
+                        }
+                      },
                     ),
-                    DropdownMenuItem(
-                      value: 'INACTIVE',
-                      child: Text('Inactive Only'),
-                    ),
-                  ],
-                  onChanged: (v) {
-                    if (v != null) setState(() => _statusFilter = v);
-                  },
+                  ),
                 ),
                 const SizedBox(width: 16),
                 ElevatedButton.icon(
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.primary,
+                    backgroundColor: const Color(0xFF0B6B3A),
                     foregroundColor: Colors.white,
                     padding: const EdgeInsets.symmetric(
                       horizontal: 18,
-                      vertical: 14,
+                      vertical: 12,
                     ),
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
+                      borderRadius: BorderRadius.circular(8),
                     ),
+                    elevation: 0,
                   ),
-                  icon: const Icon(Icons.add_rounded, size: 20),
+                  icon: const Icon(Icons.add_rounded, size: 19),
                   label: const Text(
-                    '+ Add Branch',
-                    style: TextStyle(fontWeight: FontWeight.bold),
+                    'Add Branch',
+                    style: TextStyle(fontWeight: FontWeight.w700, fontSize: 13.5),
                   ),
                   onPressed: () => _showAddEditBranchModal(),
                 ),
@@ -789,7 +814,7 @@ class _AdminBranchesScreenState extends ConsumerState<AdminBranchesScreen> {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Icon(
+                        const Icon(
                           Icons.storefront_rounded,
                           size: 64,
                           color: AppColors.neutral400,
@@ -805,7 +830,7 @@ class _AdminBranchesScreenState extends ConsumerState<AdminBranchesScreen> {
                         const SizedBox(height: 8),
                         ElevatedButton(
                           onPressed: () => _showAddEditBranchModal(),
-                          child: const Text('+ Add New Branch'),
+                          child: const Text('Add New Branch'),
                         ),
                       ],
                     ),
@@ -820,226 +845,203 @@ class _AdminBranchesScreenState extends ConsumerState<AdminBranchesScreen> {
   }
 
   Widget _buildDesktopTable(List<Branch> branches) {
+    final paginatedBranches = branches
+        .skip((_currentPage - 1) * _rowsPerPage)
+        .take(_rowsPerPage)
+        .toList();
+
     return SingleChildScrollView(
       padding: const EdgeInsets.all(24),
-      child: Card(
-        elevation: 0,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
-          side: BorderSide(color: AppColors.neutral200),
-        ),
-        child: DataTable(
-          headingRowColor: WidgetStateProperty.all(AppColors.neutral100),
-          columns: const [
-            DataColumn(
-              label: Text(
-                'Branch Name & Code',
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ),
-            ),
-            DataColumn(
-              label: Text(
-                'Manager & Contact',
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ),
-            ),
-            DataColumn(
-              label: Text(
-                'Location & PIN',
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ),
-            ),
-            DataColumn(
-              label: Text(
-                'Store Status',
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ),
-            ),
-            DataColumn(
-              label: Text(
-                'Orders',
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ),
-            ),
-            DataColumn(
-              label: Text(
-                'Actions',
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ),
-            ),
-          ],
-          rows: branches.map((branch) {
-            return DataRow(
-              cells: [
-                DataCell(
-                  Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        branch.name,
-                        style: const TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 14,
-                        ),
-                      ),
-                      const SizedBox(height: 2),
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 6,
-                          vertical: 2,
-                        ),
-                        decoration: BoxDecoration(
-                          color: AppColors.neutral200,
-                          borderRadius: BorderRadius.circular(4),
-                        ),
-                        child: Text(
-                          branch.code,
-                          style: const TextStyle(
-                            fontSize: 11,
-                            fontWeight: FontWeight.bold,
-                            color: AppColors.neutral800,
-                          ),
-                        ),
-                      ),
-                    ],
+      child: AdminTableContainer(
+        currentPage: _currentPage,
+        totalItems: branches.length,
+        rowsPerPage: _rowsPerPage,
+        onPageChanged: (page) => setState(() => _currentPage = page),
+        onRowsPerPageChanged: (rows) => setState(() {
+          _rowsPerPage = rows;
+          _currentPage = 1;
+        }),
+        itemName: 'branches',
+        columns: const [
+          AdminTableColumn(title: 'Branch Name & Code', flex: 3),
+          AdminTableColumn(title: 'Manager & Contact', flex: 2),
+          AdminTableColumn(title: 'Location & PIN', flex: 2),
+          AdminTableColumn(title: 'Store Status', flex: 1),
+          AdminTableColumn(title: 'Accepting Orders', flex: 1),
+          AdminTableColumn(
+            title: 'Actions',
+            flex: 1,
+            alignment: Alignment.centerRight,
+          ),
+        ],
+        rows: paginatedBranches.map((branch) {
+          return AdminTableRow(
+            cells: [
+              // 0: Branch Name & Code
+              Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    branch.name,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                      fontWeight: FontWeight.w700,
+                      fontSize: 13.5,
+                      color: Color(0xFF0F172A),
+                    ),
                   ),
-                ),
-                DataCell(
-                  Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        branch.managerName ?? 'Manager Unassigned',
-                        style: const TextStyle(
-                          fontSize: 13,
-                          fontWeight: FontWeight.w600,
-                        ),
+                  const SizedBox(height: 3),
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 6,
+                      vertical: 2,
+                    ),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFF1F5F9),
+                      borderRadius: BorderRadius.circular(4),
+                      border: Border.all(color: const Color(0xFFE2E8F0)),
+                    ),
+                    child: Text(
+                      branch.code,
+                      style: const TextStyle(
+                        fontSize: 11,
+                        fontWeight: FontWeight.w700,
+                        color: Color(0xFF475569),
+                        letterSpacing: 0.3,
                       ),
-                      Text(
-                        branch.phone,
-                        style: TextStyle(
-                          fontSize: 12,
-                          color: AppColors.neutral600,
-                        ),
-                      ),
-                      if (branch.contactEmail != null)
-                        Text(
-                          branch.contactEmail!,
-                          style: TextStyle(
-                            fontSize: 11,
-                            color: AppColors.neutral500,
-                          ),
-                        ),
-                    ],
+                    ),
                   ),
-                ),
-                DataCell(
-                  Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        '${branch.area}, ${branch.city}',
-                        style: const TextStyle(
-                          fontSize: 13,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                      Text(
-                        '${branch.state} • ${branch.pincode}',
-                        style: TextStyle(
-                          fontSize: 12,
-                          color: AppColors.neutral600,
-                        ),
-                      ),
-                    ],
+                ],
+              ),
+
+              // 1: Manager & Contact
+              Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    branch.managerName ?? 'Manager Unassigned',
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w600,
+                      color: branch.managerName != null
+                          ? const Color(0xFF1E293B)
+                          : const Color(0xFF94A3B8),
+                    ),
                   ),
-                ),
-                DataCell(
-                  Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Container(
-                        width: 8,
-                        height: 8,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: branch.isActive ? Colors.green : Colors.red,
-                        ),
-                      ),
-                      const SizedBox(width: 6),
-                      Text(
-                        branch.isActive
-                            ? (branch.isOpen
-                                  ? 'Active (Open)'
-                                  : 'Active (Closed)')
-                            : 'Inactive',
-                        style: TextStyle(
-                          fontSize: 12,
-                          fontWeight: FontWeight.w600,
-                          color: branch.isActive
-                              ? AppColors.primary
-                              : AppColors.error,
-                        ),
-                      ),
-                    ],
+                  Text(
+                    branch.phone,
+                    style: const TextStyle(
+                      fontSize: 11.5,
+                      color: Color(0xFF64748B),
+                    ),
                   ),
-                ),
-                DataCell(
-                  Switch(
-                    value: branch.isAcceptingOrders,
-                    activeTrackColor: AppColors.primaryLight,
-                    activeThumbColor: AppColors.primary,
-                    onChanged: (val) async {
-                      final repo = ref.read(branchRepositoryProvider);
-                      if (repo is SupabaseBranchRepository) {
-                        await repo.toggleBranchStatus(
-                          branch.id,
-                          isOpen: branch.isOpen,
-                          isAcceptingOrders: val,
-                        );
-                        _loadBranches();
-                      }
-                    },
-                  ),
-                ),
-                DataCell(
-                  Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      IconButton(
-                        icon: const Icon(
-                          Icons.edit_rounded,
-                          size: 20,
-                          color: AppColors.primary,
-                        ),
-                        tooltip: 'Edit Branch',
-                        onPressed: () => _showAddEditBranchModal(branch),
+                  if (branch.contactEmail != null)
+                    Text(
+                      branch.contactEmail!,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        fontSize: 11,
+                        color: Color(0xFF94A3B8),
                       ),
-                      IconButton(
-                        icon: Icon(
-                          branch.isActive
-                              ? Icons.toggle_on_rounded
-                              : Icons.toggle_off_rounded,
-                          size: 26,
-                          color: branch.isActive
-                              ? AppColors.primary
-                              : AppColors.neutral500,
-                        ),
-                        tooltip: branch.isActive
-                            ? 'Deactivate Branch'
-                            : 'Activate Branch',
-                        onPressed: () => _toggleBranchActive(branch),
-                      ),
-                    ],
+                    ),
+                ],
+              ),
+
+              // 2: Location & PIN
+              Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    '${branch.area}, ${branch.city}',
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w600,
+                      color: Color(0xFF334155),
+                    ),
                   ),
+                  Text(
+                    '${branch.state} • ${branch.pincode}',
+                    style: const TextStyle(
+                      fontSize: 11.5,
+                      color: Color(0xFF64748B),
+                    ),
+                  ),
+                ],
+              ),
+
+              // 3: Store Status
+              AdminStatusBadge(
+                label: branch.isActive
+                    ? (branch.isOpen ? 'Active (Open)' : 'Active (Closed)')
+                    : 'Inactive',
+                isActive: branch.isActive,
+              ),
+
+              // 4: Accepting Orders
+              Transform.scale(
+                scale: 0.85,
+                alignment: Alignment.centerLeft,
+                child: Switch(
+                  value: branch.isAcceptingOrders,
+                  activeThumbColor: const Color(0xFF16A34A),
+                  activeTrackColor: const Color(0xFFBBF7D0),
+                  onChanged: (val) async {
+                    final repo = ref.read(branchRepositoryProvider);
+                    if (repo is SupabaseBranchRepository) {
+                      await repo.toggleBranchStatus(
+                        branch.id,
+                        isOpen: branch.isOpen,
+                        isAcceptingOrders: val,
+                      );
+                      _loadBranches();
+                    }
+                  },
                 ),
-              ],
-            );
-          }).toList(),
-        ),
+              ),
+
+              // 5: Actions
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  IconButton(
+                    icon: const Icon(
+                      Icons.edit_outlined,
+                      size: 19,
+                      color: Color(0xFF475569),
+                    ),
+                    tooltip: 'Edit Branch',
+                    onPressed: () => _showAddEditBranchModal(branch),
+                  ),
+                  IconButton(
+                    icon: Icon(
+                      branch.isActive
+                          ? Icons.toggle_on_rounded
+                          : Icons.toggle_off_rounded,
+                      size: 26,
+                      color: branch.isActive
+                          ? const Color(0xFF16A34A)
+                          : const Color(0xFF94A3B8),
+                    ),
+                    tooltip: branch.isActive
+                        ? 'Deactivate Branch'
+                        : 'Activate Branch',
+                    onPressed: () => _toggleBranchActive(branch),
+                  ),
+                ],
+              ),
+            ],
+          );
+        }).toList(),
       ),
     );
   }

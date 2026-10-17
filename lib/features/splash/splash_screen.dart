@@ -4,7 +4,9 @@ import 'package:go_router/go_router.dart';
 
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../core/constants/app_colors.dart';
+import '../../shared/models/user_role.dart';
 import '../../shared/providers/auth_provider.dart';
+import '../../app/router.dart';
 
 class SplashScreen extends ConsumerStatefulWidget {
   const SplashScreen({super.key});
@@ -21,20 +23,42 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
       if (!mounted) return;
       try {
         if (Supabase.instance.client.auth.currentUser != null) {
-          context.go('/home');
+          final role = ref.read(userRoleProvider);
+          AppAuthListenable.instance.setRole(role);
+          _navigateToRoleHome(role);
         }
       } catch (_) {}
     });
   }
 
+  void _navigateToRoleHome(AppUserRole role) {
+    switch (role) {
+      case AppUserRole.deliveryStaff:
+        context.go('/delivery');
+        break;
+      case AppUserRole.branchStaff:
+        context.go('/staff');
+        break;
+      case AppUserRole.superAdmin:
+        context.go('/admin');
+        break;
+      case AppUserRole.branchAdmin:
+      case AppUserRole.customer:
+        context.go('/home');
+        break;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    // If auth state updates to authenticated, immediately navigate to /home
+    // If auth state updates to authenticated, navigate based on role
     final user = ref.watch(currentSupabaseUserProvider);
+    final role = ref.watch(userRoleProvider);
     if (user != null) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (mounted) {
-          context.go('/home');
+          AppAuthListenable.instance.setRole(role);
+          _navigateToRoleHome(role);
         }
       });
     }
@@ -149,7 +173,9 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
                     final isAuthenticated =
                         Supabase.instance.client.auth.currentUser != null;
                     if (isAuthenticated) {
-                      context.go('/home');
+                      final role = ref.read(userRoleProvider);
+                      AppAuthListenable.instance.setRole(role);
+                      _navigateToRoleHome(role);
                     } else {
                       context.go('/login');
                     }

@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/constants/app_colors.dart';
+import '../../core/utils/auth_error_parser.dart';
+import '../../core/utils/email_validator.dart';
 import '../../shared/models/branch.dart';
 import '../../shared/providers/app_providers.dart';
 import '../../shared/providers/branch_provider.dart';
@@ -77,49 +79,74 @@ class _AdminStaffManagementScreenState
                     const SizedBox(height: 14),
                     if (dialogError != null) ...[
                       Container(
-                        padding: const EdgeInsets.all(10),
-                        decoration: BoxDecoration(
-                          color: AppColors.errorContainer,
-                          borderRadius: BorderRadius.circular(8),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 14,
+                          vertical: 10,
                         ),
-                        child: Text(
-                          dialogError!,
-                          style: const TextStyle(
-                            color: AppColors.error,
-                            fontSize: 12,
-                          ),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFFEF2F2),
+                          borderRadius: BorderRadius.circular(8),
+                          border: Border.all(color: const Color(0xFFFCA5A5)),
+                        ),
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Icon(
+                              Icons.error_outline_rounded,
+                              color: Color(0xFFDC2626),
+                              size: 18,
+                            ),
+                            const SizedBox(width: 8),
+                            Expanded(
+                              child: Text(
+                                dialogError!,
+                                style: const TextStyle(
+                                  color: Color(0xFFB91C1C),
+                                  fontSize: 12.5,
+                                  fontWeight: FontWeight.w500,
+                                  height: 1.3,
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
                       ),
-                      const SizedBox(height: 12),
+                      const SizedBox(height: 14),
                     ],
                     TextFormField(
                       controller: nameCtrl,
                       decoration: const InputDecoration(
                         labelText: 'Staff Full Name',
+                        hintText: 'e.g. Ramesh Kumar',
                         isDense: true,
                         border: OutlineInputBorder(),
                       ),
-                      validator: (v) =>
-                          v?.trim().isEmpty == true ? 'Name is required' : null,
+                      validator: (v) {
+                        final name = v?.trim() ?? '';
+                        if (name.isEmpty) return 'Staff full name is required';
+                        if (name.length < 2) {
+                          return 'Full name must be at least 2 characters';
+                        }
+                        return null;
+                      },
                     ),
-                    const SizedBox(height: 12),
+                    const SizedBox(height: 14),
                     TextFormField(
                       controller: emailCtrl,
                       keyboardType: TextInputType.emailAddress,
                       decoration: const InputDecoration(
                         labelText: 'Staff Email Address',
+                        hintText: 'staff@example.com',
                         isDense: true,
                         border: OutlineInputBorder(),
                       ),
-                      validator: (v) {
-                        if (v == null || v.trim().isEmpty) {
-                          return 'Email is required';
-                        }
-                        if (!v.contains('@')) return 'Invalid email';
-                        return null;
-                      },
+                      validator: (v) => EmailValidator.validate(
+                        v,
+                        fieldName: 'staff email address',
+                        example: 'staff@store.com',
+                      ),
                     ),
-                    const SizedBox(height: 12),
+                    const SizedBox(height: 14),
                     TextFormField(
                       controller: passwordCtrl,
                       obscureText: true,
@@ -128,15 +155,21 @@ class _AdminStaffManagementScreenState
                         isDense: true,
                         border: OutlineInputBorder(),
                       ),
-                      validator: (v) => (v == null || v.length < 6)
-                          ? 'At least 6 characters'
-                          : null,
+                      validator: (v) {
+                        if (v == null || v.isEmpty) {
+                          return 'Initial password is required';
+                        }
+                        if (v.length < 6) {
+                          return 'Password must be at least 6 characters';
+                        }
+                        return null;
+                      },
                     ),
-                    const SizedBox(height: 12),
+                    const SizedBox(height: 14),
                     DropdownButtonFormField<String>(
                       initialValue: selectedBranchId,
                       decoration: const InputDecoration(
-                        labelText: 'Assign Store Branch',
+                        labelText: 'Assign Store Branch Hub',
                         isDense: true,
                         border: OutlineInputBorder(),
                       ),
@@ -155,7 +188,7 @@ class _AdminStaffManagementScreenState
                         }
                       },
                       validator: (v) =>
-                          v == null ? 'Please select a branch' : null,
+                          v == null ? 'Please select a store branch' : null,
                     ),
                   ],
                 ),
@@ -169,8 +202,15 @@ class _AdminStaffManagementScreenState
             ),
             ElevatedButton(
               style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.primary,
+                backgroundColor: const Color(0xFF0B6B3A),
                 foregroundColor: Colors.white,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 20,
+                  vertical: 12,
+                ),
               ),
               onPressed: isSubmitting
                   ? null
@@ -200,16 +240,13 @@ class _AdminStaffManagementScreenState
                             content: Text(
                               'Branch staff account successfully created!',
                             ),
-                            backgroundColor: AppColors.primary,
+                            backgroundColor: Color(0xFF0B6B3A),
                           ),
                         );
                       } catch (err) {
                         setDialogState(() {
                           isSubmitting = false;
-                          dialogError = err
-                              .toString()
-                              .replaceAll('Exception:', '')
-                              .trim();
+                          dialogError = AuthErrorParser.parse(err);
                         });
                       }
                     },

@@ -321,20 +321,21 @@ class _AdminCategoriesScreenState extends ConsumerState<AdminCategoriesScreen> {
                 const Spacer(),
                 ElevatedButton.icon(
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.primary,
+                    backgroundColor: const Color(0xFF0B6B3A),
                     foregroundColor: Colors.white,
                     padding: const EdgeInsets.symmetric(
                       horizontal: 18,
                       vertical: 12,
                     ),
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
+                      borderRadius: BorderRadius.circular(8),
                     ),
+                    elevation: 0,
                   ),
-                  icon: const Icon(Icons.add_rounded, size: 20),
+                  icon: const Icon(Icons.add_rounded, size: 19),
                   label: const Text(
-                    '+ Add Category',
-                    style: TextStyle(fontWeight: FontWeight.bold),
+                    'Add Category',
+                    style: TextStyle(fontWeight: FontWeight.w700, fontSize: 13.5),
                   ),
                   onPressed: () => _showAddEditCategoryModal(),
                 ),

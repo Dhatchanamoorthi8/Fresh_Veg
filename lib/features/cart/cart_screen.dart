@@ -7,6 +7,7 @@ import '../../core/utils/currency_formatter.dart';
 import '../../shared/providers/branch_provider.dart';
 import '../../shared/providers/cart_provider.dart';
 import '../../shared/widgets/empty_state_view.dart';
+import '../../shared/widgets/product_image_view.dart';
 
 class CartScreen extends ConsumerStatefulWidget {
   const CartScreen({super.key});
@@ -178,7 +179,7 @@ class _CartScreenState extends ConsumerState<CartScreen> {
                     ),
                     child: Row(
                       children: [
-                        // Emoji Thumbnail
+                        // Image Thumbnail
                         Container(
                           width: 54,
                           height: 54,
@@ -186,10 +187,14 @@ class _CartScreenState extends ConsumerState<CartScreen> {
                             color: AppColors.surfaceVariant,
                             borderRadius: BorderRadius.circular(10),
                           ),
+                          clipBehavior: Clip.antiAlias,
                           alignment: Alignment.center,
-                          child: Text(
-                            product.emoji,
-                            style: const TextStyle(fontSize: 28),
+                          child: ProductImageView(
+                            imageUrl: product.imageUrl,
+                            fallbackEmoji: product.emoji,
+                            fit: BoxFit.cover,
+                            borderRadius: BorderRadius.circular(10),
+                            emojiSize: 28,
                           ),
                         ),
                         const SizedBox(width: 12),

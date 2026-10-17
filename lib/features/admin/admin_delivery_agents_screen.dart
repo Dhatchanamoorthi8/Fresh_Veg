@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/constants/app_colors.dart';
+import '../../core/utils/auth_error_parser.dart';
+import '../../core/utils/email_validator.dart';
 import '../../shared/providers/app_providers.dart';
 import 'admin_shell.dart';
 
@@ -77,49 +79,74 @@ class _AdminDeliveryAgentsScreenState
                     const SizedBox(height: 14),
                     if (dialogError != null) ...[
                       Container(
-                        padding: const EdgeInsets.all(10),
-                        decoration: BoxDecoration(
-                          color: AppColors.errorContainer,
-                          borderRadius: BorderRadius.circular(8),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 14,
+                          vertical: 10,
                         ),
-                        child: Text(
-                          dialogError!,
-                          style: const TextStyle(
-                            color: AppColors.error,
-                            fontSize: 12,
-                          ),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFFEF2F2),
+                          borderRadius: BorderRadius.circular(8),
+                          border: Border.all(color: const Color(0xFFFCA5A5)),
+                        ),
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Icon(
+                              Icons.error_outline_rounded,
+                              color: Color(0xFFDC2626),
+                              size: 18,
+                            ),
+                            const SizedBox(width: 8),
+                            Expanded(
+                              child: Text(
+                                dialogError!,
+                                style: const TextStyle(
+                                  color: Color(0xFFB91C1C),
+                                  fontSize: 12.5,
+                                  fontWeight: FontWeight.w500,
+                                  height: 1.3,
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
                       ),
-                      const SizedBox(height: 12),
+                      const SizedBox(height: 14),
                     ],
                     TextFormField(
                       controller: nameCtrl,
                       decoration: const InputDecoration(
                         labelText: 'Partner Full Name',
+                        hintText: 'e.g. Suresh Kumar',
                         isDense: true,
                         border: OutlineInputBorder(),
                       ),
-                      validator: (v) =>
-                          v?.trim().isEmpty == true ? 'Name is required' : null,
+                      validator: (v) {
+                        final name = v?.trim() ?? '';
+                        if (name.isEmpty) return 'Partner full name is required';
+                        if (name.length < 2) {
+                          return 'Full name must be at least 2 characters';
+                        }
+                        return null;
+                      },
                     ),
-                    const SizedBox(height: 12),
+                    const SizedBox(height: 14),
                     TextFormField(
                       controller: emailCtrl,
                       keyboardType: TextInputType.emailAddress,
                       decoration: const InputDecoration(
                         labelText: 'Partner Email Address',
+                        hintText: 'delivery@example.com',
                         isDense: true,
                         border: OutlineInputBorder(),
                       ),
-                      validator: (v) {
-                        if (v == null || v.trim().isEmpty) {
-                          return 'Email is required';
-                        }
-                        if (!v.contains('@')) return 'Invalid email';
-                        return null;
-                      },
+                      validator: (v) => EmailValidator.validate(
+                        v,
+                        fieldName: 'partner email address',
+                        example: 'delivery@example.com',
+                      ),
                     ),
-                    const SizedBox(height: 12),
+                    const SizedBox(height: 14),
                     TextFormField(
                       controller: passwordCtrl,
                       obscureText: true,
@@ -128,9 +155,15 @@ class _AdminDeliveryAgentsScreenState
                         isDense: true,
                         border: OutlineInputBorder(),
                       ),
-                      validator: (v) => (v == null || v.length < 6)
-                          ? 'At least 6 characters'
-                          : null,
+                      validator: (v) {
+                        if (v == null || v.isEmpty) {
+                          return 'Initial password is required';
+                        }
+                        if (v.length < 6) {
+                          return 'Password must be at least 6 characters';
+                        }
+                        return null;
+                      },
                     ),
                   ],
                 ),
@@ -180,10 +213,7 @@ class _AdminDeliveryAgentsScreenState
                       } catch (err) {
                         setDialogState(() {
                           isSubmitting = false;
-                          dialogError = err
-                              .toString()
-                              .replaceAll('Exception:', '')
-                              .trim();
+                          dialogError = AuthErrorParser.parse(err);
                         });
                       }
                     },
