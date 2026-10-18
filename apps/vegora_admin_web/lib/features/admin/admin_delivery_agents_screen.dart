@@ -237,6 +237,446 @@ class _AdminDeliveryAgentsScreenState
     }
   }
 
+  void _showEditAgentDialog(Map<String, dynamic> agent) {
+    final formKey = GlobalKey<FormState>();
+    final nameCtrl =
+        TextEditingController(text: agent['full_name'] as String? ?? '');
+    final phoneCtrl =
+        TextEditingController(text: agent['phone'] as String? ?? '');
+    bool isActive = agent['is_active'] as bool? ?? true;
+    bool isSubmitting = false;
+    String? dialogError;
+
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (ctx) => StatefulBuilder(
+        builder: (context, setDialogState) => AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+          title: Row(
+            children: const [
+              Icon(Icons.edit_rounded, color: AppColors.statusDelivered),
+              SizedBox(width: 8),
+              Text(
+                'Edit Delivery Partner Profile',
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              ),
+            ],
+          ),
+          content: SingleChildScrollView(
+            child: SizedBox(
+              width: 460,
+              child: Form(
+                key: formKey,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: Colors.grey.shade50,
+                        borderRadius: BorderRadius.circular(10),
+                        border: Border.all(color: AppColors.border),
+                      ),
+                      child: Row(
+                        children: [
+                          const Icon(
+                            Icons.email_outlined,
+                            size: 18,
+                            color: AppColors.textSecondary,
+                          ),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const Text(
+                                  'Auth Email (Read-only)',
+                                  style: TextStyle(
+                                    fontSize: 11,
+                                    color: AppColors.textSecondary,
+                                  ),
+                                ),
+                                Text(
+                                  agent['email'] as String? ?? '',
+                                  style: const TextStyle(
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 14),
+                    if (dialogError != null) ...[
+                      Container(
+                        padding: const EdgeInsets.all(10),
+                        decoration: BoxDecoration(
+                          color: AppColors.errorContainer,
+                          borderRadius: BorderRadius.circular(8),
+                          border: Border.all(
+                            color: AppColors.error.withValues(alpha: 0.3),
+                          ),
+                        ),
+                        child: Row(
+                          children: [
+                            const Icon(
+                              Icons.error_outline_rounded,
+                              color: AppColors.error,
+                              size: 18,
+                            ),
+                            const SizedBox(width: 8),
+                            Expanded(
+                              child: Text(
+                                dialogError!,
+                                style: const TextStyle(
+                                  color: AppColors.error,
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 14),
+                    ],
+                    TextFormField(
+                      controller: nameCtrl,
+                      decoration: const InputDecoration(
+                        labelText: 'Partner Full Name *',
+                        prefixIcon:
+                            Icon(Icons.person_outline_rounded, size: 20),
+                        isDense: true,
+                        border: OutlineInputBorder(),
+                      ),
+                      validator: (v) {
+                        final val = v?.trim() ?? '';
+                        if (val.isEmpty) return 'Full name is required';
+                        if (val.length < 2) {
+                          return 'Name must be at least 2 characters';
+                        }
+                        return null;
+                      },
+                    ),
+                    const SizedBox(height: 14),
+                    TextFormField(
+                      controller: phoneCtrl,
+                      keyboardType: TextInputType.phone,
+                      decoration: const InputDecoration(
+                        labelText: 'Phone Number (Optional)',
+                        prefixIcon: Icon(Icons.phone_outlined, size: 20),
+                        prefixText: '+91 ',
+                        hintText: '10-digit mobile number',
+                        isDense: true,
+                        border: OutlineInputBorder(),
+                      ),
+                      validator: (v) {
+                        final val = v?.trim() ?? '';
+                        if (val.isEmpty) return null;
+                        final digits = val.replaceAll(RegExp(r'\D'), '');
+                        if (digits.length < 10) {
+                          return 'Must be at least 10 digits';
+                        }
+                        return null;
+                      },
+                    ),
+                    const SizedBox(height: 14),
+                    SwitchListTile(
+                      contentPadding: EdgeInsets.zero,
+                      title: const Text(
+                        'Account Active Status',
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      subtitle: Text(
+                        isActive
+                            ? 'Partner can accept delivery orders'
+                            : 'Account is suspended / inactive',
+                        style: TextStyle(
+                          fontSize: 12,
+                          color:
+                              isActive ? AppColors.primary : AppColors.error,
+                        ),
+                      ),
+                      value: isActive,
+                      activeThumbColor: AppColors.primary,
+                      onChanged: (val) => setDialogState(() => isActive = val),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: isSubmitting ? null : () => Navigator.pop(ctx),
+              child: const Text('Cancel'),
+            ),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.statusDelivered,
+                foregroundColor: Colors.white,
+              ),
+              onPressed: isSubmitting
+                  ? null
+                  : () async {
+                      if (!formKey.currentState!.validate()) return;
+                      final nav = Navigator.of(ctx);
+                      final messenger = ScaffoldMessenger.of(context);
+                      setDialogState(() {
+                        isSubmitting = true;
+                        dialogError = null;
+                      });
+
+                      try {
+                        final authRepo = ref.read(authRepositoryProvider);
+                        await authRepo.adminUpdateStaffOrAgent(
+                          targetUserId: agent['id'] as String,
+                          fullName: nameCtrl.text.trim(),
+                          phone: phoneCtrl.text.trim(),
+                          isActive: isActive,
+                        );
+
+                        ref.invalidate(deliveryAgentsListProvider);
+                        nav.pop();
+                        messenger.showSnackBar(
+                          SnackBar(
+                            content: Text(
+                              'Delivery partner "${nameCtrl.text.trim()}" updated successfully.',
+                            ),
+                            backgroundColor: AppColors.primary,
+                          ),
+                        );
+                      } catch (err) {
+                        setDialogState(() {
+                          isSubmitting = false;
+                          dialogError = err
+                              .toString()
+                              .replaceAll('Exception:', '')
+                              .trim();
+                        });
+                      }
+                    },
+              child: isSubmitting
+                  ? const SizedBox(
+                      width: 18,
+                      height: 18,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        color: Colors.white,
+                      ),
+                    )
+                  : const Text('Save Changes'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _showDeleteAgentConfirmation(Map<String, dynamic> agent) {
+    bool isDeleting = false;
+    String? dialogError;
+
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (ctx) => StatefulBuilder(
+        builder: (context, setDialogState) => AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+          title: Row(
+            children: const [
+              Icon(
+                Icons.warning_amber_rounded,
+                color: AppColors.error,
+                size: 28,
+              ),
+              SizedBox(width: 8),
+              Text(
+                'Delete Delivery Partner',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: AppColors.error,
+                ),
+              ),
+            ],
+          ),
+          content: SizedBox(
+            width: 440,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  'Are you sure you want to permanently delete this delivery partner account? This action cannot be undone.',
+                  style: TextStyle(fontSize: 13, height: 1.4),
+                ),
+                const SizedBox(height: 14),
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: AppColors.errorContainer.withValues(alpha: 0.4),
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(
+                      color: AppColors.error.withValues(alpha: 0.3),
+                    ),
+                  ),
+                  child: Row(
+                    children: [
+                      const CircleAvatar(
+                        radius: 18,
+                        backgroundColor: AppColors.errorContainer,
+                        child: Icon(
+                          Icons.two_wheeler_rounded,
+                          size: 18,
+                          color: AppColors.error,
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              agent['full_name'] as String? ??
+                                  'Delivery Partner',
+                              style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 14,
+                              ),
+                            ),
+                            Text(
+                              agent['email'] as String? ?? '',
+                              style: const TextStyle(
+                                fontSize: 12,
+                                color: AppColors.textSecondary,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 12),
+                const Text(
+                  'Note: If this partner is assigned to any active delivery orders in progress, deletion will be blocked by system validation to protect order fulfillment.',
+                  style: TextStyle(
+                    fontSize: 11,
+                    color: AppColors.textSecondary,
+                  ),
+                ),
+                if (dialogError != null) ...[
+                  const SizedBox(height: 14),
+                  Container(
+                    padding: const EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                      color: AppColors.errorContainer,
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(color: AppColors.error),
+                    ),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Icon(
+                          Icons.error_outline_rounded,
+                          color: AppColors.error,
+                          size: 18,
+                        ),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: Text(
+                            dialogError!,
+                            style: const TextStyle(
+                              color: AppColors.error,
+                              fontSize: 12,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ],
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: isDeleting ? null : () => Navigator.pop(ctx),
+              child: const Text('Cancel'),
+            ),
+            ElevatedButton.icon(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.error,
+                foregroundColor: Colors.white,
+              ),
+              icon: isDeleting
+                  ? const SizedBox(
+                      width: 16,
+                      height: 16,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        color: Colors.white,
+                      ),
+                    )
+                  : const Icon(Icons.delete_forever_rounded, size: 18),
+              label: const Text('Delete Partner Permanently'),
+              onPressed: isDeleting
+                  ? null
+                  : () async {
+                      final nav = Navigator.of(ctx);
+                      final messenger = ScaffoldMessenger.of(context);
+                      setDialogState(() {
+                        isDeleting = true;
+                        dialogError = null;
+                      });
+
+                      try {
+                        final authRepo = ref.read(authRepositoryProvider);
+                        await authRepo.adminDeleteStaffOrAgent(
+                          targetUserId: agent['id'] as String,
+                        );
+
+                        ref.invalidate(deliveryAgentsListProvider);
+                        nav.pop();
+                        messenger.showSnackBar(
+                          SnackBar(
+                            content: Text(
+                              'Delivery partner "${agent['full_name']}" deleted permanently.',
+                            ),
+                            backgroundColor: AppColors.error,
+                          ),
+                        );
+                      } catch (err) {
+                        setDialogState(() {
+                          isDeleting = false;
+                          dialogError = err
+                              .toString()
+                              .replaceAll('Exception:', '')
+                              .trim();
+                        });
+                      }
+                    },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final agentsAsync = ref.watch(deliveryAgentsListProvider);
@@ -467,8 +907,12 @@ class _AdminDeliveryAgentsScreenState
                             ),
                             PopupMenuButton<String>(
                               onSelected: (val) {
-                                if (val == 'toggle_active') {
+                                if (val == 'edit') {
+                                  _showEditAgentDialog(agent);
+                                } else if (val == 'toggle_active') {
                                   _toggleAgentActive(agent);
+                                } else if (val == 'delete') {
+                                  _showDeleteAgentConfirmation(agent);
                                 } else if (val == 'reset_pw') {
                                   ref
                                       .read(authRepositoryProvider)
@@ -485,6 +929,20 @@ class _AdminDeliveryAgentsScreenState
                                 }
                               },
                               itemBuilder: (ctx) => [
+                                PopupMenuItem(
+                                  value: 'edit',
+                                  child: Row(
+                                    children: const [
+                                      Icon(
+                                        Icons.edit_outlined,
+                                        size: 18,
+                                        color: AppColors.textPrimary,
+                                      ),
+                                      SizedBox(width: 8),
+                                      Text('Edit Partner Profile'),
+                                    ],
+                                  ),
+                                ),
                                 PopupMenuItem(
                                   value: 'reset_pw',
                                   child: Row(
@@ -503,13 +961,13 @@ class _AdminDeliveryAgentsScreenState
                                         isActive
                                             ? Icons.block_rounded
                                             : Icons
-                                                  .check_circle_outline_rounded,
+                                                .check_circle_outline_rounded,
                                         size: 18,
                                         color: isActive
                                             ? AppColors.error
                                             : AppColors.primary,
                                       ),
-                                      const SizedBox(width: 8),
+                                      SizedBox(width: 8),
                                       Text(
                                         isActive
                                             ? 'Deactivate Partner'
@@ -518,6 +976,27 @@ class _AdminDeliveryAgentsScreenState
                                           color: isActive
                                               ? AppColors.error
                                               : AppColors.primary,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                const PopupMenuDivider(),
+                                PopupMenuItem(
+                                  value: 'delete',
+                                  child: Row(
+                                    children: const [
+                                      Icon(
+                                        Icons.delete_outline_rounded,
+                                        size: 18,
+                                        color: AppColors.error,
+                                      ),
+                                      SizedBox(width: 8),
+                                      Text(
+                                        'Delete Partner',
+                                        style: TextStyle(
+                                          color: AppColors.error,
+                                          fontWeight: FontWeight.w600,
                                         ),
                                       ),
                                     ],
@@ -533,6 +1012,7 @@ class _AdminDeliveryAgentsScreenState
                 );
               },
               loading: () => const Center(child: CircularProgressIndicator()),
+
               error: (err, _) => Center(
                 child: Padding(
                   padding: const EdgeInsets.all(20),
