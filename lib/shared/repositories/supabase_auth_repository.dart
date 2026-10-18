@@ -363,6 +363,78 @@ class SupabaseAuthRepository {
     );
   }
 
+  /// Admin method: Update staff member or delivery partner details
+  Future<void> adminUpdateStaffOrAgent({
+    required String targetUserId,
+    required String fullName,
+    String? email,
+    String? phone,
+    bool isActive = true,
+    String? branchId,
+  }) async {
+    try {
+      await _client.rpc(
+        'admin_update_staff_or_agent',
+        params: {
+          'p_target_user_id': targetUserId,
+          'p_full_name': fullName.trim(),
+          'p_phone': (phone != null && phone.trim().isNotEmpty) ? phone.trim() : null,
+          'p_is_active': isActive,
+          'p_branch_id': branchId,
+          'p_email': (email != null && email.trim().isNotEmpty) ? email.trim().toLowerCase() : null,
+        },
+      );
+    } catch (e) {
+      debugPrint('Error updating staff/agent: $e');
+      throw Exception(_parseAuthError(e));
+    }
+  }
+
+  /// Admin method: Safely delete a staff member or delivery partner
+  Future<void> adminDeleteStaffOrAgent({
+    required String targetUserId,
+  }) async {
+    try {
+      await _client.rpc(
+        'admin_delete_staff_or_agent',
+        params: {
+          'p_target_user_id': targetUserId,
+        },
+      );
+    } catch (e) {
+      debugPrint('Error deleting staff/agent: $e');
+      throw Exception(_parseAuthError(e));
+    }
+  }
+
+  String _parseAuthError(dynamic error) {
+    final msg = error.toString();
+    if (msg.contains('active delivery assignment') || msg.contains('Cannot delete delivery partner')) {
+      final reg = RegExp(r'Cannot delete delivery partner:[^"]*');
+      final match = reg.firstMatch(msg);
+      if (match != null) return match.group(0)!;
+      return 'Cannot delete delivery partner: They currently have active delivery assignments in progress. Please reassign or complete those orders first.';
+    }
+    if (msg.contains('Active ongoing order')) {
+      return 'Cannot delete user: Active ongoing customer orders exist for this account.';
+    }
+    if (msg.contains('Cannot delete your own')) {
+      return 'You cannot delete your own administrator account.';
+    }
+    if (msg.contains('Super administrator')) {
+      return 'Super administrator accounts cannot be deleted.';
+    }
+    if (msg.contains('violates foreign key constraint')) {
+      return 'Cannot delete account because it is referenced in system records. You can suspend or deactivate the account instead.';
+    }
+    return msg
+        .replaceAll('PostgrestException(', '')
+        .replaceAll('message:', '')
+        .replaceAll('Exception:', '')
+        .replaceAll(RegExp(r', code:.*'), '')
+        .trim();
+  }
+
   /// Admin method: Retrieve list of branch staff
   Future<List<Map<String, dynamic>>> getStaffUsers() async {
     try {

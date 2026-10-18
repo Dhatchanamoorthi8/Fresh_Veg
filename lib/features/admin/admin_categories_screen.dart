@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../core/constants/app_colors.dart';
-import '../../shared/models/category.dart';
-import '../../shared/providers/app_providers.dart';
-import '../../shared/repositories/supabase_catalog_repository.dart';
+import 'package:vegora_core/vegora_core.dart';
+import 'package:vegora_models/vegora_models.dart';
+import 'package:vegora_repositories/vegora_repositories.dart';
 import 'admin_shell.dart';
 
 class AdminCategoriesScreen extends ConsumerStatefulWidget {

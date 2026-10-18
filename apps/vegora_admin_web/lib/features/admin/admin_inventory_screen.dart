@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:vegora_core/vegora_core.dart';
 import 'package:vegora_models/vegora_models.dart';
 import 'package:vegora_repositories/vegora_repositories.dart';
+import 'package:vegora_ui/vegora_ui.dart';
 import 'admin_shell.dart';
 
 class AdminInventoryScreen extends ConsumerStatefulWidget {
@@ -518,14 +519,22 @@ class _AdminInventoryScreenState extends ConsumerState<AdminInventoryScreen> {
                 const SizedBox(width: 16),
                 ElevatedButton.icon(
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.primary,
+                    backgroundColor: const Color(0xFF0B6B3A),
                     foregroundColor: Colors.white,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 12,
                     ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    elevation: 0,
                   ),
-                  icon: const Icon(Icons.add_rounded, size: 18),
-                  label: const Text('+ Stock Vegetable'),
+                  icon: const Icon(Icons.add_rounded, size: 19),
+                  label: const Text(
+                    'Stock Vegetable',
+                    style: TextStyle(fontWeight: FontWeight.w700, fontSize: 13),
+                  ),
                   onPressed: _showAddVegetableToBranchModal,
                 ),
               ],
@@ -583,26 +592,12 @@ class _AdminInventoryScreenState extends ConsumerState<AdminInventoryScreen> {
                           ),
                         ),
                         child: ListTile(
-                          leading: Container(
+                          leading: ProductImageView(
+                            imageUrl: p.imageUrl,
+                            fallbackEmoji: p.emoji,
                             width: 44,
                             height: 44,
-                            decoration: BoxDecoration(
-                              color: AppColors.neutral100,
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            clipBehavior: Clip.antiAlias,
-                            child:
-                                (p.imageUrl != null && p.imageUrl!.isNotEmpty)
-                                ? Image.network(
-                                    p.imageUrl!,
-                                    fit: BoxFit.cover,
-                                    errorBuilder: (ctx, err, stack) =>
-                                        const Icon(Icons.eco),
-                                  )
-                                : const Icon(
-                                    Icons.eco,
-                                    color: AppColors.primary,
-                                  ),
+                            borderRadius: BorderRadius.circular(8),
                           ),
                           title: Text(
                             p.name,

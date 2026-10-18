@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-
-import '../../core/constants/app_colors.dart';
-import '../../shared/providers/app_providers.dart';
+import 'package:vegora_core/vegora_core.dart';
+import 'package:vegora_repositories/vegora_repositories.dart';
 
 enum AdminMenuSection {
   dashboard,

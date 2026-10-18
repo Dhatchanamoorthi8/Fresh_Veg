@@ -367,6 +367,7 @@ class SupabaseAuthRepository {
   Future<void> adminUpdateStaffOrAgent({
     required String targetUserId,
     required String fullName,
+    String? email,
     String? phone,
     bool isActive = true,
     String? branchId,
@@ -380,6 +381,7 @@ class SupabaseAuthRepository {
           'p_phone': (phone != null && phone.trim().isNotEmpty) ? phone.trim() : null,
           'p_is_active': isActive,
           'p_branch_id': branchId,
+          'p_email': (email != null && email.trim().isNotEmpty) ? email.trim().toLowerCase() : null,
         },
       );
     } catch (e) {

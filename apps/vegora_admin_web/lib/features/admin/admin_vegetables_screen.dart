@@ -7,7 +7,10 @@ import 'package:image_picker/image_picker.dart';
 import 'package:vegora_core/vegora_core.dart';
 import 'package:vegora_models/vegora_models.dart';
 import 'package:vegora_repositories/vegora_repositories.dart';
+import 'package:vegora_ui/vegora_ui.dart';
 import 'admin_shell.dart';
+import 'widgets/admin_status_badge.dart';
+import 'widgets/admin_table_container.dart';
 
 class AdminVegetablesScreen extends ConsumerStatefulWidget {
   const AdminVegetablesScreen({super.key});
@@ -26,6 +29,8 @@ class _AdminVegetablesScreenState extends ConsumerState<AdminVegetablesScreen> {
   String _searchQuery = '';
   String? _selectedCategory; // null = all
   String _statusFilter = 'ALL'; // 'ALL', 'ACTIVE', 'INACTIVE'
+  int _currentPage = 1;
+  int _rowsPerPage = 10;
 
   @override
   void initState() {
@@ -817,7 +822,7 @@ class _AdminVegetablesScreenState extends ConsumerState<AdminVegetablesScreen> {
                           storageTips: tipsCtrl.text.trim(),
                           origin: originCtrl.text.trim(),
                           imageUrl: finalImageUrl,
-                          emoji: '🥗',
+                          emoji: isEditing ? existingProduct.emoji : '🥬',
                           isOrganic: isOrganic,
                           isSeasonal: isSeasonal,
                           isBestSeller: isBestSeller,
@@ -1214,9 +1219,9 @@ class _AdminVegetablesScreenState extends ConsumerState<AdminVegetablesScreen> {
           // Filter & Search Action Bar
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
-            decoration: BoxDecoration(
-              color: AppColors.surface,
-              border: Border(bottom: BorderSide(color: AppColors.neutral200)),
+            decoration: const BoxDecoration(
+              color: Colors.white,
+              border: Border(bottom: BorderSide(color: Color(0xFFE2E8F0))),
             ),
             child: Row(
               children: [
@@ -1224,70 +1229,145 @@ class _AdminVegetablesScreenState extends ConsumerState<AdminVegetablesScreen> {
                   child: TextField(
                     decoration: InputDecoration(
                       hintText: 'Search vegetables by name, Hindi name, SKU...',
-                      prefixIcon: const Icon(Icons.search_rounded, size: 20),
+                      hintStyle: const TextStyle(
+                        fontSize: 13.5,
+                        color: Color(0xFF94A3B8),
+                      ),
+                      prefixIcon: const Icon(
+                        Icons.search_rounded,
+                        size: 20,
+                        color: Color(0xFF64748B),
+                      ),
+                      filled: true,
+                      fillColor: const Color(0xFFF8FAFC),
                       border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(10),
+                        borderRadius: BorderRadius.circular(8),
+                        borderSide: const BorderSide(color: Color(0xFFCBD5E1)),
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
+                        borderSide: const BorderSide(color: Color(0xFFCBD5E1)),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
+                        borderSide: const BorderSide(
+                          color: Color(0xFF0B6B3A),
+                          width: 1.5,
+                        ),
                       ),
                       contentPadding: const EdgeInsets.symmetric(
                         horizontal: 14,
                         vertical: 10,
                       ),
                     ),
-                    onChanged: (v) => setState(() => _searchQuery = v),
+                    onChanged: (v) {
+                      setState(() {
+                        _searchQuery = v;
+                        _currentPage = 1;
+                      });
+                    },
                   ),
                 ),
                 const SizedBox(width: 12),
-                DropdownButton<String>(
-                  value: _selectedCategory,
-                  hint: const Text('All Categories'),
-                  items: [
-                    const DropdownMenuItem(
-                      value: null,
-                      child: Text('All Categories'),
-                    ),
-                    for (final c in _categories)
-                      DropdownMenuItem(
-                        value: c.id,
-                        child: Text('${c.emoji} ${c.name}'),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 2),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(color: const Color(0xFFCBD5E1)),
+                  ),
+                  child: DropdownButtonHideUnderline(
+                    child: DropdownButton<String>(
+                      value: _selectedCategory,
+                      hint: const Text(
+                        'All Categories',
+                        style: TextStyle(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w600,
+                          color: Color(0xFF1E293B),
+                        ),
                       ),
-                  ],
-                  onChanged: (v) => setState(() => _selectedCategory = v),
+                      style: const TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w600,
+                        color: Color(0xFF1E293B),
+                      ),
+                      items: [
+                        const DropdownMenuItem(
+                          value: null,
+                          child: Text('All Categories'),
+                        ),
+                        for (final c in _categories)
+                          DropdownMenuItem(
+                            value: c.id,
+                            child: Text('${c.emoji} ${c.name}'),
+                          ),
+                      ],
+                      onChanged: (v) {
+                        setState(() {
+                          _selectedCategory = v;
+                          _currentPage = 1;
+                        });
+                      },
+                    ),
+                  ),
                 ),
                 const SizedBox(width: 12),
-                DropdownButton<String>(
-                  value: _statusFilter,
-                  items: const [
-                    DropdownMenuItem(value: 'ALL', child: Text('All Status')),
-                    DropdownMenuItem(
-                      value: 'ACTIVE',
-                      child: Text('Active Only'),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 2),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(color: const Color(0xFFCBD5E1)),
+                  ),
+                  child: DropdownButtonHideUnderline(
+                    child: DropdownButton<String>(
+                      value: _statusFilter,
+                      style: const TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w600,
+                        color: Color(0xFF1E293B),
+                      ),
+                      items: const [
+                        DropdownMenuItem(value: 'ALL', child: Text('All Status')),
+                        DropdownMenuItem(
+                          value: 'ACTIVE',
+                          child: Text('Active Only'),
+                        ),
+                        DropdownMenuItem(
+                          value: 'INACTIVE',
+                          child: Text('Inactive Only'),
+                        ),
+                      ],
+                      onChanged: (v) {
+                        if (v != null) {
+                          setState(() {
+                            _statusFilter = v;
+                            _currentPage = 1;
+                          });
+                        }
+                      },
                     ),
-                    DropdownMenuItem(
-                      value: 'INACTIVE',
-                      child: Text('Inactive Only'),
-                    ),
-                  ],
-                  onChanged: (v) {
-                    if (v != null) setState(() => _statusFilter = v);
-                  },
+                  ),
                 ),
                 const SizedBox(width: 16),
                 ElevatedButton.icon(
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.primary,
+                    backgroundColor: const Color(0xFF0B6B3A),
                     foregroundColor: Colors.white,
                     padding: const EdgeInsets.symmetric(
                       horizontal: 18,
-                      vertical: 14,
+                      vertical: 12,
                     ),
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
+                      borderRadius: BorderRadius.circular(8),
                     ),
+                    elevation: 0,
                   ),
-                  icon: const Icon(Icons.add_rounded, size: 20),
+                  icon: const Icon(Icons.add_rounded, size: 19),
                   label: const Text(
-                    '+ Add Vegetable',
-                    style: TextStyle(fontWeight: FontWeight.bold),
+                    'Add Vegetable',
+                    style: TextStyle(fontWeight: FontWeight.w700, fontSize: 13.5),
                   ),
                   onPressed: () => _showAddEditVegetableModal(),
                 ),
@@ -1320,7 +1400,7 @@ class _AdminVegetablesScreenState extends ConsumerState<AdminVegetablesScreen> {
                         const SizedBox(height: 8),
                         ElevatedButton(
                           onPressed: () => _showAddEditVegetableModal(),
-                          child: const Text('+ Add New Vegetable'),
+                          child: const Text('Add New Vegetable'),
                         ),
                       ],
                     ),
@@ -1335,251 +1415,260 @@ class _AdminVegetablesScreenState extends ConsumerState<AdminVegetablesScreen> {
   }
 
   Widget _buildDesktopTable(List<Product> products) {
+    final paginatedProducts = products
+        .skip((_currentPage - 1) * _rowsPerPage)
+        .take(_rowsPerPage)
+        .toList();
+
     return SingleChildScrollView(
       padding: const EdgeInsets.all(24),
-      child: Card(
-        elevation: 0,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
-          side: BorderSide(color: AppColors.neutral200),
-        ),
-        child: DataTable(
-          headingRowColor: WidgetStateProperty.all(AppColors.neutral100),
-          columns: const [
-            DataColumn(
-              label: Text(
-                'Vegetable & SKU',
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ),
-            ),
-            DataColumn(
-              label: Text(
-                'Category & Unit',
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ),
-            ),
-            DataColumn(
-              label: Text(
-                'Base Price',
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ),
-            ),
-            DataColumn(
-              label: Text(
-                'Branch Coverage',
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ),
-            ),
-            DataColumn(
-              label: Text(
-                'Status',
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ),
-            ),
-            DataColumn(
-              label: Text(
-                'Actions',
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ),
-            ),
-          ],
-          rows: products.map((prod) {
-            final activeBranchesCount = prod.branchInventory.values
-                .where((inv) => inv.isAvailable)
-                .length;
+      child: AdminTableContainer(
+        currentPage: _currentPage,
+        totalItems: products.length,
+        rowsPerPage: _rowsPerPage,
+        onPageChanged: (page) => setState(() => _currentPage = page),
+        onRowsPerPageChanged: (rows) => setState(() {
+          _rowsPerPage = rows;
+          _currentPage = 1;
+        }),
+        itemName: 'vegetables',
+        columns: const [
+          AdminTableColumn(title: 'Vegetable & SKU', flex: 3),
+          AdminTableColumn(title: 'Category & Unit', flex: 2),
+          AdminTableColumn(title: 'Base Price', flex: 1),
+          AdminTableColumn(title: 'Branch Coverage', flex: 2),
+          AdminTableColumn(title: 'Status', flex: 1),
+          AdminTableColumn(
+            title: 'Actions',
+            flex: 2,
+            alignment: Alignment.centerRight,
+          ),
+        ],
+        rows: paginatedProducts.map((prod) {
+          final activeBranchesCount = prod.branchInventory.values
+              .where((inv) => inv.isAvailable)
+              .length;
 
-            return DataRow(
-              cells: [
-                DataCell(
-                  Row(
-                    children: [
-                      Container(
-                        width: 44,
-                        height: 44,
-                        decoration: BoxDecoration(
-                          color: AppColors.neutral100,
-                          borderRadius: BorderRadius.circular(8),
-                          border: Border.all(color: AppColors.neutral200),
-                        ),
-                        clipBehavior: Clip.antiAlias,
-                        child:
-                            (prod.imageUrl != null && prod.imageUrl!.isNotEmpty)
-                            ? Image.network(
-                                prod.imageUrl!,
-                                fit: BoxFit.cover,
-                                errorBuilder: (ctx, err, stack) => const Icon(
-                                  Icons.eco_rounded,
-                                  color: AppColors.primary,
-                                ),
-                              )
-                            : const Icon(
-                                Icons.eco_rounded,
-                                color: AppColors.primary,
-                              ),
-                      ),
-                      const SizedBox(width: 12),
-                      Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            prod.name,
-                            style: const TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 14,
-                            ),
-                          ),
-                          Text(
-                            '${prod.localName} • SKU: ${prod.sku}',
-                            style: const TextStyle(
-                              fontSize: 11,
-                              color: AppColors.neutral600,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
+          return AdminTableRow(
+            cells: [
+              // 0: Vegetable & SKU
+              Row(
+                children: [
+                  ProductImageView(
+                    imageUrl: prod.imageUrl,
+                    fallbackEmoji: prod.emoji,
+                    width: 44,
+                    height: 44,
+                    borderRadius: BorderRadius.circular(8),
                   ),
-                ),
-                DataCell(
-                  Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        prod.categoryId.replaceAll('_', ' ').toUpperCase(),
-                        style: const TextStyle(
-                          fontWeight: FontWeight.w600,
-                          fontSize: 12,
-                        ),
-                      ),
-                      Text(
-                        'Unit: ${prod.unit}',
-                        style: const TextStyle(
-                          fontSize: 11,
-                          color: AppColors.neutral600,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                DataCell(
-                  Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        CurrencyFormatter.formatPaise(prod.basePricePaise),
-                        style: const TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 14,
-                          color: AppColors.primary,
-                        ),
-                      ),
-                      if (prod.originalPricePaise != null)
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
                         Text(
-                          CurrencyFormatter.formatPaise(
-                            prod.originalPricePaise!,
-                          ),
+                          prod.name,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
                           style: const TextStyle(
-                            fontSize: 11,
-                            decoration: TextDecoration.lineThrough,
-                            color: AppColors.neutral500,
+                            fontWeight: FontWeight.w700,
+                            fontSize: 13.5,
+                            color: Color(0xFF0F172A),
                           ),
                         ),
-                    ],
+                        const SizedBox(height: 3),
+                        Row(
+                          children: [
+                            if (prod.localName.isNotEmpty) ...[
+                              Flexible(
+                                child: Text(
+                                  prod.localName,
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: const TextStyle(
+                                    fontSize: 11,
+                                    color: Color(0xFF64748B),
+                                  ),
+                                ),
+                              ),
+                              const Text(
+                                ' • ',
+                                style: TextStyle(
+                                  fontSize: 11,
+                                  color: Color(0xFF94A3B8),
+                                ),
+                              ),
+                            ],
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 6,
+                                vertical: 1.5,
+                              ),
+                              decoration: BoxDecoration(
+                                color: const Color(0xFFF1F5F9),
+                                borderRadius: BorderRadius.circular(4),
+                                border: Border.all(
+                                  color: const Color(0xFFE2E8F0),
+                                ),
+                              ),
+                              child: Text(
+                                prod.sku,
+                                style: const TextStyle(
+                                  fontSize: 10.5,
+                                  fontWeight: FontWeight.w700,
+                                  color: Color(0xFF475569),
+                                  letterSpacing: 0.2,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
                   ),
-                ),
-                DataCell(
+                ],
+              ),
+
+              // 1: Category & Unit
+              Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
                   Container(
                     padding: const EdgeInsets.symmetric(
                       horizontal: 8,
-                      vertical: 4,
+                      vertical: 2.5,
                     ),
                     decoration: BoxDecoration(
-                      color: activeBranchesCount > 0
-                          ? AppColors.primaryContainer.withValues(alpha: 0.5)
-                          : AppColors.neutral200,
-                      borderRadius: BorderRadius.circular(12),
+                      color: const Color(0xFFF8FAFC),
+                      borderRadius: BorderRadius.circular(5),
+                      border: Border.all(color: const Color(0xFFE2E8F0)),
                     ),
                     child: Text(
-                      '$activeBranchesCount / ${_branches.length} Branches',
+                      prod.categoryId.replaceAll('_', ' ').toUpperCase(),
                       style: const TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.bold,
-                        color: AppColors.primary,
+                        fontWeight: FontWeight.w700,
+                        fontSize: 10.5,
+                        color: Color(0xFF334155),
+                        letterSpacing: 0.3,
                       ),
                     ),
                   ),
+                  const SizedBox(height: 4),
+                  Text(
+                    'Unit: ${prod.unit}',
+                    style: const TextStyle(
+                      fontSize: 11.5,
+                      color: Color(0xFF64748B),
+                    ),
+                  ),
+                ],
+              ),
+
+              // 2: Base Price
+              Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    CurrencyFormatter.formatPaise(prod.basePricePaise),
+                    style: const TextStyle(
+                      fontWeight: FontWeight.w700,
+                      fontSize: 14,
+                      color: Color(0xFF0B6B3A),
+                    ),
+                  ),
+                  if (prod.originalPricePaise != null)
+                    Text(
+                      CurrencyFormatter.formatPaise(
+                        prod.originalPricePaise!,
+                      ),
+                      style: const TextStyle(
+                        fontSize: 11,
+                        decoration: TextDecoration.lineThrough,
+                        color: Color(0xFF94A3B8),
+                      ),
+                    ),
+                ],
+              ),
+
+              // 3: Branch Coverage
+              Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 10,
+                  vertical: 4,
                 ),
-                DataCell(
-                  Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Container(
-                        width: 8,
-                        height: 8,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: prod.isActive ? Colors.green : Colors.grey,
-                        ),
-                      ),
-                      const SizedBox(width: 6),
-                      Text(
-                        prod.isActive ? 'Active' : 'Inactive',
-                        style: TextStyle(
-                          fontSize: 12,
-                          fontWeight: FontWeight.w600,
-                          color: prod.isActive
-                              ? AppColors.primary
-                              : AppColors.neutral600,
-                        ),
-                      ),
-                    ],
+                decoration: BoxDecoration(
+                  color: activeBranchesCount > 0
+                      ? const Color(0xFFEBF7EE)
+                      : const Color(0xFFF1F5F9),
+                  borderRadius: BorderRadius.circular(14),
+                  border: Border.all(
+                    color: activeBranchesCount > 0
+                        ? const Color(0xFFB7E4C7)
+                        : const Color(0xFFE2E8F0),
                   ),
                 ),
-                DataCell(
-                  Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      IconButton(
-                        icon: const Icon(
-                          Icons.price_change_rounded,
-                          size: 20,
-                          color: AppColors.primary,
-                        ),
-                        tooltip: 'Manage Branch Prices & Stock',
-                        onPressed: () => _showManageBranchPricesModal(prod),
-                      ),
-                      IconButton(
-                        icon: const Icon(
-                          Icons.edit_rounded,
-                          size: 20,
-                          color: AppColors.neutral700,
-                        ),
-                        tooltip: 'Edit Vegetable',
-                        onPressed: () => _showAddEditVegetableModal(prod),
-                      ),
-                      IconButton(
-                        icon: Icon(
-                          prod.isActive
-                              ? Icons.toggle_on_rounded
-                              : Icons.toggle_off_rounded,
-                          size: 26,
-                          color: prod.isActive
-                              ? AppColors.primary
-                              : AppColors.neutral400,
-                        ),
-                        tooltip: prod.isActive ? 'Deactivate' : 'Activate',
-                        onPressed: () => _toggleProductActive(prod),
-                      ),
-                    ],
+                child: Text(
+                  '$activeBranchesCount / ${_branches.length} Branches',
+                  style: TextStyle(
+                    fontSize: 11.5,
+                    fontWeight: FontWeight.w700,
+                    color: activeBranchesCount > 0
+                        ? const Color(0xFF1E7E34)
+                        : const Color(0xFF64748B),
                   ),
                 ),
-              ],
-            );
-          }).toList(),
-        ),
+              ),
+
+              // 4: Status
+              AdminStatusBadge(
+                label: prod.isActive ? 'Active' : 'Inactive',
+                isActive: prod.isActive,
+              ),
+
+              // 5: Actions
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  IconButton(
+                    icon: const Icon(
+                      Icons.currency_rupee_rounded,
+                      size: 19,
+                      color: Color(0xFF0B6B3A),
+                    ),
+                    tooltip: 'Manage Branch Stock & Price',
+                    onPressed: () => _showManageBranchPricesModal(prod),
+                  ),
+                  IconButton(
+                    icon: const Icon(
+                      Icons.edit_outlined,
+                      size: 19,
+                      color: Color(0xFF475569),
+                    ),
+                    tooltip: 'Edit Vegetable',
+                    onPressed: () => _showAddEditVegetableModal(prod),
+                  ),
+                  IconButton(
+                    icon: Icon(
+                      prod.isActive
+                          ? Icons.toggle_on_rounded
+                          : Icons.toggle_off_rounded,
+                      size: 28,
+                      color: prod.isActive
+                          ? const Color(0xFF0B6B3A)
+                          : const Color(0xFF94A3B8),
+                    ),
+                    tooltip: prod.isActive ? 'Deactivate' : 'Activate',
+                    onPressed: () => _toggleProductActive(prod),
+                  ),
+                ],
+              ),
+            ],
+          );
+        }).toList(),
       ),
     );
   }
@@ -1603,22 +1692,12 @@ class _AdminVegetablesScreenState extends ConsumerState<AdminVegetablesScreen> {
               children: [
                 Row(
                   children: [
-                    Container(
+                    ProductImageView(
+                      imageUrl: p.imageUrl,
+                      fallbackEmoji: p.emoji,
                       width: 50,
                       height: 50,
-                      decoration: BoxDecoration(
-                        color: AppColors.neutral100,
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      clipBehavior: Clip.antiAlias,
-                      child: (p.imageUrl != null && p.imageUrl!.isNotEmpty)
-                          ? Image.network(
-                              p.imageUrl!,
-                              fit: BoxFit.cover,
-                              errorBuilder: (ctx, err, stack) =>
-                                  const Icon(Icons.eco),
-                            )
-                          : const Icon(Icons.eco, color: AppColors.primary),
+                      borderRadius: BorderRadius.circular(8),
                     ),
                     const SizedBox(width: 12),
                     Expanded(

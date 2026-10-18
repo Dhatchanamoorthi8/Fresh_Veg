@@ -2,14 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
-import '../../core/constants/app_colors.dart';
-import '../../core/utils/currency_formatter.dart';
-import '../../shared/models/branch.dart';
-import '../../shared/models/category.dart';
-import '../../shared/models/promotion.dart';
-import '../../shared/providers/app_providers.dart';
-import '../../shared/repositories/supabase_branch_repository.dart';
-import '../../shared/repositories/supabase_catalog_repository.dart';
+import 'package:vegora_core/vegora_core.dart';
+import 'package:vegora_models/vegora_models.dart';
+import 'package:vegora_repositories/vegora_repositories.dart';
 import 'admin_shell.dart';
 
 class AdminPromotionsScreen extends ConsumerStatefulWidget {

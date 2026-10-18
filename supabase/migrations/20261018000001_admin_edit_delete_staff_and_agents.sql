@@ -7,7 +7,8 @@ CREATE OR REPLACE FUNCTION public.admin_update_staff_or_agent(
     p_full_name TEXT,
     p_phone TEXT DEFAULT NULL,
     p_is_active BOOLEAN DEFAULT true,
-    p_branch_id TEXT DEFAULT NULL
+    p_branch_id TEXT DEFAULT NULL,
+    p_email TEXT DEFAULT NULL
 )
 RETURNS JSONB
 LANGUAGE plpgsql
@@ -18,6 +19,7 @@ DECLARE
     v_calling_user_id UUID;
     v_calling_user_role TEXT;
     v_clean_phone TEXT;
+    v_clean_email TEXT;
 BEGIN
     v_calling_user_id := auth.uid();
     IF v_calling_user_id IS NULL THEN
@@ -47,22 +49,49 @@ BEGIN
         v_clean_phone := NULL;
     END IF;
 
+    -- Clean and validate email if provided
+    IF p_email IS NOT NULL AND length(trim(p_email)) > 0 THEN
+        v_clean_email := lower(trim(p_email));
+        IF v_clean_email !~* '^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$' THEN
+            RAISE EXCEPTION 'Invalid email format: "%"', v_clean_email;
+        END IF;
+
+        IF EXISTS (SELECT 1 FROM auth.users WHERE lower(email) = v_clean_email AND id != p_target_user_id) THEN
+            RAISE EXCEPTION 'A user with email "%" already exists.', v_clean_email;
+        END IF;
+    ELSE
+        v_clean_email := NULL;
+    END IF;
+
     -- Update profile
     UPDATE public.profiles
     SET full_name = trim(p_full_name),
         phone = v_clean_phone,
+        email = COALESCE(v_clean_email, email),
         is_active = p_is_active,
         updated_at = now()
     WHERE id = p_target_user_id;
 
-    -- Update auth.users metadata
-    UPDATE auth.users
-    SET raw_user_meta_data = COALESCE(raw_user_meta_data, '{}'::jsonb) || jsonb_build_object(
-            'full_name', trim(p_full_name),
-            'phone', v_clean_phone
-        ),
-        updated_at = now()
-    WHERE id = p_target_user_id;
+    -- Update auth.users metadata and email
+    IF v_clean_email IS NOT NULL THEN
+        UPDATE auth.users
+        SET email = v_clean_email,
+            raw_user_meta_data = COALESCE(raw_user_meta_data, '{}'::jsonb) || jsonb_build_object(
+                'full_name', trim(p_full_name),
+                'phone', v_clean_phone,
+                'email', v_clean_email
+            ),
+            updated_at = now()
+        WHERE id = p_target_user_id;
+    ELSE
+        UPDATE auth.users
+        SET raw_user_meta_data = COALESCE(raw_user_meta_data, '{}'::jsonb) || jsonb_build_object(
+                'full_name', trim(p_full_name),
+                'phone', v_clean_phone
+            ),
+            updated_at = now()
+        WHERE id = p_target_user_id;
+    END IF;
 
     -- Update branch assignment if specified for staff
     IF p_branch_id IS NOT NULL AND length(trim(p_branch_id)) > 0 THEN
@@ -88,7 +117,7 @@ BEGIN
         'success', true,
         'message', 'User successfully updated.',
         'user_id', p_target_user_id,
-        'full_name', trim(p_full_name),
+        'email', v_clean_email,
         'is_active', p_is_active
     );
 END;

@@ -239,6 +239,8 @@ class _AdminDeliveryAgentsScreenState
 
   void _showEditAgentDialog(Map<String, dynamic> agent) {
     final formKey = GlobalKey<FormState>();
+    final emailCtrl =
+        TextEditingController(text: agent['email'] as String? ?? '');
     final nameCtrl =
         TextEditingController(text: agent['full_name'] as String? ?? '');
     final phoneCtrl =
@@ -253,73 +255,75 @@ class _AdminDeliveryAgentsScreenState
       builder: (ctx) => StatefulBuilder(
         builder: (context, setDialogState) => AlertDialog(
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
+            borderRadius: BorderRadius.circular(20),
           ),
+          contentPadding: const EdgeInsets.fromLTRB(28, 20, 28, 10),
+          actionsPadding: const EdgeInsets.fromLTRB(28, 12, 28, 24),
           title: Row(
-            children: const [
-              Icon(Icons.edit_rounded, color: AppColors.statusDelivered),
-              SizedBox(width: 8),
-              Text(
-                'Edit Delivery Partner Profile',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            children: [
+              Container(
+                width: 42,
+                height: 42,
+                decoration: BoxDecoration(
+                  color: AppColors.statusDelivered.withValues(alpha: 0.15),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: const Icon(
+                  Icons.two_wheeler_rounded,
+                  color: AppColors.statusDelivered,
+                  size: 22,
+                ),
+              ),
+              const SizedBox(width: 14),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: const [
+                    Text(
+                      'Edit Delivery Partner Profile',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: AppColors.neutral900,
+                      ),
+                    ),
+                    SizedBox(height: 2),
+                    Text(
+                      'Update credentials, contact info, and fleet status',
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: AppColors.textSecondary,
+                        fontWeight: FontWeight.normal,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              IconButton(
+                icon: const Icon(Icons.close_rounded, size: 20),
+                color: AppColors.neutral600,
+                onPressed: isSubmitting ? null : () => Navigator.pop(ctx),
               ),
             ],
           ),
           content: SingleChildScrollView(
             child: SizedBox(
-              width: 460,
+              width: 480,
               child: Form(
                 key: formKey,
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Container(
-                      padding: const EdgeInsets.all(12),
-                      decoration: BoxDecoration(
-                        color: Colors.grey.shade50,
-                        borderRadius: BorderRadius.circular(10),
-                        border: Border.all(color: AppColors.border),
-                      ),
-                      child: Row(
-                        children: [
-                          const Icon(
-                            Icons.email_outlined,
-                            size: 18,
-                            color: AppColors.textSecondary,
-                          ),
-                          const SizedBox(width: 8),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                const Text(
-                                  'Auth Email (Read-only)',
-                                  style: TextStyle(
-                                    fontSize: 11,
-                                    color: AppColors.textSecondary,
-                                  ),
-                                ),
-                                Text(
-                                  agent['email'] as String? ?? '',
-                                  style: const TextStyle(
-                                    fontSize: 13,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(height: 14),
                     if (dialogError != null) ...[
                       Container(
-                        padding: const EdgeInsets.all(10),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 14,
+                          vertical: 10,
+                        ),
                         decoration: BoxDecoration(
                           color: AppColors.errorContainer,
-                          borderRadius: BorderRadius.circular(8),
+                          borderRadius: BorderRadius.circular(10),
                           border: Border.all(
                             color: AppColors.error.withValues(alpha: 0.3),
                           ),
@@ -331,7 +335,7 @@ class _AdminDeliveryAgentsScreenState
                               color: AppColors.error,
                               size: 18,
                             ),
-                            const SizedBox(width: 8),
+                            const SizedBox(width: 10),
                             Expanded(
                               child: Text(
                                 dialogError!,
@@ -345,14 +349,37 @@ class _AdminDeliveryAgentsScreenState
                           ],
                         ),
                       ),
-                      const SizedBox(height: 14),
+                      const SizedBox(height: 18),
                     ],
+                    // 1. EDITABLE EMAIL FIELD
+                    TextFormField(
+                      controller: emailCtrl,
+                      keyboardType: TextInputType.emailAddress,
+                      decoration: const InputDecoration(
+                        labelText: 'Login & Notification Email *',
+                        hintText: 'e.g. partner@vegora.com',
+                        prefixIcon: Icon(Icons.alternate_email_rounded, size: 20),
+                        isDense: true,
+                        border: OutlineInputBorder(),
+                        helperText: 'Changing this updates login credentials across Supabase Auth.',
+                      ),
+                      validator: (v) {
+                        final val = v?.trim() ?? '';
+                        if (val.isEmpty) return 'Email is required';
+                        if (!RegExp(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$').hasMatch(val)) {
+                          return 'Please enter a valid email address';
+                        }
+                        return null;
+                      },
+                    ),
+                    const SizedBox(height: 18),
+                    // 2. FULL NAME FIELD
                     TextFormField(
                       controller: nameCtrl,
                       decoration: const InputDecoration(
                         labelText: 'Partner Full Name *',
-                        prefixIcon:
-                            Icon(Icons.person_outline_rounded, size: 20),
+                        hintText: 'Enter complete name',
+                        prefixIcon: Icon(Icons.person_outline_rounded, size: 20),
                         isDense: true,
                         border: OutlineInputBorder(),
                       ),
@@ -365,7 +392,8 @@ class _AdminDeliveryAgentsScreenState
                         return null;
                       },
                     ),
-                    const SizedBox(height: 14),
+                    const SizedBox(height: 18),
+                    // 3. PHONE NUMBER FIELD
                     TextFormField(
                       controller: phoneCtrl,
                       keyboardType: TextInputType.phone,
@@ -387,29 +415,71 @@ class _AdminDeliveryAgentsScreenState
                         return null;
                       },
                     ),
-                    const SizedBox(height: 14),
-                    SwitchListTile(
-                      contentPadding: EdgeInsets.zero,
-                      title: const Text(
-                        'Account Active Status',
-                        style: TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w600,
+                    const SizedBox(height: 20),
+                    // 4. ACCOUNT STATUS CARD
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 12,
+                      ),
+                      decoration: BoxDecoration(
+                        color: isActive
+                            ? AppColors.primaryContainer.withValues(alpha: 0.3)
+                            : AppColors.errorContainer.withValues(alpha: 0.25),
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(
+                          color: isActive
+                              ? AppColors.primary.withValues(alpha: 0.25)
+                              : AppColors.error.withValues(alpha: 0.25),
                         ),
                       ),
-                      subtitle: Text(
-                        isActive
-                            ? 'Partner can accept delivery orders'
-                            : 'Account is suspended / inactive',
-                        style: TextStyle(
-                          fontSize: 12,
-                          color:
-                              isActive ? AppColors.primary : AppColors.error,
-                        ),
+                      child: Row(
+                        children: [
+                          Icon(
+                            isActive
+                                ? Icons.check_circle_rounded
+                                : Icons.block_rounded,
+                            color: isActive
+                                ? AppColors.primary
+                                : AppColors.error,
+                            size: 24,
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const Text(
+                                  'Fleet Dispatch Status',
+                                  style: TextStyle(
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                const SizedBox(height: 2),
+                                Text(
+                                  isActive
+                                      ? 'Partner can accept delivery dispatches'
+                                      : 'Account suspended (offline from dispatch fleet)',
+                                  style: TextStyle(
+                                    fontSize: 11.5,
+                                    color: isActive
+                                        ? AppColors.primary
+                                        : AppColors.error,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          Switch(
+                            value: isActive,
+                            activeTrackColor: AppColors.primary,
+                            activeThumbColor: Colors.white,
+                            onChanged: (val) => setDialogState(() => isActive = val),
+                          ),
+                        ],
                       ),
-                      value: isActive,
-                      activeThumbColor: AppColors.primary,
-                      onChanged: (val) => setDialogState(() => isActive = val),
                     ),
                   ],
                 ),
@@ -419,12 +489,30 @@ class _AdminDeliveryAgentsScreenState
           actions: [
             TextButton(
               onPressed: isSubmitting ? null : () => Navigator.pop(ctx),
+              style: TextButton.styleFrom(
+                padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
+              ),
               child: const Text('Cancel'),
             ),
-            ElevatedButton(
+            ElevatedButton.icon(
+              icon: isSubmitting
+                  ? const SizedBox(
+                      width: 16,
+                      height: 16,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        color: Colors.white,
+                      ),
+                    )
+                  : const Icon(Icons.check_rounded, size: 18),
+              label: const Text('Save Changes'),
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppColors.statusDelivered,
                 foregroundColor: Colors.white,
+                padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 12),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
               ),
               onPressed: isSubmitting
                   ? null
@@ -442,6 +530,7 @@ class _AdminDeliveryAgentsScreenState
                         await authRepo.adminUpdateStaffOrAgent(
                           targetUserId: agent['id'] as String,
                           fullName: nameCtrl.text.trim(),
+                          email: emailCtrl.text.trim(),
                           phone: phoneCtrl.text.trim(),
                           isActive: isActive,
                         );
@@ -466,22 +555,13 @@ class _AdminDeliveryAgentsScreenState
                         });
                       }
                     },
-              child: isSubmitting
-                  ? const SizedBox(
-                      width: 18,
-                      height: 18,
-                      child: CircularProgressIndicator(
-                        strokeWidth: 2,
-                        color: Colors.white,
-                      ),
-                    )
-                  : const Text('Save Changes'),
             ),
           ],
         ),
       ),
     );
   }
+
 
   void _showDeleteAgentConfirmation(Map<String, dynamic> agent) {
     bool isDeleting = false;

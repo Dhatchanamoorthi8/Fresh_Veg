@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../../core/constants/app_colors.dart';
+import 'package:vegora_core/vegora_core.dart';
 
 /// Professional 2026-style visual pagination bar for admin data tables.
 /// Provides page size selection, item count summary, and interactive page buttons.

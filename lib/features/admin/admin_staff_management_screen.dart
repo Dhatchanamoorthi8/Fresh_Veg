@@ -1,12 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../core/constants/app_colors.dart';
-import '../../core/utils/auth_error_parser.dart';
-import '../../core/utils/email_validator.dart';
-import '../../shared/models/branch.dart';
-import '../../shared/providers/app_providers.dart';
-import '../../shared/providers/branch_provider.dart';
+import 'package:vegora_core/vegora_core.dart';
+import 'package:vegora_models/vegora_models.dart';
+import 'package:vegora_repositories/vegora_repositories.dart';
 import 'admin_shell.dart';
 
 final staffListProvider =
@@ -79,74 +76,49 @@ class _AdminStaffManagementScreenState
                     const SizedBox(height: 14),
                     if (dialogError != null) ...[
                       Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 14,
-                          vertical: 10,
-                        ),
+                        padding: const EdgeInsets.all(10),
                         decoration: BoxDecoration(
-                          color: const Color(0xFFFEF2F2),
+                          color: AppColors.errorContainer,
                           borderRadius: BorderRadius.circular(8),
-                          border: Border.all(color: const Color(0xFFFCA5A5)),
                         ),
-                        child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            const Icon(
-                              Icons.error_outline_rounded,
-                              color: Color(0xFFDC2626),
-                              size: 18,
-                            ),
-                            const SizedBox(width: 8),
-                            Expanded(
-                              child: Text(
-                                dialogError!,
-                                style: const TextStyle(
-                                  color: Color(0xFFB91C1C),
-                                  fontSize: 12.5,
-                                  fontWeight: FontWeight.w500,
-                                  height: 1.3,
-                                ),
-                              ),
-                            ),
-                          ],
+                        child: Text(
+                          dialogError!,
+                          style: const TextStyle(
+                            color: AppColors.error,
+                            fontSize: 12,
+                          ),
                         ),
                       ),
-                      const SizedBox(height: 14),
+                      const SizedBox(height: 12),
                     ],
                     TextFormField(
                       controller: nameCtrl,
                       decoration: const InputDecoration(
                         labelText: 'Staff Full Name',
-                        hintText: 'e.g. Ramesh Kumar',
                         isDense: true,
                         border: OutlineInputBorder(),
                       ),
-                      validator: (v) {
-                        final name = v?.trim() ?? '';
-                        if (name.isEmpty) return 'Staff full name is required';
-                        if (name.length < 2) {
-                          return 'Full name must be at least 2 characters';
-                        }
-                        return null;
-                      },
+                      validator: (v) =>
+                          v?.trim().isEmpty == true ? 'Name is required' : null,
                     ),
-                    const SizedBox(height: 14),
+                    const SizedBox(height: 12),
                     TextFormField(
                       controller: emailCtrl,
                       keyboardType: TextInputType.emailAddress,
                       decoration: const InputDecoration(
                         labelText: 'Staff Email Address',
-                        hintText: 'staff@example.com',
                         isDense: true,
                         border: OutlineInputBorder(),
                       ),
-                      validator: (v) => EmailValidator.validate(
-                        v,
-                        fieldName: 'staff email address',
-                        example: 'staff@store.com',
-                      ),
+                      validator: (v) {
+                        if (v == null || v.trim().isEmpty) {
+                          return 'Email is required';
+                        }
+                        if (!v.contains('@')) return 'Invalid email';
+                        return null;
+                      },
                     ),
-                    const SizedBox(height: 14),
+                    const SizedBox(height: 12),
                     TextFormField(
                       controller: passwordCtrl,
                       obscureText: true,
@@ -155,21 +127,15 @@ class _AdminStaffManagementScreenState
                         isDense: true,
                         border: OutlineInputBorder(),
                       ),
-                      validator: (v) {
-                        if (v == null || v.isEmpty) {
-                          return 'Initial password is required';
-                        }
-                        if (v.length < 6) {
-                          return 'Password must be at least 6 characters';
-                        }
-                        return null;
-                      },
+                      validator: (v) => (v == null || v.length < 6)
+                          ? 'At least 6 characters'
+                          : null,
                     ),
-                    const SizedBox(height: 14),
+                    const SizedBox(height: 12),
                     DropdownButtonFormField<String>(
                       initialValue: selectedBranchId,
                       decoration: const InputDecoration(
-                        labelText: 'Assign Store Branch Hub',
+                        labelText: 'Assign Store Branch',
                         isDense: true,
                         border: OutlineInputBorder(),
                       ),
@@ -188,7 +154,7 @@ class _AdminStaffManagementScreenState
                         }
                       },
                       validator: (v) =>
-                          v == null ? 'Please select a store branch' : null,
+                          v == null ? 'Please select a branch' : null,
                     ),
                   ],
                 ),
@@ -202,15 +168,8 @@ class _AdminStaffManagementScreenState
             ),
             ElevatedButton(
               style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF0B6B3A),
+                backgroundColor: AppColors.primary,
                 foregroundColor: Colors.white,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 20,
-                  vertical: 12,
-                ),
               ),
               onPressed: isSubmitting
                   ? null
@@ -240,13 +199,16 @@ class _AdminStaffManagementScreenState
                             content: Text(
                               'Branch staff account successfully created!',
                             ),
-                            backgroundColor: Color(0xFF0B6B3A),
+                            backgroundColor: AppColors.primary,
                           ),
                         );
                       } catch (err) {
                         setDialogState(() {
                           isSubmitting = false;
-                          dialogError = AuthErrorParser.parse(err);
+                          dialogError = err
+                              .toString()
+                              .replaceAll('Exception:', '')
+                              .trim();
                         });
                       }
                     },
@@ -377,6 +339,559 @@ class _AdminStaffManagementScreenState
     );
   }
 
+  void _showEditStaffDialog(
+    Map<String, dynamic> staff,
+    List<StoreBranch> branches,
+  ) {
+    final formKey = GlobalKey<FormState>();
+    final emailCtrl =
+        TextEditingController(text: staff['email'] as String? ?? '');
+    final nameCtrl =
+        TextEditingController(text: staff['full_name'] as String? ?? '');
+    final phoneCtrl =
+        TextEditingController(text: staff['phone'] as String? ?? '');
+    String? selectedBranchId = staff['branch_id'] as String? ??
+        (branches.isNotEmpty ? branches.first.id : null);
+    bool isActive = staff['is_active'] as bool? ?? true;
+    bool isSubmitting = false;
+    String? dialogError;
+
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (ctx) => StatefulBuilder(
+        builder: (context, setDialogState) => AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
+          contentPadding: const EdgeInsets.fromLTRB(28, 20, 28, 10),
+          actionsPadding: const EdgeInsets.fromLTRB(28, 12, 28, 24),
+          title: Row(
+            children: [
+              Container(
+                width: 42,
+                height: 42,
+                decoration: BoxDecoration(
+                  color: AppColors.primaryContainer.withValues(alpha: 0.7),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: const Icon(
+                  Icons.badge_rounded,
+                  color: AppColors.primary,
+                  size: 22,
+                ),
+              ),
+              const SizedBox(width: 14),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: const [
+                    Text(
+                      'Edit Staff Member Profile',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: AppColors.neutral900,
+                      ),
+                    ),
+                    SizedBox(height: 2),
+                    Text(
+                      'Update credentials, contact info, and store hub',
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: AppColors.textSecondary,
+                        fontWeight: FontWeight.normal,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              IconButton(
+                icon: const Icon(Icons.close_rounded, size: 20),
+                color: AppColors.neutral600,
+                onPressed: isSubmitting ? null : () => Navigator.pop(ctx),
+              ),
+            ],
+          ),
+          content: SingleChildScrollView(
+            child: SizedBox(
+              width: 480,
+              child: Form(
+                key: formKey,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    if (dialogError != null) ...[
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 14,
+                          vertical: 10,
+                        ),
+                        decoration: BoxDecoration(
+                          color: AppColors.errorContainer,
+                          borderRadius: BorderRadius.circular(10),
+                          border: Border.all(
+                            color: AppColors.error.withValues(alpha: 0.3),
+                          ),
+                        ),
+                        child: Row(
+                          children: [
+                            const Icon(
+                              Icons.error_outline_rounded,
+                              color: AppColors.error,
+                              size: 18,
+                            ),
+                            const SizedBox(width: 10),
+                            Expanded(
+                              child: Text(
+                                dialogError!,
+                                style: const TextStyle(
+                                  color: AppColors.error,
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 18),
+                    ],
+                    // 1. EDITABLE EMAIL FIELD
+                    TextFormField(
+                      controller: emailCtrl,
+                      keyboardType: TextInputType.emailAddress,
+                      decoration: const InputDecoration(
+                        labelText: 'Login & Notification Email *',
+                        hintText: 'e.g. staff@vegora.com',
+                        prefixIcon: Icon(Icons.alternate_email_rounded, size: 20),
+                        isDense: true,
+                        border: OutlineInputBorder(),
+                        helperText: 'Changing this updates login credentials across Supabase Auth.',
+                      ),
+                      validator: (v) {
+                        final val = v?.trim() ?? '';
+                        if (val.isEmpty) return 'Email is required';
+                        if (!RegExp(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$').hasMatch(val)) {
+                          return 'Please enter a valid email address';
+                        }
+                        return null;
+                      },
+                    ),
+                    const SizedBox(height: 18),
+                    // 2. FULL NAME FIELD
+                    TextFormField(
+                      controller: nameCtrl,
+                      decoration: const InputDecoration(
+                        labelText: 'Staff Full Name *',
+                        hintText: 'Enter complete name',
+                        prefixIcon: Icon(Icons.person_outline_rounded, size: 20),
+                        isDense: true,
+                        border: OutlineInputBorder(),
+                      ),
+                      validator: (v) {
+                        final val = v?.trim() ?? '';
+                        if (val.isEmpty) return 'Full name is required';
+                        if (val.length < 2) {
+                          return 'Name must be at least 2 characters';
+                        }
+                        return null;
+                      },
+                    ),
+                    const SizedBox(height: 18),
+                    // 3. PHONE NUMBER FIELD
+                    TextFormField(
+                      controller: phoneCtrl,
+                      keyboardType: TextInputType.phone,
+                      decoration: const InputDecoration(
+                        labelText: 'Phone Number (Optional)',
+                        prefixIcon: Icon(Icons.phone_outlined, size: 20),
+                        prefixText: '+91 ',
+                        hintText: '10-digit mobile number',
+                        isDense: true,
+                        border: OutlineInputBorder(),
+                      ),
+                      validator: (v) {
+                        final val = v?.trim() ?? '';
+                        if (val.isEmpty) return null;
+                        final digits = val.replaceAll(RegExp(r'\D'), '');
+                        if (digits.length < 10) {
+                          return 'Must be at least 10 digits';
+                        }
+                        return null;
+                      },
+                    ),
+                    const SizedBox(height: 18),
+                    // 4. ASSIGNED BRANCH DROPDOWN
+                    DropdownButtonFormField<String>(
+                      initialValue: selectedBranchId,
+                      decoration: const InputDecoration(
+                        labelText: 'Assigned Store Branch *',
+                        prefixIcon: Icon(Icons.storefront_outlined, size: 20),
+                        isDense: true,
+                        border: OutlineInputBorder(),
+                      ),
+                      items: branches.map((b) {
+                        return DropdownMenuItem(
+                          value: b.id,
+                          child: Text(
+                            '${b.name} (${b.area})',
+                            style: const TextStyle(fontSize: 13),
+                          ),
+                        );
+                      }).toList(),
+                      onChanged: (val) {
+                        if (val != null) {
+                          setDialogState(() => selectedBranchId = val);
+                        }
+                      },
+                      validator: (v) =>
+                          v == null ? 'Please select a branch' : null,
+                    ),
+                    const SizedBox(height: 20),
+                    // 5. ACCOUNT STATUS CARD
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 12,
+                      ),
+                      decoration: BoxDecoration(
+                        color: isActive
+                            ? AppColors.primaryContainer.withValues(alpha: 0.3)
+                            : AppColors.errorContainer.withValues(alpha: 0.25),
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(
+                          color: isActive
+                              ? AppColors.primary.withValues(alpha: 0.25)
+                              : AppColors.error.withValues(alpha: 0.25),
+                        ),
+                      ),
+                      child: Row(
+                        children: [
+                          Icon(
+                            isActive
+                                ? Icons.check_circle_rounded
+                                : Icons.block_rounded,
+                            color: isActive
+                                ? AppColors.primary
+                                : AppColors.error,
+                            size: 24,
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const Text(
+                                  'Account Active Status',
+                                  style: TextStyle(
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                const SizedBox(height: 2),
+                                Text(
+                                  isActive
+                                      ? 'Staff member has access to POS & order fulfillment'
+                                      : 'Account suspended (access is currently revoked)',
+                                  style: TextStyle(
+                                    fontSize: 11.5,
+                                    color: isActive
+                                        ? AppColors.primary
+                                        : AppColors.error,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          Switch(
+                            value: isActive,
+                            activeTrackColor: AppColors.primary,
+                            activeThumbColor: Colors.white,
+                            onChanged: (val) => setDialogState(() => isActive = val),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: isSubmitting ? null : () => Navigator.pop(ctx),
+              style: TextButton.styleFrom(
+                padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
+              ),
+              child: const Text('Cancel'),
+            ),
+            ElevatedButton.icon(
+              icon: isSubmitting
+                  ? const SizedBox(
+                      width: 16,
+                      height: 16,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        color: Colors.white,
+                      ),
+                    )
+                  : const Icon(Icons.check_rounded, size: 18),
+              label: const Text('Save Changes'),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.primary,
+                foregroundColor: Colors.white,
+                padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 12),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+              ),
+              onPressed: isSubmitting
+                  ? null
+                  : () async {
+                      if (!formKey.currentState!.validate()) return;
+                      final nav = Navigator.of(ctx);
+                      final messenger = ScaffoldMessenger.of(context);
+                      setDialogState(() {
+                        isSubmitting = true;
+                        dialogError = null;
+                      });
+
+                      try {
+                        final authRepo = ref.read(authRepositoryProvider);
+                        await authRepo.adminUpdateStaffOrAgent(
+                          targetUserId: staff['id'] as String,
+                          fullName: nameCtrl.text.trim(),
+                          email: emailCtrl.text.trim(),
+                          phone: phoneCtrl.text.trim(),
+                          isActive: isActive,
+                          branchId: selectedBranchId,
+                        );
+
+                        ref.invalidate(staffListProvider);
+                        nav.pop();
+                        messenger.showSnackBar(
+                          SnackBar(
+                            content: Text(
+                              'Staff member "${nameCtrl.text.trim()}" updated successfully.',
+                            ),
+                            backgroundColor: AppColors.primary,
+                          ),
+                        );
+                      } catch (err) {
+                        setDialogState(() {
+                          isSubmitting = false;
+                          dialogError = err
+                              .toString()
+                              .replaceAll('Exception:', '')
+                              .trim();
+                        });
+                      }
+                    },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+
+  void _showDeleteStaffConfirmation(Map<String, dynamic> staff) {
+    bool isDeleting = false;
+    String? dialogError;
+
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (ctx) => StatefulBuilder(
+        builder: (context, setDialogState) => AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+          title: Row(
+            children: const [
+              Icon(
+                Icons.warning_amber_rounded,
+                color: AppColors.error,
+                size: 28,
+              ),
+              SizedBox(width: 8),
+              Text(
+                'Delete Staff Member',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: AppColors.error,
+                ),
+              ),
+            ],
+          ),
+          content: SizedBox(
+            width: 440,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  'Are you sure you want to permanently delete this branch staff account? This will remove their branch access and authentication credentials.',
+                  style: TextStyle(fontSize: 13, height: 1.4),
+                ),
+                const SizedBox(height: 14),
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: AppColors.errorContainer.withValues(alpha: 0.4),
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(
+                      color: AppColors.error.withValues(alpha: 0.3),
+                    ),
+                  ),
+                  child: Row(
+                    children: [
+                      const CircleAvatar(
+                        radius: 18,
+                        backgroundColor: AppColors.errorContainer,
+                        child: Icon(
+                          Icons.storefront_rounded,
+                          size: 18,
+                          color: AppColors.error,
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              staff['full_name'] as String? ?? 'Staff Member',
+                              style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 14,
+                              ),
+                            ),
+                            Text(
+                              staff['email'] as String? ?? '',
+                              style: const TextStyle(
+                                fontSize: 12,
+                                color: AppColors.textSecondary,
+                              ),
+                            ),
+                            if (staff['branch_name'] != null)
+                              Text(
+                                'Hub: ${staff['branch_name']}',
+                                style: const TextStyle(
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.w600,
+                                  color: AppColors.primaryDark,
+                                ),
+                              ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                if (dialogError != null) ...[
+                  const SizedBox(height: 14),
+                  Container(
+                    padding: const EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                      color: AppColors.errorContainer,
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(color: AppColors.error),
+                    ),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Icon(
+                          Icons.error_outline_rounded,
+                          color: AppColors.error,
+                          size: 18,
+                        ),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: Text(
+                            dialogError!,
+                            style: const TextStyle(
+                              color: AppColors.error,
+                              fontSize: 12,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ],
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: isDeleting ? null : () => Navigator.pop(ctx),
+              child: const Text('Cancel'),
+            ),
+            ElevatedButton.icon(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.error,
+                foregroundColor: Colors.white,
+              ),
+              icon: isDeleting
+                  ? const SizedBox(
+                      width: 16,
+                      height: 16,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        color: Colors.white,
+                      ),
+                    )
+                  : const Icon(Icons.delete_forever_rounded, size: 18),
+              label: const Text('Delete Staff Permanently'),
+              onPressed: isDeleting
+                  ? null
+                  : () async {
+                      final nav = Navigator.of(ctx);
+                      final messenger = ScaffoldMessenger.of(context);
+                      setDialogState(() {
+                        isDeleting = true;
+                        dialogError = null;
+                      });
+
+                      try {
+                        final authRepo = ref.read(authRepositoryProvider);
+                        await authRepo.adminDeleteStaffOrAgent(
+                          targetUserId: staff['id'] as String,
+                        );
+
+                        ref.invalidate(staffListProvider);
+                        nav.pop();
+                        messenger.showSnackBar(
+                          SnackBar(
+                            content: Text(
+                              'Staff member "${staff['full_name']}" deleted permanently.',
+                            ),
+                            backgroundColor: AppColors.error,
+                          ),
+                        );
+                      } catch (err) {
+                        setDialogState(() {
+                          isDeleting = false;
+                          dialogError = err
+                              .toString()
+                              .replaceAll('Exception:', '')
+                              .trim();
+                        });
+                      }
+                    },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   Future<void> _toggleStaffActive(Map<String, dynamic> staff) async {
     final bool currentActive = staff['is_active'] as bool? ?? true;
     final bool nextActive = !currentActive;
@@ -409,6 +924,7 @@ class _AdminStaffManagementScreenState
       }
     }
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -674,8 +1190,14 @@ class _AdminStaffManagementScreenState
                             // Action options
                             PopupMenuButton<String>(
                               onSelected: (val) {
-                                if (val == 'toggle_active') {
+                                if (val == 'edit') {
+                                  branchesAsync.whenData((branches) {
+                                    _showEditStaffDialog(staff, branches);
+                                  });
+                                } else if (val == 'toggle_active') {
                                   _toggleStaffActive(staff);
+                                } else if (val == 'delete') {
+                                  _showDeleteStaffConfirmation(staff);
                                 } else if (val == 'reassign') {
                                   branchesAsync.whenData((branches) {
                                     _showReassignBranchDialog(staff, branches);
@@ -696,6 +1218,20 @@ class _AdminStaffManagementScreenState
                                 }
                               },
                               itemBuilder: (ctx) => [
+                                PopupMenuItem(
+                                  value: 'edit',
+                                  child: Row(
+                                    children: const [
+                                      Icon(
+                                        Icons.edit_outlined,
+                                        size: 18,
+                                        color: AppColors.textPrimary,
+                                      ),
+                                      SizedBox(width: 8),
+                                      Text('Edit Staff Profile'),
+                                    ],
+                                  ),
+                                ),
                                 PopupMenuItem(
                                   value: 'reassign',
                                   child: Row(
@@ -724,13 +1260,13 @@ class _AdminStaffManagementScreenState
                                         isActive
                                             ? Icons.block_rounded
                                             : Icons
-                                                  .check_circle_outline_rounded,
+                                                .check_circle_outline_rounded,
                                         size: 18,
                                         color: isActive
                                             ? AppColors.error
                                             : AppColors.primary,
                                       ),
-                                      const SizedBox(width: 8),
+                                      SizedBox(width: 8),
                                       Text(
                                         isActive
                                             ? 'Deactivate Staff'
@@ -739,6 +1275,27 @@ class _AdminStaffManagementScreenState
                                           color: isActive
                                               ? AppColors.error
                                               : AppColors.primary,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                const PopupMenuDivider(),
+                                PopupMenuItem(
+                                  value: 'delete',
+                                  child: Row(
+                                    children: const [
+                                      Icon(
+                                        Icons.delete_outline_rounded,
+                                        size: 18,
+                                        color: AppColors.error,
+                                      ),
+                                      SizedBox(width: 8),
+                                      Text(
+                                        'Delete Staff Member',
+                                        style: TextStyle(
+                                          color: AppColors.error,
+                                          fontWeight: FontWeight.w600,
                                         ),
                                       ),
                                     ],

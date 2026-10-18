@@ -344,6 +344,8 @@ class _AdminStaffManagementScreenState
     List<StoreBranch> branches,
   ) {
     final formKey = GlobalKey<FormState>();
+    final emailCtrl =
+        TextEditingController(text: staff['email'] as String? ?? '');
     final nameCtrl =
         TextEditingController(text: staff['full_name'] as String? ?? '');
     final phoneCtrl =
@@ -360,73 +362,75 @@ class _AdminStaffManagementScreenState
       builder: (ctx) => StatefulBuilder(
         builder: (context, setDialogState) => AlertDialog(
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
+            borderRadius: BorderRadius.circular(20),
           ),
+          contentPadding: const EdgeInsets.fromLTRB(28, 20, 28, 10),
+          actionsPadding: const EdgeInsets.fromLTRB(28, 12, 28, 24),
           title: Row(
-            children: const [
-              Icon(Icons.edit_rounded, color: AppColors.primary),
-              SizedBox(width: 8),
-              Text(
-                'Edit Staff Member Profile',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            children: [
+              Container(
+                width: 42,
+                height: 42,
+                decoration: BoxDecoration(
+                  color: AppColors.primaryContainer.withValues(alpha: 0.7),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: const Icon(
+                  Icons.badge_rounded,
+                  color: AppColors.primary,
+                  size: 22,
+                ),
+              ),
+              const SizedBox(width: 14),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: const [
+                    Text(
+                      'Edit Staff Member Profile',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: AppColors.neutral900,
+                      ),
+                    ),
+                    SizedBox(height: 2),
+                    Text(
+                      'Update credentials, contact info, and store hub',
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: AppColors.textSecondary,
+                        fontWeight: FontWeight.normal,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              IconButton(
+                icon: const Icon(Icons.close_rounded, size: 20),
+                color: AppColors.neutral600,
+                onPressed: isSubmitting ? null : () => Navigator.pop(ctx),
               ),
             ],
           ),
           content: SingleChildScrollView(
             child: SizedBox(
-              width: 460,
+              width: 480,
               child: Form(
                 key: formKey,
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Container(
-                      padding: const EdgeInsets.all(12),
-                      decoration: BoxDecoration(
-                        color: Colors.grey.shade50,
-                        borderRadius: BorderRadius.circular(10),
-                        border: Border.all(color: AppColors.border),
-                      ),
-                      child: Row(
-                        children: [
-                          const Icon(
-                            Icons.email_outlined,
-                            size: 18,
-                            color: AppColors.textSecondary,
-                          ),
-                          const SizedBox(width: 8),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                const Text(
-                                  'Auth Email (Read-only)',
-                                  style: TextStyle(
-                                    fontSize: 11,
-                                    color: AppColors.textSecondary,
-                                  ),
-                                ),
-                                Text(
-                                  staff['email'] as String? ?? '',
-                                  style: const TextStyle(
-                                    fontSize: 13,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(height: 14),
                     if (dialogError != null) ...[
                       Container(
-                        padding: const EdgeInsets.all(10),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 14,
+                          vertical: 10,
+                        ),
                         decoration: BoxDecoration(
                           color: AppColors.errorContainer,
-                          borderRadius: BorderRadius.circular(8),
+                          borderRadius: BorderRadius.circular(10),
                           border: Border.all(
                             color: AppColors.error.withValues(alpha: 0.3),
                           ),
@@ -438,7 +442,7 @@ class _AdminStaffManagementScreenState
                               color: AppColors.error,
                               size: 18,
                             ),
-                            const SizedBox(width: 8),
+                            const SizedBox(width: 10),
                             Expanded(
                               child: Text(
                                 dialogError!,
@@ -452,14 +456,37 @@ class _AdminStaffManagementScreenState
                           ],
                         ),
                       ),
-                      const SizedBox(height: 14),
+                      const SizedBox(height: 18),
                     ],
+                    // 1. EDITABLE EMAIL FIELD
+                    TextFormField(
+                      controller: emailCtrl,
+                      keyboardType: TextInputType.emailAddress,
+                      decoration: const InputDecoration(
+                        labelText: 'Login & Notification Email *',
+                        hintText: 'e.g. staff@vegora.com',
+                        prefixIcon: Icon(Icons.alternate_email_rounded, size: 20),
+                        isDense: true,
+                        border: OutlineInputBorder(),
+                        helperText: 'Changing this updates login credentials across Supabase Auth.',
+                      ),
+                      validator: (v) {
+                        final val = v?.trim() ?? '';
+                        if (val.isEmpty) return 'Email is required';
+                        if (!RegExp(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$').hasMatch(val)) {
+                          return 'Please enter a valid email address';
+                        }
+                        return null;
+                      },
+                    ),
+                    const SizedBox(height: 18),
+                    // 2. FULL NAME FIELD
                     TextFormField(
                       controller: nameCtrl,
                       decoration: const InputDecoration(
                         labelText: 'Staff Full Name *',
-                        prefixIcon:
-                            Icon(Icons.person_outline_rounded, size: 20),
+                        hintText: 'Enter complete name',
+                        prefixIcon: Icon(Icons.person_outline_rounded, size: 20),
                         isDense: true,
                         border: OutlineInputBorder(),
                       ),
@@ -472,7 +499,8 @@ class _AdminStaffManagementScreenState
                         return null;
                       },
                     ),
-                    const SizedBox(height: 14),
+                    const SizedBox(height: 18),
+                    // 3. PHONE NUMBER FIELD
                     TextFormField(
                       controller: phoneCtrl,
                       keyboardType: TextInputType.phone,
@@ -494,13 +522,13 @@ class _AdminStaffManagementScreenState
                         return null;
                       },
                     ),
-                    const SizedBox(height: 14),
+                    const SizedBox(height: 18),
+                    // 4. ASSIGNED BRANCH DROPDOWN
                     DropdownButtonFormField<String>(
                       initialValue: selectedBranchId,
                       decoration: const InputDecoration(
                         labelText: 'Assigned Store Branch *',
-                        prefixIcon:
-                            Icon(Icons.storefront_outlined, size: 20),
+                        prefixIcon: Icon(Icons.storefront_outlined, size: 20),
                         isDense: true,
                         border: OutlineInputBorder(),
                       ),
@@ -521,29 +549,71 @@ class _AdminStaffManagementScreenState
                       validator: (v) =>
                           v == null ? 'Please select a branch' : null,
                     ),
-                    const SizedBox(height: 14),
-                    SwitchListTile(
-                      contentPadding: EdgeInsets.zero,
-                      title: const Text(
-                        'Account Active Status',
-                        style: TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w600,
+                    const SizedBox(height: 20),
+                    // 5. ACCOUNT STATUS CARD
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 12,
+                      ),
+                      decoration: BoxDecoration(
+                        color: isActive
+                            ? AppColors.primaryContainer.withValues(alpha: 0.3)
+                            : AppColors.errorContainer.withValues(alpha: 0.25),
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(
+                          color: isActive
+                              ? AppColors.primary.withValues(alpha: 0.25)
+                              : AppColors.error.withValues(alpha: 0.25),
                         ),
                       ),
-                      subtitle: Text(
-                        isActive
-                            ? 'Staff member can access POS & order fulfillment'
-                            : 'Account is suspended / inactive',
-                        style: TextStyle(
-                          fontSize: 12,
-                          color:
-                              isActive ? AppColors.primary : AppColors.error,
-                        ),
+                      child: Row(
+                        children: [
+                          Icon(
+                            isActive
+                                ? Icons.check_circle_rounded
+                                : Icons.block_rounded,
+                            color: isActive
+                                ? AppColors.primary
+                                : AppColors.error,
+                            size: 24,
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const Text(
+                                  'Account Active Status',
+                                  style: TextStyle(
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                const SizedBox(height: 2),
+                                Text(
+                                  isActive
+                                      ? 'Staff member has access to POS & order fulfillment'
+                                      : 'Account suspended (access is currently revoked)',
+                                  style: TextStyle(
+                                    fontSize: 11.5,
+                                    color: isActive
+                                        ? AppColors.primary
+                                        : AppColors.error,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          Switch(
+                            value: isActive,
+                            activeTrackColor: AppColors.primary,
+                            activeThumbColor: Colors.white,
+                            onChanged: (val) => setDialogState(() => isActive = val),
+                          ),
+                        ],
                       ),
-                      value: isActive,
-                      activeThumbColor: AppColors.primary,
-                      onChanged: (val) => setDialogState(() => isActive = val),
                     ),
                   ],
                 ),
@@ -553,12 +623,30 @@ class _AdminStaffManagementScreenState
           actions: [
             TextButton(
               onPressed: isSubmitting ? null : () => Navigator.pop(ctx),
+              style: TextButton.styleFrom(
+                padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
+              ),
               child: const Text('Cancel'),
             ),
-            ElevatedButton(
+            ElevatedButton.icon(
+              icon: isSubmitting
+                  ? const SizedBox(
+                      width: 16,
+                      height: 16,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        color: Colors.white,
+                      ),
+                    )
+                  : const Icon(Icons.check_rounded, size: 18),
+              label: const Text('Save Changes'),
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppColors.primary,
                 foregroundColor: Colors.white,
+                padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 12),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
               ),
               onPressed: isSubmitting
                   ? null
@@ -576,6 +664,7 @@ class _AdminStaffManagementScreenState
                         await authRepo.adminUpdateStaffOrAgent(
                           targetUserId: staff['id'] as String,
                           fullName: nameCtrl.text.trim(),
+                          email: emailCtrl.text.trim(),
                           phone: phoneCtrl.text.trim(),
                           isActive: isActive,
                           branchId: selectedBranchId,
@@ -601,22 +690,13 @@ class _AdminStaffManagementScreenState
                         });
                       }
                     },
-              child: isSubmitting
-                  ? const SizedBox(
-                      width: 18,
-                      height: 18,
-                      child: CircularProgressIndicator(
-                        strokeWidth: 2,
-                        color: Colors.white,
-                      ),
-                    )
-                  : const Text('Save Changes'),
             ),
           ],
         ),
       ),
     );
   }
+
 
   void _showDeleteStaffConfirmation(Map<String, dynamic> staff) {
     bool isDeleting = false;
