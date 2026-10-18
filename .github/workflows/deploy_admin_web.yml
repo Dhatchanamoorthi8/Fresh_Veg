@@ -33,10 +33,23 @@ jobs:
           cp web/vercel.json build/web/vercel.json
 
       - name: Deploy to Vercel
-        uses: amondnet/vercel-action@v25
-        with:
-          vercel-token: ${{ secrets.VERCEL_TOKEN }}
-          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
-          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
-          vercel-args: '--prod'
-          working-directory: apps/vegora_admin_web/build/web
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID || 'team_xCI1i2o8KOEZtkckplKB7vc4' }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID || 'prj_7R6fTUlBToQUVOjmyGYcqwDHsd7a' }}
+        run: |
+          if [ -z "$VERCEL_TOKEN" ]; then
+            echo "::error::VERCEL_TOKEN secret is missing or empty! Please go to your GitHub Repo -> Settings -> Secrets and variables -> Actions, and add VERCEL_TOKEN."
+            exit 1
+          fi
+
+          mkdir -p apps/vegora_admin_web/build/web/.vercel
+          cat << EOF > apps/vegora_admin_web/build/web/.vercel/project.json
+          {
+            "orgId": "$VERCEL_ORG_ID",
+            "projectId": "$VERCEL_PROJECT_ID"
+          }
+          EOF
+
+          cd apps/vegora_admin_web/build/web
+          npx vercel deploy --prod --token="$VERCEL_TOKEN" --yes
