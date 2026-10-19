@@ -8,7 +8,10 @@ void main() {
       expect(EmailValidator.isValid('admin@vegora.in'), isTrue);
       expect(EmailValidator.isValid('customer.care@fresh.store'), isTrue);
       expect(EmailValidator.isValid('support+orders@company.online'), isTrue);
-      expect(EmailValidator.isValid('staff@branch.north.vegora.technology'), isTrue);
+      expect(
+        EmailValidator.isValid('staff@branch.north.vegora.technology'),
+        isTrue,
+      );
       expect(EmailValidator.isValid('first.last123@sub-domain.org'), isTrue);
       expect(EmailValidator.isValid('  trimmed.user@domain.com  '), isTrue);
     });
@@ -21,7 +24,10 @@ void main() {
       expect(EmailValidator.isValid('@missingusername.com'), isFalse);
       expect(EmailValidator.isValid('missingdomain@'), isFalse);
       expect(EmailValidator.isValid('user@domain'), isFalse);
-      expect(EmailValidator.isValid('user@domain.c'), isFalse); // Single letter TLD
+      expect(
+        EmailValidator.isValid('user@domain.c'),
+        isFalse,
+      ); // Single letter TLD
       expect(EmailValidator.isValid('spaces in@domain.com'), isFalse);
     });
 
@@ -43,7 +49,11 @@ void main() {
         'Enter a valid email address',
       );
       expect(
-        EmailValidator.validate('invalid@c', fieldName: 'admin email', example: 'admin@vegora.in'),
+        EmailValidator.validate(
+          'invalid@c',
+          fieldName: 'admin email',
+          example: 'admin@vegora.in',
+        ),
         'Enter a valid admin email (e.g. admin@vegora.in)',
       );
       expect(

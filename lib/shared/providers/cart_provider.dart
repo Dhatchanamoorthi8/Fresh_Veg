@@ -38,13 +38,12 @@ class CartNotifier extends Notifier<Cart> {
     return const Cart();
   }
 
-  /// Adds a product to the cart.
-  /// Throws [BranchMismatchException] if the cart has items from another branch.
-  /// Throws [OutOfStockException] if the item is out of stock.
-  void addItem(Product product, String branchId, {int quantity = 1}) {
+  /// Adds a product to the cart with specified quantity (in grams or piece count).
+  /// If [quantity] is omitted: defaults to 500g for weight items, 1 for piece items.
+  void addItem(Product product, String branchId, {int? quantity}) {
     if (!product.isAvailableAtBranch(branchId)) {
       throw OutOfStockException(
-        '${product.name} is currently out of stock at this branch.',
+        '${product.displayName()} is currently out of stock at this branch.',
       );
     }
 
@@ -59,6 +58,8 @@ class CartNotifier extends Notifier<Cart> {
       );
     }
 
+    final effectiveQty =
+        quantity ?? (product.isWeightBased ? product.minOrderQuantity : 1);
     final existingIndex = state.items.indexWhere(
       (i) => i.product.id == product.id,
     );
@@ -66,10 +67,10 @@ class CartNotifier extends Notifier<Cart> {
 
     if (existingIndex >= 0) {
       final currentItem = state.items[existingIndex];
-      final newQty = currentItem.quantity + quantity;
+      final newQty = currentItem.quantity + effectiveQty;
       if (newQty > maxStock) {
         throw OutOfStockException(
-          'Only $maxStock units available in this branch.',
+          'Only ${product.formatQuantity(maxStock)} available in this branch.',
         );
       }
 
@@ -80,15 +81,15 @@ class CartNotifier extends Notifier<Cart> {
       );
       state = state.copyWith(items: updatedItems, branchId: branchId);
     } else {
-      if (quantity > maxStock) {
+      if (effectiveQty > maxStock) {
         throw OutOfStockException(
-          'Only $maxStock units available in this branch.',
+          'Only ${product.formatQuantity(maxStock)} available in this branch.',
         );
       }
 
       final newItem = CartItem(
         product: product,
-        quantity: quantity,
+        quantity: effectiveQty,
         branchId: branchId,
         unitPricePaise: unitPrice,
       );
@@ -113,12 +114,30 @@ class CartNotifier extends Notifier<Cart> {
     final maxStock = currentItem.product.getStockForBranch(branchId);
 
     if (newQuantity > maxStock) {
-      throw OutOfStockException('Only $maxStock units available in stock.');
+      throw OutOfStockException(
+        'Only ${currentItem.product.formatQuantity(maxStock)} available in stock.',
+      );
     }
 
     final updatedItems = List<CartItem>.from(state.items);
     updatedItems[index] = currentItem.copyWith(quantity: newQuantity);
     state = state.copyWith(items: updatedItems);
+  }
+
+  void incrementQuantity(String productId) {
+    final index = state.items.indexWhere((i) => i.product.id == productId);
+    if (index == -1) return;
+    final item = state.items[index];
+    final step = item.product.isWeightBased ? item.product.quantityStep : 1;
+    updateQuantity(productId, item.quantity + step);
+  }
+
+  void decrementQuantity(String productId) {
+    final index = state.items.indexWhere((i) => i.product.id == productId);
+    if (index == -1) return;
+    final item = state.items[index];
+    final step = item.product.isWeightBased ? item.product.quantityStep : 1;
+    updateQuantity(productId, item.quantity - step);
   }
 
   void removeItem(String productId) {
@@ -137,15 +156,22 @@ class CartNotifier extends Notifier<Cart> {
   }
 
   /// Explicitly reset cart and switch to new branch (e.g. after customer confirms)
-  void switchBranchAndClear(String newBranchId, {Product? initialProduct}) {
+  void switchBranchAndClear(
+    String newBranchId, {
+    Product? initialProduct,
+    int? initialQuantity,
+  }) {
     if (initialProduct != null) {
       final unitPrice = initialProduct.getPricePaiseForBranch(newBranchId);
+      final qty =
+          initialQuantity ??
+          (initialProduct.isWeightBased ? initialProduct.minOrderQuantity : 1);
       state = Cart(
         branchId: newBranchId,
         items: [
           CartItem(
             product: initialProduct,
-            quantity: 1,
+            quantity: qty,
             branchId: newBranchId,
             unitPricePaise: unitPrice,
           ),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import '../../core/constants/app_colors.dart';
 
 /// Reusable widget for displaying produce/product images with graceful
@@ -52,7 +53,7 @@ class ProductImageView extends StatelessWidget {
                   color: AppColors.primary,
                   value: progress.expectedTotalBytes != null
                       ? progress.cumulativeBytesLoaded /
-                          progress.expectedTotalBytes!
+                            progress.expectedTotalBytes!
                       : null,
                 ),
               ),
@@ -76,10 +77,7 @@ class ProductImageView extends StatelessWidget {
     }
 
     if (borderRadius != null) {
-      return ClipRRect(
-        borderRadius: borderRadius!,
-        child: imageContent,
-      );
+      return ClipRRect(borderRadius: borderRadius!, child: imageContent);
     }
 
     return imageContent;

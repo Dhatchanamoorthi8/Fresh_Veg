@@ -34,10 +34,17 @@ class Product {
   final String id;
   final String sku;
   final String name;
-  final String localName; // e.g., "Palak", "Tamatar", "Aloo"
+  final String nameTa;
+  final String localName; // e.g. "Palak", "Tamatar", "Aloo"
   final String categoryId;
-  final String unit; // "500 g", "1 kg", "1 bunch", "250 g", "1 pc"
+  final String unit; // "1 kg", "500 g", "1 bunch", "1 pc"
+  final String unitType; // 'WEIGHT', 'COUNT', 'BUNCH'
+  final String baseUnit; // 'g', 'pc', 'bunch'
+  final int minOrderQuantity; // e.g. 100 for weight, 1 for pieces
+  final int quantityStep; // e.g. 50 or 100 for weight, 1 for pieces
+  final bool allowCustomQuantity;
   final String description;
+  final String descriptionTa;
   final String storageTips;
   final String origin;
   final String? imageUrl;
@@ -55,14 +62,21 @@ class Product {
     required this.id,
     this.sku = '',
     required this.name,
-    required this.localName,
-    required this.categoryId,
-    required this.unit,
-    required this.description,
-    required this.storageTips,
-    required this.origin,
+    this.nameTa = '',
+    this.localName = '',
+    this.categoryId = 'everyday_veggies',
+    this.unit = '1 kg',
+    this.unitType = 'WEIGHT',
+    this.baseUnit = 'g',
+    this.minOrderQuantity = 100,
+    this.quantityStep = 50,
+    this.allowCustomQuantity = true,
+    this.description = '',
+    this.descriptionTa = '',
+    this.storageTips = '',
+    this.origin = '',
     this.imageUrl,
-    required this.emoji,
+    this.emoji = '🥗',
     this.isOrganic = false,
     this.isSeasonal = false,
     this.isBestSeller = false,
@@ -72,6 +86,68 @@ class Product {
     this.originalPricePaise,
     this.branchInventory = const {},
   });
+
+  bool get isWeightBased => unitType == 'WEIGHT';
+  bool get isPieceBased => unitType == 'COUNT';
+  bool get isBunchBased => unitType == 'BUNCH';
+
+  /// Returns Tamil vegetable name when languageCode is 'ta' and available, else English name.
+  String displayName([String? languageCode]) {
+    if (languageCode == 'ta' && nameTa.trim().isNotEmpty) {
+      return nameTa;
+    }
+    return name;
+  }
+
+  /// Returns Tamil description when languageCode is 'ta' and available, else English description.
+  String displayDescription([String? languageCode]) {
+    if (languageCode == 'ta' && descriptionTa.trim().isNotEmpty) {
+      return descriptionTa;
+    }
+    return description;
+  }
+
+  /// Calculates authoritative line price in paise without floating-point errors.
+  /// For weight products: (pricePerKg * quantityGrams) / 1000
+  /// For count products: pricePerPiece * quantity
+  int calculatePricePaise(int quantityGramsOrCount, int pricePaisePerKgOrPiece) {
+    if (quantityGramsOrCount <= 0 || pricePaisePerKgOrPiece <= 0) return 0;
+    if (isWeightBased) {
+      return ((pricePaisePerKgOrPiece * quantityGramsOrCount) / 1000.0).round();
+    }
+    return pricePaisePerKgOrPiece * quantityGramsOrCount;
+  }
+
+  /// Formats quantity with appropriate units (e.g. 500 g -> "500 g" / "500 கிராம்")
+  String formatQuantity(int quantityGramsOrCount, {bool isTamil = false}) {
+    if (isWeightBased) {
+      if (quantityGramsOrCount >= 1000 && quantityGramsOrCount % 100 == 0) {
+        final kg = quantityGramsOrCount / 1000;
+        final kgStr = kg % 1 == 0 ? kg.toInt().toString() : kg.toStringAsFixed(1);
+        return isTamil ? '$kgStr கிலோ' : '$kgStr kg';
+      }
+      return isTamil ? '$quantityGramsOrCount கிராம்' : '$quantityGramsOrCount g';
+    } else if (isBunchBased) {
+      return isTamil
+          ? '$quantityGramsOrCount கட்டு'
+          : '$quantityGramsOrCount ${quantityGramsOrCount == 1 ? 'bunch' : 'bunches'}';
+    } else {
+      return isTamil
+          ? '$quantityGramsOrCount எண்ணிக்கை'
+          : '$quantityGramsOrCount ${quantityGramsOrCount == 1 ? 'pc' : 'pcs'}';
+    }
+  }
+
+  /// Formats unit price label (e.g. "per kg" / "ஒரு கிலோ")
+  String formatUnitLabel({bool isTamil = false}) {
+    if (isWeightBased) {
+      return isTamil ? 'ஒரு கிலோ' : 'per kg';
+    } else if (isBunchBased) {
+      return isTamil ? 'ஒரு கட்டு' : 'per bunch';
+    } else {
+      return isTamil ? 'ஒன்று' : 'per pc';
+    }
+  }
 
   factory Product.fromJson(
     Map<String, dynamic> json, {
@@ -88,15 +164,31 @@ class Product {
       }
     }
 
+    final rawUnit = json['unit'] as String? ?? '1 kg';
+    final inferredType = (rawUnit.contains('kg') || rawUnit.contains('g'))
+        ? 'WEIGHT'
+        : (rawUnit.contains('bunch') ? 'BUNCH' : 'COUNT');
+    final resolvedUnitType = (json['unit_type'] as String?)?.toUpperCase() ?? inferredType;
+    final resolvedBaseUnit = json['base_unit'] as String? ??
+        (resolvedUnitType == 'WEIGHT' ? 'g' : (resolvedUnitType == 'BUNCH' ? 'bunch' : 'pc'));
+    final defaultMin = resolvedUnitType == 'WEIGHT' ? 100 : 1;
+    final defaultStep = resolvedUnitType == 'WEIGHT' ? 50 : 1;
+
     return Product(
       id: json['id'] as String,
-      sku:
-          json['sku'] as String? ?? (json['id'] as String? ?? '').toUpperCase(),
+      sku: json['sku'] as String? ?? (json['id'] as String? ?? '').toUpperCase(),
       name: json['name'] as String,
+      nameTa: json['name_ta'] as String? ?? '',
       localName: json['local_name'] as String? ?? '',
       categoryId: json['category_id'] as String,
-      unit: json['unit'] as String,
+      unit: rawUnit,
+      unitType: resolvedUnitType,
+      baseUnit: resolvedBaseUnit,
+      minOrderQuantity: (json['min_order_quantity'] as num?)?.toInt() ?? defaultMin,
+      quantityStep: (json['quantity_step'] as num?)?.toInt() ?? defaultStep,
+      allowCustomQuantity: json['allow_custom_quantity'] as bool? ?? true,
       description: json['description'] as String? ?? '',
+      descriptionTa: json['description_ta'] as String? ?? '',
       storageTips: json['storage_tips'] as String? ?? '',
       origin: json['origin'] as String? ?? '',
       imageUrl: json['image_url'] as String?,
@@ -117,10 +209,17 @@ class Product {
       'id': id,
       if (sku.isNotEmpty) 'sku': sku,
       'name': name,
+      'name_ta': nameTa,
       'local_name': localName,
       'category_id': categoryId,
       'unit': unit,
+      'unit_type': unitType,
+      'base_unit': baseUnit,
+      'min_order_quantity': minOrderQuantity,
+      'quantity_step': quantityStep,
+      'allow_custom_quantity': allowCustomQuantity,
       'description': description,
+      'description_ta': descriptionTa,
       'storage_tips': storageTips,
       'origin': origin,
       'image_url': imageUrl,
@@ -139,10 +238,17 @@ class Product {
     String? id,
     String? sku,
     String? name,
+    String? nameTa,
     String? localName,
     String? categoryId,
     String? unit,
+    String? unitType,
+    String? baseUnit,
+    int? minOrderQuantity,
+    int? quantityStep,
+    bool? allowCustomQuantity,
     String? description,
+    String? descriptionTa,
     String? storageTips,
     String? origin,
     String? imageUrl,
@@ -160,10 +266,17 @@ class Product {
       id: id ?? this.id,
       sku: sku ?? this.sku,
       name: name ?? this.name,
+      nameTa: nameTa ?? this.nameTa,
       localName: localName ?? this.localName,
       categoryId: categoryId ?? this.categoryId,
       unit: unit ?? this.unit,
+      unitType: unitType ?? this.unitType,
+      baseUnit: baseUnit ?? this.baseUnit,
+      minOrderQuantity: minOrderQuantity ?? this.minOrderQuantity,
+      quantityStep: quantityStep ?? this.quantityStep,
+      allowCustomQuantity: allowCustomQuantity ?? this.allowCustomQuantity,
       description: description ?? this.description,
+      descriptionTa: descriptionTa ?? this.descriptionTa,
       storageTips: storageTips ?? this.storageTips,
       origin: origin ?? this.origin,
       imageUrl: imageUrl ?? this.imageUrl,
@@ -188,13 +301,15 @@ class Product {
     return basePricePaise;
   }
 
-  /// Get stock count for the given branch (0 if not configured)
+  /// Get stock count for the given branch (0 if not configured).
+  /// For weight products, returns stock in grams (e.g. 50,000 for 50kg).
+  /// For count products, returns stock in pieces.
   int getStockForBranch(String branchId) {
     final override = branchInventory[branchId];
     if (override != null) {
       return override.stockQuantity;
     }
-    return branchInventory.isEmpty ? 15 : 0;
+    return branchInventory.isEmpty ? (isWeightBased ? 50000 : 15) : 0;
   }
 
   /// Check whether product is available in stock for the given branch

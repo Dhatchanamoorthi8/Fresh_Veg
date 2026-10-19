@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:vegora_core/localization/app_localizations.dart';
 
+import '../core/localization/app_locale_state.dart';
 import '../core/theme/app_theme.dart';
 import 'router.dart';
 
@@ -9,10 +12,20 @@ class VegoraApp extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final currentLocale = ref.watch(appLocaleProvider);
+
     return MaterialApp.router(
       title: 'Vegora • Freshness at Your Doorstep',
       debugShowCheckedModeBanner: false,
-      theme: AppTheme.lightTheme,
+      locale: currentLocale,
+      supportedLocales: AppLocalizations.supportedLocales,
+      localizationsDelegates: const [
+        AppLocalizations.delegate,
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      theme: AppTheme.getTheme(locale: currentLocale),
       routerConfig: appRouter,
     );
   }

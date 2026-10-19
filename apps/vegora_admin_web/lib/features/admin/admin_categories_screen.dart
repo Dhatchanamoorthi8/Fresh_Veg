@@ -64,6 +64,7 @@ class _AdminCategoriesScreenState extends ConsumerState<AdminCategoriesScreen> {
     final formKey = GlobalKey<FormState>();
 
     final nameCtrl = TextEditingController(text: existingCategory?.name ?? '');
+    final nameTaCtrl = TextEditingController(text: existingCategory?.nameTa ?? '');
     final subtitleCtrl = TextEditingController(
       text: existingCategory?.subtitle ?? '',
     );
@@ -143,7 +144,7 @@ class _AdminCategoriesScreenState extends ConsumerState<AdminCategoriesScreen> {
                         child: TextFormField(
                           controller: nameCtrl,
                           decoration: const InputDecoration(
-                            labelText: 'Category Name *',
+                            labelText: 'Category Name (English) *',
                             hintText: 'e.g. Exotic Greens',
                             border: OutlineInputBorder(),
                           ),
@@ -153,6 +154,15 @@ class _AdminCategoriesScreenState extends ConsumerState<AdminCategoriesScreen> {
                         ),
                       ),
                     ],
+                  ),
+                  const SizedBox(height: 12),
+                  TextFormField(
+                    controller: nameTaCtrl,
+                    decoration: const InputDecoration(
+                      labelText: 'Category Name (Tamil / தமிழ்)',
+                      hintText: 'e.g. அன்றாட காய்கறிகள்',
+                      border: OutlineInputBorder(),
+                    ),
                   ),
                   const SizedBox(height: 12),
                   TextFormField(
@@ -232,6 +242,7 @@ class _AdminCategoriesScreenState extends ConsumerState<AdminCategoriesScreen> {
                         final catPayload = ProductCategory(
                           id: catId,
                           name: nameCtrl.text.trim(),
+                          nameTa: nameTaCtrl.text.trim(),
                           subtitle: subtitleCtrl.text.trim(),
                           icon: Icons.category_rounded,
                           emoji: emojiCtrl.text.trim(),
@@ -366,12 +377,37 @@ class _AdminCategoriesScreenState extends ConsumerState<AdminCategoriesScreen> {
                               style: const TextStyle(fontSize: 20),
                             ),
                           ),
-                          title: Text(
-                            c.name,
-                            style: const TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 15,
-                            ),
+                          title: Row(
+                            children: [
+                              Text(
+                                c.name,
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 15,
+                                ),
+                              ),
+                              if (c.nameTa.isNotEmpty) ...[
+                                const SizedBox(width: 8),
+                                Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 6,
+                                    vertical: 2,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: const Color(0xFFE8F5E9),
+                                    borderRadius: BorderRadius.circular(4),
+                                  ),
+                                  child: Text(
+                                    c.nameTa,
+                                    style: const TextStyle(
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w600,
+                                      color: Color(0xFF1B5E20),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ],
                           ),
                           subtitle: Text(
                             '${c.subtitle.isNotEmpty ? "${c.subtitle} • " : ""}ID: ${c.id} • Order: ${c.sortOrder}',

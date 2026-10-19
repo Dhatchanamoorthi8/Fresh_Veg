@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../core/constants/app_colors.dart';
+import '../../core/localization/app_locale_state.dart';
 import '../../core/utils/currency_formatter.dart';
 import '../../shared/providers/branch_provider.dart';
 import '../../shared/providers/cart_provider.dart';
@@ -29,15 +30,21 @@ class _CartScreenState extends ConsumerState<CartScreen> {
   Widget build(BuildContext context) {
     final cart = ref.watch(cartProvider);
     final currentBranch = ref.watch(selectedBranchProvider);
+    final locale = ref.watch(appLocaleProvider);
+    final isTamil = locale.languageCode == 'ta';
 
     if (cart.isEmpty) {
       return Scaffold(
-        appBar: AppBar(title: const Text('Shopping Cart')),
+        appBar: AppBar(title: Text(isTamil ? 'கூடை' : 'Shopping Cart')),
         body: EmptyStateView(
           emoji: '🛒',
-          title: 'Your Cart is Empty',
-          message: 'Fresh leafy greens, tomatoes, and crunchy veggies are waiting for you!',
-          buttonText: 'Shop Fresh Vegetables',
+          title: isTamil ? 'உங்கள் கூடை காலியாக உள்ளது' : 'Your Cart is Empty',
+          message: isTamil
+              ? 'புதிய காய்கறிகள், கீரைகள் உங்கள் வருகைக்காக காத்திருக்கின்றன!'
+              : 'Fresh leafy greens, tomatoes, and crunchy veggies are waiting for you!',
+          buttonText: isTamil
+              ? 'காய்கறிகளை வாங்குங்கள்'
+              : 'Shop Fresh Vegetables',
           onButtonPressed: () => context.go('/home'),
         ),
       );
@@ -55,17 +62,22 @@ class _CartScreenState extends ConsumerState<CartScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Shopping Cart'),
+        title: Text(isTamil ? 'கூடை' : 'Shopping Cart'),
         actions: [
           TextButton(
             onPressed: () {
               ref.read(cartProvider.notifier).clearCart();
-              ScaffoldMessenger.of(context)
-                  .showSnackBar(const SnackBar(content: Text('Cart cleared')));
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(
+                    isTamil ? 'கூடை நீக்கப்பட்டது' : 'Cart cleared',
+                  ),
+                ),
+              );
             },
-            child: const Text(
-              'Clear All',
-              style: TextStyle(color: AppColors.statusCancelled),
+            child: Text(
+              isTamil ? 'அனைத்தும் நீக்கு' : 'Clear All',
+              style: const TextStyle(color: AppColors.statusCancelled),
             ),
           ),
         ],
@@ -87,7 +99,9 @@ class _CartScreenState extends ConsumerState<CartScreen> {
                   const SizedBox(width: 8),
                   Expanded(
                     child: Text(
-                      'Fulfilling from: ${currentBranch.name} (~${currentBranch.estimatedDeliveryMinutes}m)',
+                      isTamil
+                          ? 'கிளை: ${currentBranch.name} (~${currentBranch.estimatedDeliveryMinutes} நிமி)'
+                          : 'Fulfilling from: ${currentBranch.name} (~${currentBranch.estimatedDeliveryMinutes}m)',
                       style: const TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.bold,
@@ -97,9 +111,9 @@ class _CartScreenState extends ConsumerState<CartScreen> {
                   ),
                   InkWell(
                     onTap: () => context.push('/branches'),
-                    child: const Text(
-                      'Change',
-                      style: TextStyle(
+                    child: Text(
+                      isTamil ? 'மாற்று' : 'Change',
+                      style: const TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.bold,
                         color: AppColors.primary,
@@ -141,8 +155,12 @@ class _CartScreenState extends ConsumerState<CartScreen> {
                   Expanded(
                     child: Text(
                       isFreeDelivery
-                          ? '🎉 You unlocked FREE Delivery from this branch!'
-                          : 'Add ${CurrencyFormatter.formatPaise(remainingForFreeDelivery)} more to get FREE Delivery!',
+                          ? (isTamil
+                                ? '🎉 இக்கிளையிலிருந்து இலவச டெலிவரி கிடைத்துள்ளது!'
+                                : '🎉 You unlocked FREE Delivery from this branch!')
+                          : (isTamil
+                                ? 'இன்னும் ${CurrencyFormatter.formatPaise(remainingForFreeDelivery)} சேர்த்தால் இலவச டெலிவரி!'
+                                : 'Add ${CurrencyFormatter.formatPaise(remainingForFreeDelivery)} more to get FREE Delivery!'),
                       style: TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.w700,
@@ -205,24 +223,26 @@ class _CartScreenState extends ConsumerState<CartScreen> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                product.name,
-                                style: const TextStyle(
+                                product.displayName(locale.languageCode),
+                                style: TextStyle(
                                   fontSize: 14,
                                   fontWeight: FontWeight.bold,
                                   color: AppColors.textPrimary,
+                                  height: isTamil ? 1.35 : 1.2,
                                 ),
                               ),
                               const SizedBox(height: 2),
                               Text(
-                                '${CurrencyFormatter.formatPaise(item.unitPricePaise)} / ${product.unit}',
-                                style: const TextStyle(
+                                '${CurrencyFormatter.formatPaise(item.unitPricePaise)} / ${product.formatUnitLabel(isTamil: isTamil)}',
+                                style: TextStyle(
                                   fontSize: 12,
                                   color: AppColors.textSecondary,
+                                  height: isTamil ? 1.3 : 1.2,
                                 ),
                               ),
                               const SizedBox(height: 4),
                               Text(
-                                'Item Total: ${CurrencyFormatter.formatPaise(item.totalPaise)}',
+                                '${isTamil ? "மொத்தம்" : "Item Total"}: ${CurrencyFormatter.formatPaise(item.totalPaise)}',
                                 style: const TextStyle(
                                   fontSize: 13,
                                   fontWeight: FontWeight.w800,
@@ -233,9 +253,9 @@ class _CartScreenState extends ConsumerState<CartScreen> {
                           ),
                         ),
 
-                        // Quantity Stepper
+                        // Quantity Stepper (Weight/Gram Aware)
                         Container(
-                          height: 34,
+                          height: 36,
                           decoration: BoxDecoration(
                             color: AppColors.surfaceVariant,
                             borderRadius: BorderRadius.circular(8),
@@ -250,21 +270,18 @@ class _CartScreenState extends ConsumerState<CartScreen> {
                                 onPressed: () {
                                   ref
                                       .read(cartProvider.notifier)
-                                      .updateQuantity(
-                                        product.id,
-                                        item.quantity - 1,
-                                      );
+                                      .decrementQuantity(product.id);
                                 },
                               ),
                               Padding(
                                 padding: const EdgeInsets.symmetric(
-                                  horizontal: 4,
+                                  horizontal: 6,
                                 ),
                                 child: Text(
-                                  '${item.quantity}',
+                                  item.formattedQuantity(isTamil: isTamil),
                                   style: const TextStyle(
                                     fontWeight: FontWeight.bold,
-                                    fontSize: 13,
+                                    fontSize: 12.5,
                                   ),
                                 ),
                               ),
@@ -272,18 +289,20 @@ class _CartScreenState extends ConsumerState<CartScreen> {
                                 icon: const Icon(Icons.add, size: 14),
                                 visualDensity: VisualDensity.compact,
                                 onPressed: () {
-                                  if (item.quantity < stock) {
+                                  final step = product.isWeightBased
+                                      ? product.quantityStep
+                                      : 1;
+                                  if (item.quantity + step <= stock) {
                                     ref
                                         .read(cartProvider.notifier)
-                                        .updateQuantity(
-                                          product.id,
-                                          item.quantity + 1,
-                                        );
+                                        .incrementQuantity(product.id);
                                   } else {
                                     ScaffoldMessenger.of(context).showSnackBar(
                                       SnackBar(
                                         content: Text(
-                                          'Maximum available stock is $stock units',
+                                          isTamil
+                                              ? 'அதிகபட்ச இருப்பு ${product.formatQuantity(stock, isTamil: true)} மட்டுமே'
+                                              : 'Maximum available stock is ${product.formatQuantity(stock)}',
                                         ),
                                         duration: const Duration(seconds: 1),
                                       ),
@@ -309,7 +328,9 @@ class _CartScreenState extends ConsumerState<CartScreen> {
               child: TextField(
                 controller: _instructionsController,
                 decoration: InputDecoration(
-                  hintText: 'Delivery instructions (e.g. Leave with guard, ring bell)...',
+                  hintText: isTamil
+                      ? 'டெலிவரி குறிப்புகள் (எ.கா. காவலாளியிடம் கொடுக்கவும்)...'
+                      : 'Delivery instructions (e.g. Leave with guard, ring bell)...',
                   prefixIcon: const Icon(
                     Icons.note_alt_outlined,
                     color: AppColors.textSecondary,
@@ -333,27 +354,30 @@ class _CartScreenState extends ConsumerState<CartScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
-                    'Bill Details',
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                  Text(
+                    isTamil ? 'கட்டண விவரங்கள்' : 'Bill Details',
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                   const SizedBox(height: 12),
                   _buildBillRow(
-                    'Item Subtotal',
+                    isTamil ? 'பொருட்களின் கட்டணம்' : 'Item Subtotal',
                     CurrencyFormatter.formatPaise(subtotal),
                   ),
                   const SizedBox(height: 8),
                   _buildBillRow(
-                    'Delivery Partner Fee',
+                    isTamil ? 'டெலிவரி கட்டணம்' : 'Delivery Partner Fee',
                     deliveryFee == 0
-                        ? 'FREE'
+                        ? (isTamil ? 'இலவசம்' : 'FREE')
                         : CurrencyFormatter.formatPaise(deliveryFee),
                     isGreen: deliveryFee == 0,
                   ),
                   if (discount > 0) ...[
                     const SizedBox(height: 8),
                     _buildBillRow(
-                      'Promotional Discount',
+                      isTamil ? 'தள்ளுபடி' : 'Promotional Discount',
                       '-${CurrencyFormatter.formatPaise(discount)}',
                       isGreen: true,
                     ),
@@ -362,9 +386,9 @@ class _CartScreenState extends ConsumerState<CartScreen> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      const Text(
-                        'To Pay',
-                        style: TextStyle(
+                      Text(
+                        isTamil ? 'செலுத்த வேண்டிய தொகை' : 'To Pay',
+                        style: const TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w900,
                         ),
@@ -383,7 +407,7 @@ class _CartScreenState extends ConsumerState<CartScreen> {
               ),
             ),
 
-            const SizedBox(height: 100), // Spacing for bottom action
+            const SizedBox(height: 100),
           ],
         ),
       ),
@@ -417,7 +441,9 @@ class _CartScreenState extends ConsumerState<CartScreen> {
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Text(
-                    'Minimum order amount for ${currentBranch.name} is ${CurrencyFormatter.formatPaise(currentBranch.minOrderAmountPaise)}',
+                    isTamil
+                        ? '${currentBranch.name} கிளைக்கான குறைந்தபட்ச ஆர்டர் தொகை ${CurrencyFormatter.formatPaise(currentBranch.minOrderAmountPaise)}'
+                        : 'Minimum order amount for ${currentBranch.name} is ${CurrencyFormatter.formatPaise(currentBranch.minOrderAmountPaise)}',
                     style: const TextStyle(
                       fontSize: 11,
                       color: AppColors.statusCancelled,
@@ -432,9 +458,9 @@ class _CartScreenState extends ConsumerState<CartScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      const Text(
-                        'TOTAL AMOUNT',
-                        style: TextStyle(
+                      Text(
+                        isTamil ? 'மொத்த தொகை' : 'TOTAL AMOUNT',
+                        style: const TextStyle(
                           fontSize: 10,
                           fontWeight: FontWeight.bold,
                           color: AppColors.textMuted,
@@ -471,18 +497,20 @@ class _CartScreenState extends ConsumerState<CartScreen> {
                                 );
                               }
                             : null,
-                        child: const Row(
+                        child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Text(
-                              'Proceed to Checkout',
-                              style: TextStyle(
+                              isTamil
+                                  ? 'செக் அவுட் செய்க'
+                                  : 'Proceed to Checkout',
+                              style: const TextStyle(
                                 fontSize: 15,
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
-                            SizedBox(width: 6),
-                            Icon(Icons.arrow_forward_rounded, size: 16),
+                            const SizedBox(width: 6),
+                            const Icon(Icons.arrow_forward_rounded, size: 16),
                           ],
                         ),
                       ),

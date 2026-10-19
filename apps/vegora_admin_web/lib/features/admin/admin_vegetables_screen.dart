@@ -101,12 +101,18 @@ class _AdminVegetablesScreenState extends ConsumerState<AdminVegetablesScreen> {
     final formKey = GlobalKey<FormState>();
 
     final nameCtrl = TextEditingController(text: existingProduct?.name ?? '');
+    final nameTaCtrl = TextEditingController(
+      text: existingProduct?.nameTa ?? '',
+    );
     final localNameCtrl = TextEditingController(
       text: existingProduct?.localName ?? '',
     );
     final skuCtrl = TextEditingController(text: existingProduct?.sku ?? '');
     final descCtrl = TextEditingController(
       text: existingProduct?.description ?? '',
+    );
+    final descTaCtrl = TextEditingController(
+      text: existingProduct?.descriptionTa ?? '',
     );
     final tipsCtrl = TextEditingController(
       text: existingProduct?.storageTips ?? '',
@@ -128,6 +134,8 @@ class _AdminVegetablesScreenState extends ConsumerState<AdminVegetablesScreen> {
     String selectedCategory =
         existingProduct?.categoryId ??
         (_categories.isNotEmpty ? _categories.first.id : 'everyday_veggies');
+
+    String selectedUnitType = existingProduct?.unitType ?? 'weight';
 
     const unitOptions = [
       '1 kg',
@@ -169,9 +177,13 @@ class _AdminVegetablesScreenState extends ConsumerState<AdminVegetablesScreen> {
             ? (existingInv!.pricePaise! / 100).toStringAsFixed(0)
             : basePriceCtrl.text,
       );
-      branchStocks[b.id] = TextEditingController(
-        text: (existingInv?.stockQuantity ?? 25).toString(),
-      );
+      final rawStock = existingInv?.stockQuantity ?? 25;
+      final displayStock = (existingProduct != null &&
+              existingProduct.isWeightBased &&
+              rawStock >= 1000)
+          ? (rawStock / 1000).toStringAsFixed(rawStock % 1000 == 0 ? 0 : 1)
+          : rawStock.toString();
+      branchStocks[b.id] = TextEditingController(text: displayStock);
     }
 
     bool isSaving = false;
@@ -267,12 +279,27 @@ class _AdminVegetablesScreenState extends ConsumerState<AdminVegetablesScreen> {
                           child: TextFormField(
                             controller: nameCtrl,
                             decoration: const InputDecoration(
-                              labelText: 'Vegetable Name *',
+                              labelText: 'Vegetable Name (English) *',
                               hintText: 'e.g. Crisp English Cucumber',
                               border: OutlineInputBorder(),
                             ),
                             validator: (v) => (v == null || v.trim().isEmpty)
                                 ? 'Name is required'
+                                : null,
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          flex: 3,
+                          child: TextFormField(
+                            controller: nameTaCtrl,
+                            decoration: const InputDecoration(
+                              labelText: 'Tamil Name (தமிழ் பெயர்) *',
+                              hintText: 'எ.கா. வெள்ளரிக்காய், தக்காளி',
+                              border: OutlineInputBorder(),
+                            ),
+                            validator: (v) => (v == null || v.trim().isEmpty)
+                                ? 'Tamil name is required'
                                 : null,
                           ),
                         ),
@@ -316,6 +343,39 @@ class _AdminVegetablesScreenState extends ConsumerState<AdminVegetablesScreen> {
                         ),
                         const SizedBox(width: 12),
                         Expanded(
+                          flex: 2,
+                          child: DropdownButtonFormField<String>(
+                            initialValue: selectedUnitType,
+                            decoration: const InputDecoration(
+                              labelText: 'Unit Type *',
+                              border: OutlineInputBorder(),
+                            ),
+                            items: const [
+                              DropdownMenuItem(
+                                value: 'weight',
+                                child: Text('Weight (g / kg)'),
+                              ),
+                              DropdownMenuItem(
+                                value: 'count',
+                                child: Text('Count (pc / bunch)'),
+                              ),
+                            ],
+                            onChanged: (v) {
+                              if (v != null) {
+                                setDialogState(() {
+                                  selectedUnitType = v;
+                                  if (v == 'count' && selectedUnit.contains('kg')) {
+                                    selectedUnit = '1 pc';
+                                  } else if (v == 'weight' && !selectedUnit.contains('g') && !selectedUnit.contains('kg')) {
+                                    selectedUnit = '1 kg';
+                                  }
+                                });
+                              }
+                            },
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
                           flex: 3,
                           child: DropdownButtonFormField<String>(
                             initialValue: selectedCategory,
@@ -342,7 +402,7 @@ class _AdminVegetablesScreenState extends ConsumerState<AdminVegetablesScreen> {
                           child: DropdownButtonFormField<String>(
                             initialValue: selectedUnit,
                             decoration: const InputDecoration(
-                              labelText: 'Unit *',
+                              labelText: 'Unit Display *',
                               border: OutlineInputBorder(),
                             ),
                             items: unitOptions.map((u) {
@@ -358,14 +418,32 @@ class _AdminVegetablesScreenState extends ConsumerState<AdminVegetablesScreen> {
                       ],
                     ),
                     const SizedBox(height: 10),
-                    TextFormField(
-                      controller: descCtrl,
-                      maxLines: 2,
-                      decoration: const InputDecoration(
-                        labelText: 'Description',
-                        hintText: 'Fresh, crunchy, and directly harvested from partner farms.',
-                        border: OutlineInputBorder(),
-                      ),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: TextFormField(
+                            controller: descCtrl,
+                            maxLines: 2,
+                            decoration: const InputDecoration(
+                              labelText: 'Description (English)',
+                              hintText: 'Fresh, crunchy, and directly harvested from partner farms.',
+                              border: OutlineInputBorder(),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: TextFormField(
+                            controller: descTaCtrl,
+                            maxLines: 2,
+                            decoration: const InputDecoration(
+                              labelText: 'Description (தமிழ் விளக்கம்)',
+                              hintText: 'புதிய, பண்ணை காய்கறிகள் நேரடியாக உங்கள் இல்லத்திற்கு.',
+                              border: OutlineInputBorder(),
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                     const SizedBox(height: 10),
                     Row(
@@ -815,10 +893,17 @@ class _AdminVegetablesScreenState extends ConsumerState<AdminVegetablesScreen> {
                           id: prodId,
                           sku: skuCtrl.text.trim().toUpperCase(),
                           name: nameCtrl.text.trim(),
+                          nameTa: nameTaCtrl.text.trim(),
                           localName: localNameCtrl.text.trim(),
                           categoryId: selectedCategory,
                           unit: selectedUnit,
+                          unitType: selectedUnitType,
+                          baseUnit: selectedUnitType == 'weight' ? 'g' : 'piece',
+                          minOrderQuantity: selectedUnitType == 'weight' ? 100 : 1,
+                          quantityStep: selectedUnitType == 'weight' ? 100 : 1,
+                          allowCustomQuantity: true,
                           description: descCtrl.text.trim(),
+                          descriptionTa: descTaCtrl.text.trim(),
                           storageTips: tipsCtrl.text.trim(),
                           origin: originCtrl.text.trim(),
                           imageUrl: finalImageUrl,
@@ -832,17 +917,20 @@ class _AdminVegetablesScreenState extends ConsumerState<AdminVegetablesScreen> {
                           originalPricePaise: origPaise,
                         );
 
-                        // Assemble multi-branch inventory map
+                        // Assemble multi-branch inventory map (normalize weight to integer grams)
                         final branchInventoryPayload =
                             <String, BranchProductInventory>{};
                         for (final b in _branches.where((b) => b.isActive)) {
                           final isSelected = branchSelections[b.id] ?? false;
                           if (isSelected) {
-                            final stock =
-                                int.tryParse(
+                            final stockInput = double.tryParse(
                                   branchStocks[b.id]?.text.trim() ?? '',
                                 ) ??
-                                25;
+                                25.0;
+                            final stockGrams = selectedUnitType == 'weight'
+                                ? (stockInput * 1000).round()
+                                : stockInput.round();
+
                             final priceVal = double.tryParse(
                               branchPrices[b.id]?.text.trim() ?? '',
                             );
@@ -853,9 +941,10 @@ class _AdminVegetablesScreenState extends ConsumerState<AdminVegetablesScreen> {
                             branchInventoryPayload[b.id] =
                                 BranchProductInventory(
                                   pricePaise: pricePaise,
-                                  stockQuantity: stock,
-                                  lowStockThreshold: 5,
-                                  isAvailable: stock > 0,
+                                  stockQuantity: stockGrams,
+                                  lowStockThreshold:
+                                      selectedUnitType == 'weight' ? 5000 : 5,
+                                  isAvailable: stockGrams > 0,
                                 );
                           }
                         }
@@ -1480,7 +1569,27 @@ class _AdminVegetablesScreenState extends ConsumerState<AdminVegetablesScreen> {
                         const SizedBox(height: 3),
                         Row(
                           children: [
-                            if (prod.localName.isNotEmpty) ...[
+                            if (prod.nameTa.isNotEmpty) ...[
+                              Flexible(
+                                child: Text(
+                                  prod.nameTa,
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: const TextStyle(
+                                    fontSize: 11.5,
+                                    fontWeight: FontWeight.w700,
+                                    color: Color(0xFF0B6B3A),
+                                  ),
+                                ),
+                              ),
+                              const Text(
+                                ' • ',
+                                style: TextStyle(
+                                  fontSize: 11,
+                                  color: Color(0xFF94A3B8),
+                                ),
+                              ),
+                            ] else if (prod.localName.isNotEmpty) ...[
                               Flexible(
                                 child: Text(
                                   prod.localName,

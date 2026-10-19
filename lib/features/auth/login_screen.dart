@@ -100,12 +100,13 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         final resolvedName = (profile?.fullName.trim().isNotEmpty ?? false)
             ? profile!.fullName.trim()
             : (user.userMetadata?['full_name'] as String? ??
-                user.userMetadata?['name'] as String? ??
-                user.email?.split('@').first ??
-                'Customer');
+                  user.userMetadata?['name'] as String? ??
+                  user.email?.split('@').first ??
+                  'Customer');
         ref.read(customerNameProvider.notifier).setName(resolvedName);
 
-        final resolvedPhone = profile?.phone ??
+        final resolvedPhone =
+            profile?.phone ??
             user.userMetadata?['phone'] as String? ??
             user.phone;
         if (resolvedPhone != null) {
@@ -179,12 +180,13 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
           final resolvedName = (profile?.fullName.trim().isNotEmpty ?? false)
               ? profile!.fullName.trim()
               : (user.userMetadata?['full_name'] as String? ??
-                  user.userMetadata?['name'] as String? ??
-                  user.email?.split('@').first ??
-                  'Customer');
+                    user.userMetadata?['name'] as String? ??
+                    user.email?.split('@').first ??
+                    'Customer');
           ref.read(customerNameProvider.notifier).setName(resolvedName);
 
-          final resolvedPhone = profile?.phone ??
+          final resolvedPhone =
+              profile?.phone ??
               user.userMetadata?['phone'] as String? ??
               user.phone;
           if (resolvedPhone != null) {
@@ -572,8 +574,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   const SizedBox(height: 28),
 
                   // Registration Footer
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
+                  Wrap(
+                    alignment: WrapAlignment.center,
+                    crossAxisAlignment: WrapCrossAlignment.center,
                     children: [
                       const Text(
                         "Don't have an account? ",

@@ -114,7 +114,9 @@ class SupabaseAuthRepository {
   Future<void> resetPasswordForEmail(String email, {String? redirectTo}) async {
     await _client.auth.resetPasswordForEmail(
       email.trim(),
-      redirectTo: redirectTo ?? (kIsWeb ? null : 'io.supabase.kisanfresh://reset-callback'),
+      redirectTo:
+          redirectTo ??
+          (kIsWeb ? null : 'io.supabase.kisanfresh://reset-callback'),
     );
   }
 
@@ -207,11 +209,13 @@ class SupabaseAuthRepository {
   /// Ensures user profile is synced from authenticated user session metadata
   Future<void> syncCustomerSession(User user) async {
     try {
-      final metadataName = user.userMetadata?['full_name'] as String? ??
+      final metadataName =
+          user.userMetadata?['full_name'] as String? ??
           user.userMetadata?['name'] as String? ??
           user.email?.split('@').first ??
           'Customer';
-      final avatarUrl = user.userMetadata?['avatar_url'] as String? ??
+      final avatarUrl =
+          user.userMetadata?['avatar_url'] as String? ??
           user.userMetadata?['picture'] as String?;
 
       final existing = await _client
@@ -234,7 +238,9 @@ class SupabaseAuthRepository {
         } catch (_) {}
       } else {
         final existingName = (existing['full_name'] as String?)?.trim();
-        if (existingName == null || existingName.isEmpty || existingName == 'Customer') {
+        if (existingName == null ||
+            existingName.isEmpty ||
+            existingName == 'Customer') {
           try {
             final updatePayload = <String, dynamic>{
               'full_name': metadataName,
@@ -243,7 +249,10 @@ class SupabaseAuthRepository {
             if (avatarUrl != null) {
               updatePayload['avatar_url'] = avatarUrl;
             }
-            await _client.from('profiles').update(updatePayload).eq('id', user.id);
+            await _client
+                .from('profiles')
+                .update(updatePayload)
+                .eq('id', user.id);
           } catch (_) {}
         }
       }
@@ -378,10 +387,14 @@ class SupabaseAuthRepository {
         params: {
           'p_target_user_id': targetUserId,
           'p_full_name': fullName.trim(),
-          'p_phone': (phone != null && phone.trim().isNotEmpty) ? phone.trim() : null,
+          'p_phone': (phone != null && phone.trim().isNotEmpty)
+              ? phone.trim()
+              : null,
           'p_is_active': isActive,
           'p_branch_id': branchId,
-          'p_email': (email != null && email.trim().isNotEmpty) ? email.trim().toLowerCase() : null,
+          'p_email': (email != null && email.trim().isNotEmpty)
+              ? email.trim().toLowerCase()
+              : null,
         },
       );
     } catch (e) {
@@ -391,15 +404,11 @@ class SupabaseAuthRepository {
   }
 
   /// Admin method: Safely delete a staff member or delivery partner
-  Future<void> adminDeleteStaffOrAgent({
-    required String targetUserId,
-  }) async {
+  Future<void> adminDeleteStaffOrAgent({required String targetUserId}) async {
     try {
       await _client.rpc(
         'admin_delete_staff_or_agent',
-        params: {
-          'p_target_user_id': targetUserId,
-        },
+        params: {'p_target_user_id': targetUserId},
       );
     } catch (e) {
       debugPrint('Error deleting staff/agent: $e');
@@ -409,7 +418,8 @@ class SupabaseAuthRepository {
 
   String _parseAuthError(dynamic error) {
     final msg = error.toString();
-    if (msg.contains('active delivery assignment') || msg.contains('Cannot delete delivery partner')) {
+    if (msg.contains('active delivery assignment') ||
+        msg.contains('Cannot delete delivery partner')) {
       final reg = RegExp(r'Cannot delete delivery partner:[^"]*');
       final match = reg.firstMatch(msg);
       if (match != null) return match.group(0)!;

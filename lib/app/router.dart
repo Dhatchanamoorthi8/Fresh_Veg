@@ -1,31 +1,16 @@
 import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-import '../features/admin/admin_branches_screen.dart';
-import '../features/admin/admin_categories_screen.dart';
-import '../features/admin/admin_dashboard_screen.dart';
-import '../features/admin/admin_delivery_agents_screen.dart';
-import '../features/admin/admin_delivery_assignments_screen.dart';
-import '../features/admin/admin_inventory_screen.dart';
-import '../features/admin/admin_orders_screen.dart';
-import '../features/admin/admin_price_management_screen.dart';
-import '../features/admin/admin_promotions_screen.dart';
-import '../features/admin/admin_reports_screen.dart';
-import '../features/admin/admin_settings_screen.dart';
-import '../features/admin/admin_staff_management_screen.dart';
-import '../features/admin/admin_vegetables_screen.dart';
-import '../features/auth/admin_forgot_password_screen.dart';
-import '../features/auth/admin_login_screen.dart';
-import '../features/auth/admin_reset_password_screen.dart';
+import 'package:vegora_admin_web/vegora_admin_web.dart';
+
 import '../features/auth/delivery_login_screen.dart';
 import '../features/auth/forgot_password_screen.dart';
 import '../features/auth/login_screen.dart';
 import '../features/auth/register_screen.dart';
 import '../features/auth/reset_password_screen.dart';
-import '../features/auth/staff_login_screen.dart';
-import '../features/branch_staff/branch_staff_screen.dart';
 import '../features/branches/branch_selection_screen.dart';
 import '../features/cart/cart_screen.dart';
 import '../features/catalog/catalog_screen.dart';
@@ -64,7 +49,9 @@ class AppAuthListenable extends ChangeNotifier {
   void _trySubscribe() {
     if (_sub != null) return;
     try {
-      _sub = Supabase.instance.client.auth.onAuthStateChange.listen((data) async {
+      _sub = Supabase.instance.client.auth.onAuthStateChange.listen((
+        data,
+      ) async {
         if (data.event == AuthChangeEvent.passwordRecovery) {
           isPasswordRecovery = true;
           appRouter.go('/customer/reset-password');

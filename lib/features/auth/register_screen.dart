@@ -686,8 +686,9 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                     const SizedBox(height: 24),
 
                     // Sign In Link
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
+                    Wrap(
+                      alignment: WrapAlignment.center,
+                      crossAxisAlignment: WrapCrossAlignment.center,
                       children: [
                         const Text(
                           'Already have an account? ',

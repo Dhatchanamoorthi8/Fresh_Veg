@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
 import '../../core/constants/app_colors.dart';
+import '../../core/localization/app_locale_state.dart';
 import '../../core/utils/currency_formatter.dart';
 import '../../shared/models/order.dart';
 import '../../shared/models/order_status.dart';
@@ -37,6 +38,8 @@ class _OrdersScreenState extends ConsumerState<OrdersScreen>
   @override
   Widget build(BuildContext context) {
     final customerOrders = ref.watch(customerOrdersProvider);
+    final locale = ref.watch(appLocaleProvider);
+    final isTamil = locale.languageCode == 'ta';
 
     final activeOrders = customerOrders
         .where((o) => !o.status.isTerminal)
@@ -48,7 +51,7 @@ class _OrdersScreenState extends ConsumerState<OrdersScreen>
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('My Orders'),
+        title: Text(isTamil ? 'என் ஆர்டர்கள்' : 'My Orders'),
         bottom: TabBar(
           controller: _tabController,
           labelColor: AppColors.primary,
@@ -56,30 +59,61 @@ class _OrdersScreenState extends ConsumerState<OrdersScreen>
           indicatorColor: AppColors.primary,
           indicatorWeight: 3,
           tabs: [
-            Tab(text: 'Active (${activeOrders.length})'),
-            Tab(text: 'Past Orders (${pastOrders.length})'),
+            Tab(
+              text: isTamil
+                  ? 'நடப்பில் உள்ளவை (${activeOrders.length})'
+                  : 'Active (${activeOrders.length})',
+            ),
+            Tab(
+              text: isTamil
+                  ? 'முடிந்தவை (${pastOrders.length})'
+                  : 'Past Orders (${pastOrders.length})',
+            ),
           ],
         ),
       ),
       body: TabBarView(
         controller: _tabController,
         children: [
-          _buildOrdersList(activeOrders, isActive: true),
-          _buildOrdersList(pastOrders, isActive: false),
+          _buildOrdersList(
+            activeOrders,
+            isActive: true,
+            isTamil: isTamil,
+            localeCode: locale.languageCode,
+          ),
+          _buildOrdersList(
+            pastOrders,
+            isActive: false,
+            isTamil: isTamil,
+            localeCode: locale.languageCode,
+          ),
         ],
       ),
     );
   }
 
-  Widget _buildOrdersList(List<Order> orders, {required bool isActive}) {
+  Widget _buildOrdersList(
+    List<Order> orders, {
+    required bool isActive,
+    required bool isTamil,
+    required String localeCode,
+  }) {
     if (orders.isEmpty) {
       return EmptyStateView(
         emoji: isActive ? '📦' : '🧾',
-        title: isActive ? 'No Active Orders' : 'No Past Orders',
+        title: isActive
+            ? (isTamil ? 'நடப்பு ஆர்டர்கள் எதுவும் இல்லை' : 'No Active Orders')
+            : (isTamil ? 'கடந்த ஆர்டர்கள் எதுவும் இல்லை' : 'No Past Orders'),
         message: isActive
-            ? 'You have no orders currently in progress. Fresh vegetables are just a few taps away!'
-            : 'Your past delivered or cancelled orders will appear here.',
-        buttonText: isActive ? 'Start Shopping' : null,
+            ? (isTamil
+                  ? 'தற்போது செயலில் உள்ள ஆர்டர்கள் எதுவும் இல்லை. புதிய காய்கறிகளை உடனே ஆர்டர் செய்யுங்கள்!'
+                  : 'You have no orders currently in progress. Fresh vegetables are just a few taps away!')
+            : (isTamil
+                  ? 'உங்கள் கடந்த கால ஆர்டர்கள் மற்றும் ரசீதுகள் இங்கு காண்பிக்கப்படும்.'
+                  : 'Your past delivered or cancelled orders will appear here.'),
+        buttonText: isActive
+            ? (isTamil ? 'காய்கறிகளை வாங்குக' : 'Start Shopping')
+            : null,
         onButtonPressed: isActive ? () => context.go('/home') : null,
       );
     }
@@ -164,13 +198,17 @@ class _OrdersScreenState extends ConsumerState<OrdersScreen>
                 // Items preview string
                 Text(
                   order.items
-                      .map((i) => '${i.quantity}x ${i.product.name}')
+                      .map(
+                        (i) =>
+                            '${i.formattedQuantity(isTamil: isTamil)} ${i.product.displayName(localeCode)}',
+                      )
                       .join(', '),
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 13,
                     color: AppColors.textSecondary,
+                    height: isTamil ? 1.35 : 1.2,
                   ),
                 ),
 
@@ -183,9 +221,9 @@ class _OrdersScreenState extends ConsumerState<OrdersScreen>
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text(
-                          'Total Paid',
-                          style: TextStyle(
+                        Text(
+                          isTamil ? 'செலுத்திய தொகை' : 'Total Paid',
+                          style: const TextStyle(
                             fontSize: 11,
                             color: AppColors.textMuted,
                           ),

@@ -10,14 +10,14 @@ class Cart {
   bool get isEmpty => items.isEmpty;
   bool get isNotEmpty => items.isNotEmpty;
 
-  int get totalItemCount => items.fold(0, (sum, item) => sum + item.quantity);
+  /// Counts the distinct items / packs in cart for badges
+  int get totalItemCount => items.fold(0, (sum, item) => sum + (item.product.isWeightBased ? 1 : item.quantity));
   int get uniqueProductCount => items.length;
 
   int get subtotalPaise => items.fold(0, (sum, item) => sum + item.totalPaise);
 
-  /// Promotional savings or discount
+  /// Promotional savings or discount (5% discount if subtotal exceeds ₹500)
   int get discountPaise {
-    // Example: 5% discount if subtotal exceeds ₹500
     if (subtotalPaise >= 50000) {
       return (subtotalPaise * 0.05).round();
     }

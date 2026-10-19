@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 class ProductCategory {
   final String id;
   final String name;
+  final String nameTa;
   final String subtitle;
   final IconData icon;
   final String emoji;
@@ -14,6 +15,7 @@ class ProductCategory {
   const ProductCategory({
     required this.id,
     required this.name,
+    this.nameTa = '',
     required this.subtitle,
     required this.icon,
     required this.emoji,
@@ -23,9 +25,18 @@ class ProductCategory {
     this.sortOrder = 0,
   });
 
+  /// Returns Tamil category name when languageCode is 'ta' and available, else English name.
+  String displayName([String? languageCode]) {
+    if (languageCode == 'ta' && nameTa.trim().isNotEmpty) {
+      return nameTa;
+    }
+    return name;
+  }
+
   factory ProductCategory.fromJson(Map<String, dynamic> json) {
     final id = json['id'] as String;
     final name = json['name'] as String;
+    final nameTa = json['name_ta'] as String? ?? '';
     final localName = json['local_name'] as String? ?? '';
     final imageUrl = json['image_url'] as String?;
     final isActive = json['is_active'] as bool? ?? true;
@@ -71,6 +82,7 @@ class ProductCategory {
     return ProductCategory(
       id: id,
       name: name,
+      nameTa: nameTa,
       subtitle: localName,
       icon: iconData,
       emoji: emojiChar,
@@ -85,6 +97,7 @@ class ProductCategory {
     return {
       'id': id,
       'name': name,
+      'name_ta': nameTa,
       'local_name': subtitle,
       'icon_name': 'category_rounded',
       'emoji': emoji,
@@ -98,6 +111,7 @@ class ProductCategory {
   ProductCategory copyWith({
     String? id,
     String? name,
+    String? nameTa,
     String? subtitle,
     IconData? icon,
     String? emoji,
@@ -109,6 +123,7 @@ class ProductCategory {
     return ProductCategory(
       id: id ?? this.id,
       name: name ?? this.name,
+      nameTa: nameTa ?? this.nameTa,
       subtitle: subtitle ?? this.subtitle,
       icon: icon ?? this.icon,
       emoji: emoji ?? this.emoji,

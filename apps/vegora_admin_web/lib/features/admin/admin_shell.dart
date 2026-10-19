@@ -244,32 +244,35 @@ class AdminScaffold extends ConsumerWidget {
       ),
       child: Row(
         children: [
-          Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const Text(
-                'Vegora Admin',
-                style: TextStyle(
-                  fontSize: 13,
-                  fontWeight: FontWeight.w500,
-                  color: Color(0xFF64748B),
+          Expanded(
+            child: Row(
+              children: [
+                const Text(
+                  'Vegora Admin',
+                  style: TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w500,
+                    color: Color(0xFF64748B),
+                  ),
                 ),
-              ),
-              const Padding(
-                padding: EdgeInsets.symmetric(horizontal: 8),
-                child: Text('/', style: TextStyle(color: Color(0xFFCBD5E1), fontSize: 13)),
-              ),
-              Text(
-                title,
-                style: const TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w700,
-                  color: Color(0xFF0F172A),
+                const Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 8),
+                  child: Text('/', style: TextStyle(color: Color(0xFFCBD5E1), fontSize: 13)),
                 ),
-              ),
-            ],
+                Flexible(
+                  child: Text(
+                    title,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w700,
+                      color: Color(0xFF0F172A),
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ),
-          const Spacer(),
           ...?actions,
           const SizedBox(width: 14),
           // Live Network Status
@@ -471,7 +474,7 @@ class AdminScaffold extends ConsumerWidget {
                     size: 19,
                   ),
                   title: const Text(
-                    'Sign Out',
+                    'Logout',
                     style: TextStyle(
                       fontWeight: FontWeight.w700,
                       color: AppColors.error,

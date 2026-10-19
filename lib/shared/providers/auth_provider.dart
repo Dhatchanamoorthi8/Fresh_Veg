@@ -91,7 +91,8 @@ class CustomerNameNotifier extends Notifier<String> {
       return profile.fullName.trim();
     }
     final user = ref.watch(currentSupabaseUserProvider);
-    final metaName = user?.userMetadata?['full_name'] as String? ??
+    final metaName =
+        user?.userMetadata?['full_name'] as String? ??
         user?.userMetadata?['name'] as String?;
     if (metaName != null && metaName.trim().isNotEmpty) {
       return metaName.trim();

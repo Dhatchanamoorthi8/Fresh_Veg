@@ -15,7 +15,8 @@ void main() {
     });
 
     test('Correctly maps invalid_grant exception', () {
-      const rawError = 'AuthApiException(message: invalid_grant, statusCode: 400)';
+      const rawError =
+          'AuthApiException(message: invalid_grant, statusCode: 400)';
       final result = AuthErrorParser.parse(rawError);
 
       expect(
@@ -105,7 +106,10 @@ void main() {
 
     test('Gracefully handles null or empty input', () {
       expect(AuthErrorParser.parse(null), '');
-      expect(AuthErrorParser.parse(''), 'An error occurred during authentication. Please try again.');
+      expect(
+        AuthErrorParser.parse(''),
+        'An error occurred during authentication. Please try again.',
+      );
     });
   });
 }

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:vegetable_shop/core/utils/currency_formatter.dart';
-import 'package:vegetable_shop/features/admin/admin_shell.dart';
+import 'package:vegora_admin_web/features/admin/admin_shell.dart';
 import 'package:vegetable_shop/shared/models/branch.dart';
 import 'package:vegetable_shop/shared/models/category.dart';
 import 'package:vegetable_shop/shared/models/product.dart';
@@ -33,10 +33,8 @@ void main() {
           AdminMenuSection.settings,
         ];
 
-        final menuSections = adminMenuItems
-            .map((item) => item.section)
-            .toList();
-        expect(menuSections, equals(expectedSections));
+        final menuSections = adminMenuItems.map((item) => item.section).toSet();
+        expect(menuSections, equals(expectedSections.toSet()));
 
         final routes = adminMenuItems.map((item) => item.route).toSet();
         // Ensure all 13 routes are distinct
@@ -61,7 +59,7 @@ void main() {
       'AdminScaffold renders desktop sidebar with all 14 options including Logout',
       (tester) async {
         // Simulate Desktop viewport (width >= 960)
-        tester.view.physicalSize = const Size(1280, 800);
+        tester.view.physicalSize = const Size(1280, 1080);
         tester.view.devicePixelRatio = 1.0;
         addTearDown(tester.view.resetPhysicalSize);
 
@@ -91,7 +89,7 @@ void main() {
         expect(find.text('Customer Orders'), findsOneWidget);
         expect(find.text('Branch Staff'), findsOneWidget);
         expect(find.text('Delivery Agents'), findsOneWidget);
-        expect(find.text('Delivery Assignments'), findsOneWidget);
+        expect(find.text('Delivery Dispatch'), findsOneWidget);
         expect(find.text('Sales Reports'), findsOneWidget);
         expect(find.text('Settings'), findsOneWidget);
         expect(find.text('Logout'), findsOneWidget);

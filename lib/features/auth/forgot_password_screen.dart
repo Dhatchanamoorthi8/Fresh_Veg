@@ -94,7 +94,10 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
   Widget build(BuildContext context) {
     // Reactive listener: if the user clicks the recovery link in their email,
     // Supabase fires an authStateChange. We immediately transition to reset-password.
-    ref.listen<AsyncValue<AuthState>>(authStateStreamProvider, (previous, next) {
+    ref.listen<AsyncValue<AuthState>>(authStateStreamProvider, (
+      previous,
+      next,
+    ) {
       final event = next.value?.event;
       if (event == AuthChangeEvent.passwordRecovery ||
           (next.value?.session != null && _emailSent)) {

@@ -1,13 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:vegora_core/localization/app_localizations.dart';
 
 import '../../core/constants/app_colors.dart';
+import '../../core/localization/app_locale_state.dart';
 import '../../core/utils/currency_formatter.dart';
+import '../models/branch.dart';
+import '../models/cart.dart';
 import '../models/product.dart';
 import '../providers/branch_provider.dart';
 import '../providers/cart_provider.dart';
 import 'branch_switch_dialog.dart';
 import 'product_image_view.dart';
+import 'quantity_selector_sheet.dart';
 
 class ProductCard extends ConsumerWidget {
   final Product product;
@@ -19,11 +24,19 @@ class ProductCard extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final currentBranch = ref.watch(selectedBranchProvider);
     final cart = ref.watch(cartProvider);
+    final locale = ref.watch(appLocaleProvider);
+    final isTamil = locale.languageCode == 'ta';
+    final l10n = context.l10n;
 
     final isAvailable = product.isAvailableAtBranch(currentBranch.id);
     final stock = product.getStockForBranch(currentBranch.id);
     final pricePaise = product.getPricePaiseForBranch(currentBranch.id);
     final qtyInCart = ref.read(cartProvider.notifier).getQuantity(product.id);
+
+    final displayName = product.displayName(locale.languageCode);
+    final secondaryName = isTamil
+        ? (product.name)
+        : (product.nameTa.isNotEmpty ? product.nameTa : product.localName);
 
     return InkWell(
       onTap: onTap,
@@ -59,7 +72,7 @@ class ProductCard extends ConsumerWidget {
                     ),
                   ),
 
-                  // Refined, human-crafted badges (subtle tones, no screaming AI stickers)
+                  // Badges
                   Positioned(
                     top: 6,
                     left: 6,
@@ -77,30 +90,29 @@ class ProductCard extends ConsumerWidget {
                               color: AppColors.primaryContainer,
                               borderRadius: BorderRadius.circular(4),
                             ),
-                            child: const Row(
+                            child: Row(
                               mainAxisSize: MainAxisSize.min,
                               children: [
-                                Icon(
+                                const Icon(
                                   Icons.eco_rounded,
                                   size: 10,
                                   color: AppColors.primary,
                                 ),
-                                SizedBox(width: 3),
+                                const SizedBox(width: 3),
                                 Text(
-                                  'ORGANIC',
-                                  style: TextStyle(
+                                  l10n.organic,
+                                  style: const TextStyle(
                                     color: AppColors.primary,
-                                    fontSize: 9,
+                                    fontSize: 8.5,
                                     fontWeight: FontWeight.w700,
                                     letterSpacing: 0.3,
                                   ),
                                 ),
                               ],
                             ),
-                          )
-                        else if (product.isBestSeller)
+                          ),
+                        if (product.isBestSeller)
                           Container(
-                            margin: const EdgeInsets.only(bottom: 4),
                             padding: const EdgeInsets.symmetric(
                               horizontal: 6,
                               vertical: 2,
@@ -109,11 +121,11 @@ class ProductCard extends ConsumerWidget {
                               color: const Color(0xFFFFEDD5),
                               borderRadius: BorderRadius.circular(4),
                             ),
-                            child: const Text(
-                              'POPULAR',
-                              style: TextStyle(
+                            child: Text(
+                              l10n.bestSeller,
+                              style: const TextStyle(
                                 color: Color(0xFFC2410C),
-                                fontSize: 9,
+                                fontSize: 8.5,
                                 fontWeight: FontWeight.w700,
                                 letterSpacing: 0.3,
                               ),
@@ -122,31 +134,6 @@ class ProductCard extends ConsumerWidget {
                       ],
                     ),
                   ),
-
-                  // Low stock notice
-                  if (isAvailable && stock > 0 && stock <= 5)
-                    Positioned(
-                      bottom: 4,
-                      left: 4,
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 5,
-                          vertical: 2,
-                        ),
-                        decoration: BoxDecoration(
-                          color: const Color(0xFFFEF2F2),
-                          borderRadius: BorderRadius.circular(4),
-                        ),
-                        child: Text(
-                          '$stock left',
-                          style: const TextStyle(
-                            color: AppColors.error,
-                            fontSize: 9,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                      ),
-                    ),
 
                   // Out of stock overlay
                   if (!isAvailable || stock == 0)
@@ -167,9 +154,9 @@ class ProductCard extends ConsumerWidget {
                           color: AppColors.neutral700,
                           borderRadius: BorderRadius.circular(4),
                         ),
-                        child: const Text(
-                          'SOLD OUT',
-                          style: TextStyle(
+                        child: Text(
+                          l10n.outOfStock.toUpperCase(),
+                          style: const TextStyle(
                             color: Colors.white,
                             fontSize: 9.5,
                             fontWeight: FontWeight.w700,
@@ -183,22 +170,22 @@ class ProductCard extends ConsumerWidget {
             ),
             const SizedBox(height: 8),
 
-            // Product Name
+            // Product Primary Name
             Text(
-              product.name,
+              displayName,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 13.5,
                 fontWeight: FontWeight.w700,
                 color: AppColors.textPrimary,
-                letterSpacing: -0.2,
+                height: isTamil ? 1.35 : 1.2,
               ),
             ),
 
-            // Local name & origin
+            // Secondary Name / Local Name
             Text(
-              product.localName.isNotEmpty ? product.localName : product.origin,
+              secondaryName.isNotEmpty ? secondaryName : product.origin,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
               style: const TextStyle(
@@ -209,9 +196,9 @@ class ProductCard extends ConsumerWidget {
             ),
             const SizedBox(height: 2),
 
-            // Unit/weight label
+            // Unit/weight label (e.g. per kg / ஒரு கிலோ)
             Text(
-              product.unit,
+              product.formatUnitLabel(isTamil: isTamil),
               style: const TextStyle(
                 fontSize: 11,
                 color: AppColors.neutral500,
@@ -251,7 +238,7 @@ class ProductCard extends ConsumerWidget {
                   ],
                 ),
 
-                // Tactile Quick-Commerce Add / Stepper Button
+                // Quick-Commerce Add / Stepper Button
                 if (!isAvailable || stock == 0)
                   const SizedBox.shrink()
                 else if (qtyInCart == 0)
@@ -272,72 +259,82 @@ class ProductCard extends ConsumerWidget {
                       ),
                       onPressed: () =>
                           _handleAddToCart(context, ref, currentBranch, cart),
-                      child: const Row(
+                      child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           Text(
-                            'ADD',
-                            style: TextStyle(
+                            l10n.add.toUpperCase(),
+                            style: const TextStyle(
                               fontSize: 11.5,
                               fontWeight: FontWeight.w800,
                               letterSpacing: 0.2,
                             ),
                           ),
-                          SizedBox(width: 3),
-                          Icon(Icons.add, size: 13),
+                          const SizedBox(width: 3),
+                          const Icon(Icons.add, size: 13),
                         ],
                       ),
                     ),
                   )
                 else
-                  Container(
-                    height: 30,
-                    decoration: BoxDecoration(
-                      color: AppColors.primary,
-                      borderRadius: BorderRadius.circular(8),
+                  InkWell(
+                    onTap: () => QuantitySelectorSheet.show(
+                      context,
+                      product: product,
+                      initialQuantity: qtyInCart,
                     ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        _buildStepperButton(
-                          icon: Icons.remove,
-                          onTap: () {
-                            ref
+                    child: Container(
+                      height: 30,
+                      padding: const EdgeInsets.symmetric(horizontal: 6),
+                      decoration: BoxDecoration(
+                        color: AppColors.primary,
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          InkWell(
+                            onTap: () => ref
                                 .read(cartProvider.notifier)
-                                .updateQuantity(product.id, qtyInCart - 1);
-                          },
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 6),
-                          child: Text(
-                            '$qtyInCart',
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 12.5,
+                                .decrementQuantity(product.id),
+                            child: const Padding(
+                              padding: EdgeInsets.symmetric(horizontal: 4),
+                              child: Icon(
+                                Icons.remove,
+                                size: 12,
+                                color: Colors.white,
+                              ),
                             ),
                           ),
-                        ),
-                        _buildStepperButton(
-                          icon: Icons.add,
-                          onTap: () {
-                            if (qtyInCart < stock) {
-                              ref
-                                  .read(cartProvider.notifier)
-                                  .updateQuantity(product.id, qtyInCart + 1);
-                            } else {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  content: Text(
-                                    'Cannot add more than $stock units',
-                                  ),
-                                  duration: const Duration(seconds: 1),
-                                ),
-                              );
-                            }
-                          },
-                        ),
-                      ],
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 4),
+                            child: Text(
+                              product.formatQuantity(
+                                qtyInCart,
+                                isTamil: isTamil,
+                              ),
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 11,
+                              ),
+                            ),
+                          ),
+                          InkWell(
+                            onTap: () => ref
+                                .read(cartProvider.notifier)
+                                .incrementQuantity(product.id),
+                            child: const Padding(
+                              padding: EdgeInsets.symmetric(horizontal: 4),
+                              child: Icon(
+                                Icons.add,
+                                size: 12,
+                                color: Colors.white,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
               ],
@@ -348,35 +345,29 @@ class ProductCard extends ConsumerWidget {
     );
   }
 
-  Widget _buildStepperButton({
-    required IconData icon,
-    required VoidCallback onTap,
-  }) {
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(6),
-        child: Padding(
-          padding: const EdgeInsets.all(5),
-          child: Icon(icon, size: 14, color: Colors.white),
-        ),
-      ),
-    );
-  }
-
   void _handleAddToCart(
     BuildContext context,
     WidgetRef ref,
-    dynamic currentBranch,
-    dynamic cart,
+    Branch currentBranch,
+    Cart cart,
   ) {
+    if (product.isWeightBased) {
+      QuantitySelectorSheet.show(
+        context,
+        product: product,
+        initialQuantity: product.minOrderQuantity,
+      );
+      return;
+    }
+
     try {
-      ref.read(cartProvider.notifier).addItem(product, currentBranch.id);
+      ref
+          .read(cartProvider.notifier)
+          .addItem(product, currentBranch.id, quantity: 1);
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('${product.name} added to cart'),
-          duration: const Duration(milliseconds: 900),
+          content: Text('${product.displayName()} added to cart'),
+          duration: const Duration(seconds: 1),
           behavior: SnackBarBehavior.floating,
         ),
       );
@@ -395,20 +386,21 @@ class ProductCard extends ConsumerWidget {
         onConfirm: () {
           ref
               .read(cartProvider.notifier)
-              .switchBranchAndClear(currentBranch.id, initialProduct: product);
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(
-                'Switched to ${currentBranch.name}. Cart refreshed.',
-              ),
-              behavior: SnackBarBehavior.floating,
-            ),
-          );
+              .switchBranchAndClear(
+                currentBranch.id,
+                initialProduct: product,
+                initialQuantity: product.isWeightBased
+                    ? product.minOrderQuantity
+                    : 1,
+              );
         },
       );
-    } on OutOfStockException catch (e) {
+    } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(e.message), behavior: SnackBarBehavior.floating),
+        SnackBar(
+          content: Text('$e'),
+          backgroundColor: AppColors.statusCancelled,
+        ),
       );
     }
   }

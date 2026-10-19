@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../core/constants/app_colors.dart';
+import '../../core/localization/app_locale_state.dart';
 import '../../core/utils/currency_formatter.dart';
 import '../../shared/models/category.dart';
 import '../../shared/models/product.dart';
@@ -21,6 +22,7 @@ class HomeScreen extends ConsumerWidget {
     final currentAddress = ref.watch(selectedAddressProvider);
     final catalogRepo = ref.watch(catalogRepositoryProvider);
     final cart = ref.watch(cartProvider);
+    final locale = ref.watch(appLocaleProvider);
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -226,8 +228,10 @@ class HomeScreen extends ConsumerWidget {
                                 end: Alignment.centerRight,
                                 colors: [
                                   const Color(0xFF074826),
-                                  const Color(0xFF074826).withValues(alpha: 0.95),
-                                  const Color(0xFF074826).withValues(alpha: 0.6),
+                                  const Color(0xFF074826)
+                                      .withValues(alpha: 0.95),
+                                  const Color(0xFF074826)
+                                      .withValues(alpha: 0.6),
                                   Colors.transparent,
                                 ],
                                 stops: const [0.0, 0.45, 0.7, 1.0],
@@ -382,7 +386,7 @@ class HomeScreen extends ConsumerWidget {
                                     ),
                                     const SizedBox(height: 5),
                                     Text(
-                                      cat.name,
+                                      cat.displayName(locale.languageCode),
                                       textAlign: TextAlign.center,
                                       maxLines: 2,
                                       overflow: TextOverflow.ellipsis,

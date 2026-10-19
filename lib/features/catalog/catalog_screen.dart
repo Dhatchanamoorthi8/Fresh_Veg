@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../core/constants/app_colors.dart';
+import '../../core/localization/app_locale_state.dart';
 import '../../shared/models/category.dart';
 import '../../shared/models/product.dart';
 import '../../shared/providers/app_providers.dart';
@@ -43,10 +44,12 @@ class _CatalogScreenState extends ConsumerState<CatalogScreen> {
   Widget build(BuildContext context) {
     final catalogRepo = ref.watch(catalogRepositoryProvider);
     final currentBranch = ref.watch(selectedBranchProvider);
+    final locale = ref.watch(appLocaleProvider);
+    final isTamil = locale.languageCode == 'ta';
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Vegetable & Fruit Mandi'),
+        title: Text(isTamil ? 'காய்கறி சந்தை' : 'Vegetable & Fruit Mandi'),
       ),
       body: Column(
         children: [
@@ -60,7 +63,9 @@ class _CatalogScreenState extends ConsumerState<CatalogScreen> {
                     controller: _searchController,
                     onChanged: (_) => setState(() {}),
                     decoration: InputDecoration(
-                      hintText: 'Search vegetables (e.g., Palak, Tomato)...',
+                      hintText: isTamil
+                          ? 'காய்கறிகளைத் தேடுங்கள் (எ.கா., தக்காளி)...'
+                          : 'Search vegetables (e.g., Palak, Tomato)...',
                       prefixIcon: const Icon(
                         Icons.search_rounded,
                         color: AppColors.textSecondary,
@@ -84,7 +89,7 @@ class _CatalogScreenState extends ConsumerState<CatalogScreen> {
                 const SizedBox(width: 8),
                 IconButton.filledTonal(
                   icon: const Icon(Icons.sort_rounded),
-                  tooltip: 'Sort Products',
+                  tooltip: isTamil ? 'வரிசைப்படுத்து' : 'Sort Products',
                   onPressed: () => _showSortBottomSheet(context),
                 ),
               ],
@@ -98,10 +103,11 @@ class _CatalogScreenState extends ConsumerState<CatalogScreen> {
               if (!catSnapshot.hasData) return const SizedBox.shrink();
 
               final categories = [
-                const ProductCategory(
+                ProductCategory(
                   id: 'all',
                   name: 'All Items',
-                  subtitle: 'सभी',
+                  nameTa: 'அனைத்து பொருட்கள்',
+                  subtitle: 'Fresh',
                   icon: Icons.grid_view_rounded,
                   emoji: '🧺',
                 ),
@@ -122,7 +128,9 @@ class _CatalogScreenState extends ConsumerState<CatalogScreen> {
 
                     return ChoiceChip(
                       selected: isSelected,
-                      label: Text('${cat.emoji} ${cat.name}'),
+                      label: Text(
+                        '${cat.emoji} ${cat.displayName(locale.languageCode)}',
+                      ),
                       onSelected: (val) {
                         setState(() => _selectedCategoryId = cat.id);
                       },

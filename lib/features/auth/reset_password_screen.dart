@@ -51,7 +51,9 @@ class _ResetPasswordScreenState extends ConsumerState<ResetPasswordScreen> {
 
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('Password updated successfully! You can now log in with your new password.'),
+          content: Text(
+            'Password updated successfully! You can now log in with your new password.',
+          ),
           backgroundColor: AppColors.primary,
         ),
       );

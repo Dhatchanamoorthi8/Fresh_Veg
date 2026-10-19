@@ -89,7 +89,8 @@ class _BranchSelectionScreenState extends ConsumerState<BranchSelectionScreen> {
                           color: AppColors.textSecondary,
                         ),
                       ),
-                      if (currentBranch.latitude != null && currentBranch.longitude != null) ...[
+                      if (currentBranch.latitude != null &&
+                          currentBranch.longitude != null) ...[
                         const SizedBox(height: 3),
                         Row(
                           children: [
@@ -315,7 +316,8 @@ class _BranchSelectionScreenState extends ConsumerState<BranchSelectionScreen> {
                         ),
                       ],
                     ),
-                    if (branch.latitude != null && branch.longitude != null) ...[
+                    if (branch.latitude != null &&
+                        branch.longitude != null) ...[
                       const SizedBox(height: 4),
                       Row(
                         children: [
@@ -501,7 +503,10 @@ class _BranchSelectionScreenState extends ConsumerState<BranchSelectionScreen> {
                   ),
                   style: OutlinedButton.styleFrom(
                     foregroundColor: AppColors.primary,
-                    side: const BorderSide(color: AppColors.primary, width: 1.5),
+                    side: const BorderSide(
+                      color: AppColors.primary,
+                      width: 1.5,
+                    ),
                     padding: const EdgeInsets.symmetric(vertical: 14),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
@@ -646,7 +651,8 @@ class _BranchSelectionScreenState extends ConsumerState<BranchSelectionScreen> {
                               color: AppColors.textMuted,
                             ),
                           ),
-                          if (addr.latitude != null && addr.longitude != null) ...[
+                          if (addr.latitude != null &&
+                              addr.longitude != null) ...[
                             const SizedBox(height: 5),
                             Container(
                               padding: const EdgeInsets.symmetric(
@@ -728,7 +734,9 @@ class _BranchSelectionScreenState extends ConsumerState<BranchSelectionScreen> {
             Icon(
               icon,
               size: 16,
-              color: isSelected ? AppColors.primaryDark : AppColors.textSecondary,
+              color: isSelected
+                  ? AppColors.primaryDark
+                  : AppColors.textSecondary,
             ),
             const SizedBox(width: 6),
             Text(
@@ -736,7 +744,9 @@ class _BranchSelectionScreenState extends ConsumerState<BranchSelectionScreen> {
               style: TextStyle(
                 fontSize: 13,
                 fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
-                color: isSelected ? AppColors.primaryDark : AppColors.textPrimary,
+                color: isSelected
+                    ? AppColors.primaryDark
+                    : AppColors.textPrimary,
               ),
             ),
           ],
@@ -748,7 +758,8 @@ class _BranchSelectionScreenState extends ConsumerState<BranchSelectionScreen> {
   Future<void> _showAddAddressSheet(BuildContext context) async {
     final formKey = GlobalKey<FormState>();
     final currentBranch = ref.read(selectedBranchProvider);
-    final branches = ref.read(branchesListProvider).value ??
+    final branches =
+        ref.read(branchesListProvider).value ??
         MockBranchRepository.sampleBranches;
 
     String selectedLabel = 'Home';
@@ -937,12 +948,12 @@ class _BranchSelectionScreenState extends ConsumerState<BranchSelectionScreen> {
                                   color: Colors.white,
                                   borderRadius: BorderRadius.circular(8),
                                   border: Border.all(
-                                    color: selectedDbBranch?.id ==
-                                            currentBranch.id
+                                    color:
+                                        selectedDbBranch?.id == currentBranch.id
                                         ? AppColors.primary
                                         : AppColors.border,
-                                    width: selectedDbBranch?.id ==
-                                            currentBranch.id
+                                    width:
+                                        selectedDbBranch?.id == currentBranch.id
                                         ? 1.5
                                         : 1,
                                   ),
@@ -1114,7 +1125,8 @@ class _BranchSelectionScreenState extends ConsumerState<BranchSelectionScreen> {
                         controller: areaController,
                         decoration: InputDecoration(
                           labelText: 'Area / Locality',
-                          hintText: 'e.g., Indiranagar, Whitefield, Koramangala',
+                          hintText:
+                              'e.g., Indiranagar, Whitefield, Koramangala',
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(10),
                           ),
@@ -1202,7 +1214,8 @@ class _BranchSelectionScreenState extends ConsumerState<BranchSelectionScreen> {
                               longitude: selectedLng,
                             );
 
-                            final eligibleBranch = selectedDbBranch ??
+                            final eligibleBranch =
+                                selectedDbBranch ??
                                 await ref
                                     .read(branchRepositoryProvider)
                                     .getEligibleBranchForAddress(newAddr);

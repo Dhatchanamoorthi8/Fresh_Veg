@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../core/constants/app_colors.dart';
+import '../../core/localization/app_locale_state.dart';
 import '../../shared/models/user_role.dart';
 import '../../shared/providers/app_providers.dart';
 import '../../shared/providers/auth_provider.dart';
@@ -17,10 +18,13 @@ class ProfileScreen extends ConsumerWidget {
     final customerPhone = ref.watch(customerPhoneProvider);
     final currentAddress = ref.watch(selectedAddressProvider);
     final authUser = ref.watch(currentSupabaseUserProvider);
+    final activeLocale = ref.watch(appLocaleProvider);
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('My Account'),
+        title: Text(
+          activeLocale.languageCode == 'ta' ? 'என் கணக்கு' : 'My Account',
+        ),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
@@ -326,6 +330,46 @@ class ProfileScreen extends ConsumerWidget {
                 child: Column(
                   children: [
                     _buildTile(
+                      icon: Icons.language_rounded,
+                      title: activeLocale.languageCode == 'ta'
+                          ? 'மொழி / Language'
+                          : 'Language / மொழி',
+                      subtitle: activeLocale.languageCode == 'ta'
+                          ? 'தமிழ் (Tamil) • செயலில் உள்ளது'
+                          : 'English • Active',
+                      trailingWidget: Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 10,
+                          vertical: 4,
+                        ),
+                        decoration: BoxDecoration(
+                          color: AppColors.primaryContainer,
+                          borderRadius: BorderRadius.circular(8),
+                          border: Border.all(
+                            color: AppColors.primaryLight.withValues(
+                              alpha: 0.5,
+                            ),
+                          ),
+                        ),
+                        child: Text(
+                          activeLocale.languageCode == 'ta'
+                              ? 'தமிழ்'
+                              : 'English',
+                          style: const TextStyle(
+                            color: AppColors.primaryDark,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 12,
+                          ),
+                        ),
+                      ),
+                      onTap: () => _showLanguageSelectionDialog(
+                        context,
+                        ref,
+                        activeLocale,
+                      ),
+                    ),
+                    const Divider(height: 1),
+                    _buildTile(
                       icon: Icons.pin_drop_outlined,
                       title: 'Saved Delivery Addresses',
                       subtitle:
@@ -363,7 +407,8 @@ class ProfileScreen extends ConsumerWidget {
                     _buildTile(
                       icon: Icons.help_outline_rounded,
                       title: 'Help & FAQ',
-                      subtitle: 'Multi-branch ordering rules and delivery times',
+                      subtitle:
+                          'Multi-branch ordering rules and delivery times',
                       onTap: () => _showHelpDialog(context),
                     ),
                   ],
@@ -412,6 +457,7 @@ class ProfileScreen extends ConsumerWidget {
     required String title,
     required String subtitle,
     required VoidCallback onTap,
+    Widget? trailingWidget,
   }) {
     return ListTile(
       leading: Icon(icon, color: AppColors.primary),
@@ -423,12 +469,186 @@ class ProfileScreen extends ConsumerWidget {
         subtitle,
         style: const TextStyle(fontSize: 12, color: AppColors.textSecondary),
       ),
-      trailing: const Icon(
-        Icons.arrow_forward_ios_rounded,
-        size: 14,
-        color: AppColors.textMuted,
-      ),
+      trailing:
+          trailingWidget ??
+          const Icon(
+            Icons.arrow_forward_ios_rounded,
+            size: 14,
+            color: AppColors.textMuted,
+          ),
       onTap: onTap,
+    );
+  }
+
+  void _showLanguageSelectionDialog(
+    BuildContext context,
+    WidgetRef ref,
+    Locale currentLocale,
+  ) {
+    showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (ctx) {
+        return SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 16),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: AppColors.primaryContainer,
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: const Icon(
+                        Icons.language_rounded,
+                        color: AppColors.primaryDark,
+                        size: 22,
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    const Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Choose Language / மொழியைத் தேர்ந்தெடுக்கவும்',
+                            style: TextStyle(
+                              fontSize: 15,
+                              fontWeight: FontWeight.bold,
+                              color: AppColors.textPrimary,
+                            ),
+                          ),
+                          Text(
+                            'Select your preferred app language',
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: AppColors.textSecondary,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 18),
+                ListTile(
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    side: BorderSide(
+                      color: currentLocale.languageCode == 'en'
+                          ? AppColors.primary
+                          : AppColors.border,
+                      width: currentLocale.languageCode == 'en' ? 1.5 : 1,
+                    ),
+                  ),
+                  tileColor: currentLocale.languageCode == 'en'
+                      ? AppColors.primaryContainer.withValues(alpha: 0.3)
+                      : Colors.transparent,
+                  leading: const CircleAvatar(
+                    backgroundColor: AppColors.surfaceVariant,
+                    child: Text(
+                      'EN',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 12,
+                        color: AppColors.textPrimary,
+                      ),
+                    ),
+                  ),
+                  title: const Text(
+                    'English',
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                  subtitle: const Text('Default interface language'),
+                  trailing: currentLocale.languageCode == 'en'
+                      ? const Icon(
+                          Icons.check_circle_rounded,
+                          color: AppColors.primary,
+                        )
+                      : null,
+                  onTap: () async {
+                    Navigator.pop(ctx);
+                    await ref
+                        .read(appLocaleProvider.notifier)
+                        .setLanguage('en');
+                    if (context.mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('Language updated to English'),
+                          duration: Duration(seconds: 2),
+                        ),
+                      );
+                    }
+                  },
+                ),
+                const SizedBox(height: 10),
+                ListTile(
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    side: BorderSide(
+                      color: currentLocale.languageCode == 'ta'
+                          ? AppColors.primary
+                          : AppColors.border,
+                      width: currentLocale.languageCode == 'ta' ? 1.5 : 1,
+                    ),
+                  ),
+                  tileColor: currentLocale.languageCode == 'ta'
+                      ? AppColors.primaryContainer.withValues(alpha: 0.3)
+                      : Colors.transparent,
+                  leading: const CircleAvatar(
+                    backgroundColor: AppColors.primaryContainer,
+                    child: Text(
+                      'த',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 14,
+                        color: AppColors.primaryDark,
+                      ),
+                    ),
+                  ),
+                  title: const Text(
+                    'தமிழ் (Tamil)',
+                    style: TextStyle(fontWeight: FontWeight.bold, height: 1.3),
+                  ),
+                  subtitle: const Text(
+                    'முழுமையான தமிழ் இடைமுகம் மற்றும் காய்கறி பெயர்கள்',
+                    style: TextStyle(fontSize: 11, height: 1.3),
+                  ),
+                  trailing: currentLocale.languageCode == 'ta'
+                      ? const Icon(
+                          Icons.check_circle_rounded,
+                          color: AppColors.primary,
+                        )
+                      : null,
+                  onTap: () async {
+                    Navigator.pop(ctx);
+                    await ref
+                        .read(appLocaleProvider.notifier)
+                        .setLanguage('ta');
+                    if (context.mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text(
+                            'செயலி மொழி தமிழில் மாற்றப்பட்டது (Tamil set)',
+                          ),
+                          duration: Duration(seconds: 2),
+                        ),
+                      );
+                    }
+                  },
+                ),
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 

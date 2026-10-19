@@ -13,13 +13,19 @@ class AuthErrorParser {
     // Direct typed handling for PostgrestException
     if (error is PostgrestException) {
       final msg = error.message.toLowerCase();
-      if (error.code == '23505' || msg.contains('already exists') || msg.contains('unique constraint')) {
+      if (error.code == '23505' ||
+          msg.contains('already exists') ||
+          msg.contains('unique constraint')) {
         return 'An account with this email address already exists. Please choose a different email.';
       }
-      if (error.code == '42501' || msg.contains('access denied') || msg.contains('unauthorized') || msg.contains('permission denied')) {
+      if (error.code == '42501' ||
+          msg.contains('access denied') ||
+          msg.contains('unauthorized') ||
+          msg.contains('permission denied')) {
         return 'Access denied: You do not have administrative privileges to perform this action.';
       }
-      if (msg.contains('password') && (msg.contains('6') || msg.contains('least'))) {
+      if (msg.contains('password') &&
+          (msg.contains('6') || msg.contains('least'))) {
         return 'Password must be at least 6 characters long.';
       }
       if (msg.contains('branch assignment is required')) {
@@ -53,9 +59,8 @@ class AuthErrorParser {
     // User already registered
     if (raw.contains('user_already_exists') ||
         raw.contains('already registered') ||
-        raw.contains('already exists') ||
         raw.contains('User already registered')) {
-      return 'An account with this email address already exists. Please choose a different email.';
+      return 'An account with this email address already exists. Please sign in instead.';
     }
 
     // User not found
@@ -68,7 +73,7 @@ class AuthErrorParser {
         raw.contains('rate_limit') ||
         raw.contains('over_email_send_rate_limit') ||
         raw.contains('Too many requests')) {
-      return 'Too many attempts. For security reasons, please wait a moment before trying again.';
+      return 'Too many sign-in attempts. For security reasons, please wait a moment before trying again.';
     }
 
     // Weak password

@@ -17,6 +17,7 @@ dependencies:
   intl: ^0.20.3
   supabase_flutter: ^2.18.3
   image_picker: ^1.2.4
+  shared_preferences: ^2.3.2
 
   # Local Monorepo Packages
   vegora_core:
@@ -38,3 +39,11 @@ flutter:
 
   assets:
     - assets/branding/
+    - assets/fonts/
+
+  fonts:
+    - family: NotoSansTamil
+      fonts:
+        - asset: assets/fonts/NotoSansTamil-Regular.ttf
+        - asset: assets/fonts/NotoSansTamil-Bold.ttf
+          weight: 700

@@ -146,9 +146,12 @@ class _AdminInventoryScreenState extends ConsumerState<AdminInventoryScreen> {
                     border: OutlineInputBorder(),
                   ),
                   items: availableToAdd.map((p) {
+                    final label = p.nameTa.isNotEmpty
+                        ? '${p.name} (${p.nameTa}) - ${p.unit}'
+                        : '${p.name} (${p.unit})';
                     return DropdownMenuItem(
                       value: p,
-                      child: Text('${p.name} (${p.unit})'),
+                      child: Text(label),
                     );
                   }).toList(),
                   onChanged: (v) {
@@ -180,9 +183,11 @@ class _AdminInventoryScreenState extends ConsumerState<AdminInventoryScreen> {
                       child: TextFormField(
                         controller: stockCtrl,
                         keyboardType: TextInputType.number,
-                        decoration: const InputDecoration(
-                          labelText: 'Initial Stock Qty',
-                          border: OutlineInputBorder(),
+                        decoration: InputDecoration(
+                          labelText: (selectedProduct?.isWeightBased ?? true)
+                              ? 'Initial Stock (kg)'
+                              : 'Initial Stock (pcs)',
+                          border: const OutlineInputBorder(),
                         ),
                       ),
                     ),
@@ -192,10 +197,12 @@ class _AdminInventoryScreenState extends ConsumerState<AdminInventoryScreen> {
                 TextFormField(
                   controller: thresholdCtrl,
                   keyboardType: TextInputType.number,
-                  decoration: const InputDecoration(
-                    labelText: 'Low Stock Alert Threshold',
+                  decoration: InputDecoration(
+                    labelText: (selectedProduct?.isWeightBased ?? true)
+                        ? 'Low Stock Alert (kg)'
+                        : 'Low Stock Alert (pcs)',
                     hintText: '5',
-                    border: OutlineInputBorder(),
+                    border: const OutlineInputBorder(),
                   ),
                 ),
               ],
@@ -223,10 +230,22 @@ class _AdminInventoryScreenState extends ConsumerState<AdminInventoryScreen> {
 
                         final priceVal =
                             double.tryParse(priceCtrl.text.trim()) ?? 0;
-                        final stockVal =
-                            int.tryParse(stockCtrl.text.trim()) ?? 0;
-                        final thresholdVal =
-                            int.tryParse(thresholdCtrl.text.trim()) ?? 5;
+                        final stockNum =
+                            double.tryParse(stockCtrl.text.trim()) ?? 0;
+                        final thresholdNum =
+                            double.tryParse(thresholdCtrl.text.trim()) ?? 5;
+
+                        final isWeight = selectedProduct!.isWeightBased;
+                        final stockVal = isWeight
+                            ? (stockNum * 1000).round()
+                            : stockNum.round();
+                        final thresholdVal = isWeight
+                            ? (thresholdNum * 1000).round()
+                            : thresholdNum.round();
+
+                        if (stockVal < 0) {
+                          throw Exception('Stock cannot be negative.');
+                        }
 
                         await repo.updateBranchInventoryPricingAndStock(
                           branchId: _selectedBranchId!,
@@ -284,15 +303,25 @@ class _AdminInventoryScreenState extends ConsumerState<AdminInventoryScreen> {
     final inv = product.branchInventory[_selectedBranchId];
     final currentPrice = inv?.pricePaise ?? product.basePricePaise;
     final currentStock = inv?.stockQuantity ?? 0;
-    final currentThreshold = inv?.lowStockThreshold ?? 5;
+    final currentThreshold = inv?.lowStockThreshold ?? (product.isWeightBased ? 5000 : 5);
+
+    final isWeight = product.isWeightBased;
+    final displayStock = isWeight
+        ? (currentStock >= 1000
+            ? (currentStock / 1000).toStringAsFixed(currentStock % 1000 == 0 ? 0 : 1)
+            : currentStock.toString())
+        : currentStock.toString();
+    final displayThreshold = isWeight
+        ? (currentThreshold >= 1000
+            ? (currentThreshold / 1000).toStringAsFixed(currentThreshold % 1000 == 0 ? 0 : 1)
+            : currentThreshold.toString())
+        : currentThreshold.toString();
 
     final priceCtrl = TextEditingController(
       text: (currentPrice / 100).toStringAsFixed(0),
     );
-    final stockCtrl = TextEditingController(text: currentStock.toString());
-    final thresholdCtrl = TextEditingController(
-      text: currentThreshold.toString(),
-    );
+    final stockCtrl = TextEditingController(text: displayStock);
+    final thresholdCtrl = TextEditingController(text: displayThreshold);
     bool isAvailable = inv?.isAvailable ?? true;
     bool isSaving = false;
 
@@ -303,7 +332,9 @@ class _AdminInventoryScreenState extends ConsumerState<AdminInventoryScreen> {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(16),
           ),
-          title: Text('Adjust Stock: ${product.name}'),
+          title: Text(
+            'Adjust Stock: ${product.name}${product.nameTa.isNotEmpty ? " (${product.nameTa})" : ""}',
+          ),
           content: SizedBox(
             width: 440,
             child: Column(
@@ -315,9 +346,11 @@ class _AdminInventoryScreenState extends ConsumerState<AdminInventoryScreen> {
                       child: TextFormField(
                         controller: stockCtrl,
                         keyboardType: TextInputType.number,
-                        decoration: const InputDecoration(
-                          labelText: 'Stock Units',
-                          border: OutlineInputBorder(),
+                        decoration: InputDecoration(
+                          labelText: isWeight
+                              ? 'Stock in Kilograms (kg)'
+                              : 'Stock Units (pcs)',
+                          border: const OutlineInputBorder(),
                         ),
                       ),
                     ),
@@ -326,14 +359,29 @@ class _AdminInventoryScreenState extends ConsumerState<AdminInventoryScreen> {
                       child: TextFormField(
                         controller: thresholdCtrl,
                         keyboardType: TextInputType.number,
-                        decoration: const InputDecoration(
-                          labelText: 'Low Stock Alert',
-                          border: OutlineInputBorder(),
+                        decoration: InputDecoration(
+                          labelText: isWeight
+                              ? 'Low Stock Alert (kg)'
+                              : 'Low Stock Alert (pcs)',
+                          border: const OutlineInputBorder(),
                         ),
                       ),
                     ),
                   ],
                 ),
+                if (isWeight) ...[
+                  const SizedBox(height: 6),
+                  const Align(
+                    alignment: Alignment.centerLeft,
+                    child: Text(
+                      'Weight is normalized to integer grams in the backend (e.g. 25 kg = 25,000 g).',
+                      style: TextStyle(
+                        fontSize: 11,
+                        color: AppColors.neutral600,
+                      ),
+                    ),
+                  ),
+                ],
                 const SizedBox(height: 12),
                 TextFormField(
                   controller: priceCtrl,
@@ -377,10 +425,22 @@ class _AdminInventoryScreenState extends ConsumerState<AdminInventoryScreen> {
 
                         final priceVal =
                             double.tryParse(priceCtrl.text.trim()) ?? 0;
-                        final stockVal =
-                            int.tryParse(stockCtrl.text.trim()) ?? 0;
-                        final thresholdVal =
-                            int.tryParse(thresholdCtrl.text.trim()) ?? 5;
+                        final stockNum =
+                            double.tryParse(stockCtrl.text.trim()) ?? 0;
+                        final thresholdNum =
+                            double.tryParse(thresholdCtrl.text.trim()) ??
+                                (isWeight ? 5.0 : 5.0);
+
+                        final stockVal = isWeight
+                            ? (stockNum * 1000).round()
+                            : stockNum.round();
+                        final thresholdVal = isWeight
+                            ? (thresholdNum * 1000).round()
+                            : thresholdNum.round();
+
+                        if (stockVal < 0) {
+                          throw Exception('Stock quantity cannot be negative.');
+                        }
 
                         await repo.updateBranchInventoryPricingAndStock(
                           branchId: _selectedBranchId!,
@@ -421,7 +481,7 @@ class _AdminInventoryScreenState extends ConsumerState<AdminInventoryScreen> {
                       ),
                     )
                   : const Text(
-                      'Save Changes',
+                      'Update Stock',
                       style: TextStyle(color: Colors.white),
                     ),
             ),
@@ -600,11 +660,11 @@ class _AdminInventoryScreenState extends ConsumerState<AdminInventoryScreen> {
                             borderRadius: BorderRadius.circular(8),
                           ),
                           title: Text(
-                            p.name,
+                            p.nameTa.isNotEmpty ? '${p.name} (${p.nameTa})' : p.name,
                             style: const TextStyle(fontWeight: FontWeight.bold),
                           ),
                           subtitle: Text(
-                            'SKU: ${p.sku} • Unit: ${p.unit} • Threshold: $threshold units',
+                            'SKU: ${p.sku} • Unit: ${p.formatUnitLabel()} • Alert: ${p.formatQuantity(threshold)}',
                           ),
                           trailing: Row(
                             mainAxisSize: MainAxisSize.min,
@@ -638,10 +698,10 @@ class _AdminInventoryScreenState extends ConsumerState<AdminInventoryScreen> {
                                     ),
                                     child: Text(
                                       isOut
-                                          ? 'Out of Stock ($stock)'
+                                          ? 'Out of Stock'
                                           : isLow
-                                          ? 'Low Stock ($stock units)'
-                                          : '$stock in stock',
+                                          ? 'Low Stock (${p.formatQuantity(stock)})'
+                                          : '${p.formatQuantity(stock)} in stock',
                                       style: TextStyle(
                                         fontSize: 11,
                                         fontWeight: FontWeight.bold,

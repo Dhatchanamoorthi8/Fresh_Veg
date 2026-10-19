@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
 import '../../core/constants/app_colors.dart';
+import '../../core/localization/app_locale_state.dart';
 import '../../core/utils/currency_formatter.dart';
 import '../../shared/models/order.dart';
 import '../../shared/models/order_status.dart';
@@ -18,11 +19,17 @@ class OrderTrackingScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final order = ref.watch(orderByIdProvider(orderId));
+    final locale = ref.watch(appLocaleProvider);
+    final isTamil = locale.languageCode == 'ta';
 
     if (order == null) {
       return Scaffold(
-        appBar: AppBar(title: const Text('Track Order')),
-        body: const Center(child: Text('Order not found')),
+        appBar: AppBar(
+          title: Text(isTamil ? 'ஆர்டர் கண்காணிப்பு' : 'Track Order'),
+        ),
+        body: Center(
+          child: Text(isTamil ? 'ஆர்டர் கிடைக்கவில்லை' : 'Order not found'),
+        ),
       );
     }
 
@@ -31,7 +38,11 @@ class OrderTrackingScreen extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('Order ${order.orderNumber}'),
+        title: Text(
+          isTamil
+              ? 'ஆர்டர் ${order.orderNumber}'
+              : 'Order ${order.orderNumber}',
+        ),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
@@ -301,17 +312,19 @@ class OrderTrackingScreen extends ConsumerWidget {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  item.product.name,
-                                  style: const TextStyle(
+                                  item.product.displayName(locale.languageCode),
+                                  style: TextStyle(
                                     fontSize: 13,
                                     fontWeight: FontWeight.bold,
+                                    height: isTamil ? 1.35 : 1.2,
                                   ),
                                 ),
                                 Text(
-                                  '${item.quantity} x ${CurrencyFormatter.formatPaise(item.unitPricePaise)} / ${item.product.unit}',
-                                  style: const TextStyle(
+                                  '${item.formattedQuantity(isTamil: isTamil)} • ${CurrencyFormatter.formatPaise(item.unitPricePaise)} / ${item.product.formatUnitLabel(isTamil: isTamil)}',
+                                  style: TextStyle(
                                     fontSize: 11,
                                     color: AppColors.textSecondary,
+                                    height: isTamil ? 1.3 : 1.2,
                                   ),
                                 ),
                               ],

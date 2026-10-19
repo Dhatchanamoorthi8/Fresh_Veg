@@ -5,8 +5,8 @@ import 'package:vegetable_shop/features/auth/login_screen.dart';
 import 'package:vegetable_shop/features/auth/register_screen.dart';
 import 'package:vegetable_shop/features/auth/forgot_password_screen.dart';
 import 'package:vegetable_shop/features/auth/reset_password_screen.dart';
-import 'package:vegetable_shop/features/auth/admin_forgot_password_screen.dart';
-import 'package:vegetable_shop/features/auth/admin_reset_password_screen.dart';
+import 'package:vegora_admin_web/features/auth/admin_forgot_password_screen.dart';
+import 'package:vegora_admin_web/features/auth/admin_reset_password_screen.dart';
 import 'package:vegetable_shop/shared/models/user_role.dart';
 import 'package:vegetable_shop/shared/repositories/supabase_auth_repository.dart';
 
@@ -93,7 +93,7 @@ void main() {
         await tester.pumpAndSettle();
 
         // Find Create Account button, ensure visible in scroll view, and tap
-        final createButton = find.text('Create Customer Account');
+        final createButton = find.text('Create Account');
         expect(createButton, findsOneWidget);
         await tester.ensureVisible(createButton);
         await tester.pumpAndSettle();
@@ -131,7 +131,7 @@ void main() {
         'DifferentPassword456!',
       );
 
-      final createButton = find.text('Create Customer Account');
+      final createButton = find.text('Create Account');
       await tester.ensureVisible(createButton);
       await tester.pumpAndSettle();
       await tester.tap(createButton);
@@ -156,7 +156,7 @@ void main() {
         expect(find.text('Password'), findsOneWidget);
         expect(find.text('Sign In'), findsOneWidget);
         expect(find.text('Continue with Google'), findsOneWidget);
-        expect(find.text('Register here'), findsOneWidget);
+        expect(find.text('Sign up'), findsOneWidget);
         expect(find.text('Forgot Password?'), findsOneWidget);
 
         // Dedicated Monorepo Separation: Staff & Admin logins MUST NOT be present
@@ -173,14 +173,16 @@ void main() {
       },
     );
 
-    testWidgets('Login form email validation rejects invalid email formats', (tester) async {
+    testWidgets('Login form email validation rejects invalid email formats', (
+      tester,
+    ) async {
       await tester.pumpWidget(
         const ProviderScope(child: MaterialApp(home: LoginScreen())),
       );
       await tester.pumpAndSettle();
 
       // Submit empty
-      final signInButton = find.widgetWithText(FilledButton, 'Sign In');
+      final signInButton = find.widgetWithText(ElevatedButton, 'Sign In');
       await tester.ensureVisible(signInButton);
       await tester.tap(signInButton);
       await tester.pumpAndSettle();
@@ -197,92 +199,123 @@ void main() {
   });
 
   group('4. Password Recovery & Reset Password Flow Tests', () {
-    testWidgets('Customer ForgotPasswordScreen renders email input and recovery action', (tester) async {
-      await tester.pumpWidget(
-        const ProviderScope(child: MaterialApp(home: ForgotPasswordScreen())),
-      );
-      await tester.pumpAndSettle();
+    testWidgets(
+      'Customer ForgotPasswordScreen renders email input and recovery action',
+      (tester) async {
+        await tester.pumpWidget(
+          const ProviderScope(child: MaterialApp(home: ForgotPasswordScreen())),
+        );
+        await tester.pumpAndSettle();
 
-      expect(find.text('Forgot Password?'), findsOneWidget);
-      expect(find.text('Email Address'), findsOneWidget);
-      expect(find.text('Send Confirmation Code'), findsOneWidget);
+        expect(find.text('Forgot Password?'), findsOneWidget);
+        expect(find.text('Email Address'), findsOneWidget);
+        expect(find.text('Send Reset Link'), findsOneWidget);
 
-      // Verify email validation
-      final sendBtn = find.text('Send Confirmation Code');
-      await tester.tap(sendBtn);
-      await tester.pumpAndSettle();
+        // Verify email validation
+        final sendBtn = find.text('Send Reset Link');
+        await tester.tap(sendBtn);
+        await tester.pumpAndSettle();
 
-      expect(find.text('Please enter your email address'), findsOneWidget);
-    });
+        expect(find.text('Please enter your email address'), findsOneWidget);
+      },
+    );
 
-    testWidgets('Customer ResetPasswordScreen validates password confirmation and length', (tester) async {
-      await tester.pumpWidget(
-        const ProviderScope(child: MaterialApp(home: ResetPasswordScreen())),
-      );
-      await tester.pumpAndSettle();
+    testWidgets(
+      'Customer ResetPasswordScreen validates password confirmation and length',
+      (tester) async {
+        await tester.pumpWidget(
+          const ProviderScope(child: MaterialApp(home: ResetPasswordScreen())),
+        );
+        await tester.pumpAndSettle();
 
-      expect(find.text('Set New Password'), findsWidgets);
-      expect(find.text('New Password'), findsOneWidget);
-      expect(find.text('Confirm New Password'), findsOneWidget);
+        expect(find.text('Set New Password'), findsWidgets);
+        expect(find.text('New Password'), findsOneWidget);
+        expect(find.text('Confirm New Password'), findsOneWidget);
 
-      final updateBtn = find.text('Update Password');
-      await tester.tap(updateBtn);
-      await tester.pumpAndSettle();
+        final updateBtn = find.text('Update Password');
+        await tester.tap(updateBtn);
+        await tester.pumpAndSettle();
 
-      expect(find.text('Please enter a new password'), findsOneWidget);
+        expect(find.text('Please enter a new password'), findsOneWidget);
 
-      // Short password
-      await tester.enterText(find.byType(TextFormField).at(0), '123');
-      await tester.tap(updateBtn);
-      await tester.pumpAndSettle();
-      expect(find.text('Password must be at least 6 characters'), findsOneWidget);
+        // Short password
+        await tester.enterText(find.byType(TextFormField).at(0), '123');
+        await tester.tap(updateBtn);
+        await tester.pumpAndSettle();
+        expect(
+          find.text('Password must be at least 6 characters'),
+          findsOneWidget,
+        );
 
-      // Mismatched confirmation
-      await tester.enterText(find.byType(TextFormField).at(0), 'ValidPass123!');
-      await tester.enterText(find.byType(TextFormField).at(1), 'DifferentPass!');
-      await tester.tap(updateBtn);
-      await tester.pumpAndSettle();
-      expect(find.text('Passwords do not match'), findsOneWidget);
-    });
+        // Mismatched confirmation
+        await tester.enterText(
+          find.byType(TextFormField).at(0),
+          'ValidPass123!',
+        );
+        await tester.enterText(
+          find.byType(TextFormField).at(1),
+          'DifferentPass!',
+        );
+        await tester.tap(updateBtn);
+        await tester.pumpAndSettle();
+        expect(find.text('Passwords do not match'), findsOneWidget);
+      },
+    );
 
-    testWidgets('Admin ForgotPasswordScreen renders and validates administrator email', (tester) async {
-      await tester.pumpWidget(
-        const ProviderScope(child: MaterialApp(home: AdminForgotPasswordScreen())),
-      );
-      await tester.pumpAndSettle();
+    testWidgets(
+      'Admin ForgotPasswordScreen renders and validates administrator email',
+      (tester) async {
+        await tester.pumpWidget(
+          const ProviderScope(
+            child: MaterialApp(home: AdminForgotPasswordScreen()),
+          ),
+        );
+        await tester.pumpAndSettle();
 
-      expect(find.text('Admin Password Recovery'), findsOneWidget);
-      expect(find.text('Administrator Email'), findsOneWidget);
-      expect(find.text('Send Recovery Code'), findsOneWidget);
+        expect(find.text('Admin Password Recovery'), findsOneWidget);
+        expect(find.text('Administrator Email'), findsOneWidget);
+        expect(find.text('Send Recovery Code'), findsOneWidget);
 
-      final sendBtn = find.text('Send Recovery Code');
-      await tester.tap(sendBtn);
-      await tester.pumpAndSettle();
+        final sendBtn = find.text('Send Recovery Code');
+        await tester.tap(sendBtn);
+        await tester.pumpAndSettle();
 
-      expect(find.text('Please enter your administrator email'), findsOneWidget);
-    });
+        expect(
+          find.text('Please enter your administrator email'),
+          findsOneWidget,
+        );
+      },
+    );
 
-    testWidgets('Admin ResetPasswordScreen enforces 8 character minimum enterprise password', (tester) async {
-      await tester.pumpWidget(
-        const ProviderScope(child: MaterialApp(home: AdminResetPasswordScreen())),
-      );
-      await tester.pumpAndSettle();
+    testWidgets(
+      'Admin ResetPasswordScreen enforces 8 character minimum enterprise password',
+      (tester) async {
+        await tester.pumpWidget(
+          const ProviderScope(
+            child: MaterialApp(home: AdminResetPasswordScreen()),
+          ),
+        );
+        await tester.pumpAndSettle();
 
-      expect(find.text('Set New Admin Password'), findsOneWidget);
-      expect(find.text('New Administrator Password'), findsOneWidget);
-      expect(find.text('Confirm Administrator Password'), findsOneWidget);
+        expect(find.text('Set New Admin Password'), findsOneWidget);
+        expect(find.text('New Administrator Password'), findsOneWidget);
+        expect(find.text('Confirm Administrator Password'), findsOneWidget);
 
-      final updateBtn = find.text('Update Administrator Password');
-      await tester.tap(updateBtn);
-      await tester.pumpAndSettle();
+        final updateBtn = find.text('Update Administrator Password');
+        await tester.tap(updateBtn);
+        await tester.pumpAndSettle();
 
-      expect(find.text('Please enter a new password'), findsOneWidget);
+        expect(find.text('Please enter a new password'), findsOneWidget);
 
-      // Under 8 chars
-      await tester.enterText(find.byType(TextFormField).at(0), 'Pass12');
-      await tester.tap(updateBtn);
-      await tester.pumpAndSettle();
-      expect(find.text('Administrator password must be at least 8 characters'), findsOneWidget);
-    });
+        // Under 8 chars
+        await tester.enterText(find.byType(TextFormField).at(0), 'Pass12');
+        await tester.tap(updateBtn);
+        await tester.pumpAndSettle();
+        expect(
+          find.text('Administrator password must be at least 8 characters'),
+          findsOneWidget,
+        );
+      },
+    );
   });
 }

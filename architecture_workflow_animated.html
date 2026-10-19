@@ -1,0 +1,883 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vegora — System Architecture & Workflow Visualizer</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #0B6B3A;
+      --primary-dark: #074826;
+      --primary-light: #4CAF50;
+      --accent: #FF8A00;
+      --accent-light: #FFE0B2;
+      --bg: #0C120E;
+      --surface: #141E17;
+      --surface-card: #1A261E;
+      --border: #26382C;
+      --border-bright: #3D5A46;
+      --text: #F1F5F9;
+      --text-muted: #94A3B8;
+      --mint-glow: rgba(76, 175, 80, 0.25);
+      --orange-glow: rgba(255, 138, 0, 0.3);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background: radial-gradient(circle at 50% 0%, #152A1C 0%, var(--bg) 70%);
+      color: var(--text);
+      min-height: 100vh;
+      padding: 2rem 1.5rem 4rem;
+      overflow-x: hidden;
+    }
+
+    header {
+      max-width: 1300px;
+      margin: 0 auto 2.5rem;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1.5rem;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 1.5rem;
+    }
+
+    .brand-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.6rem;
+      background: rgba(11, 107, 58, 0.3);
+      border: 1px solid var(--primary-light);
+      padding: 0.35rem 0.9rem;
+      border-radius: 999px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: #A7F3D0;
+      margin-bottom: 0.6rem;
+    }
+
+    .brand-badge span.pulse-dot {
+      width: 8px;
+      height: 8px;
+      background: #4CAF50;
+      border-radius: 50%;
+      box-shadow: 0 0 10px #4CAF50;
+      animation: pulse 1.5s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.4; transform: scale(1.3); }
+    }
+
+    h1 {
+      font-size: 2.2rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      background: linear-gradient(135deg, #FFFFFF 30%, #86EFAC 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .subtitle {
+      color: var(--text-muted);
+      font-size: 0.95rem;
+      margin-top: 0.25rem;
+    }
+
+    .controls-panel {
+      display: flex;
+      gap: 0.75rem;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      padding: 0.4rem;
+      border-radius: 12px;
+    }
+
+    .tab-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      padding: 0.6rem 1.1rem;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 0.85rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .tab-btn:hover {
+      color: #fff;
+      background: rgba(255, 255, 255, 0.05);
+    }
+
+    .tab-btn.active {
+      background: var(--primary);
+      color: #FFFFFF;
+      box-shadow: 0 4px 15px rgba(11, 107, 58, 0.4);
+    }
+
+    .main-container {
+      max-width: 1300px;
+      margin: 0 auto;
+      display: grid;
+      gap: 2.5rem;
+    }
+
+    /* Workflow Stepper */
+    .stepper-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 1.5rem;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    }
+
+    .stepper-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.5rem;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .stepper-title {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .step-pills {
+      display: flex;
+      gap: 0.5rem;
+      overflow-x: auto;
+      padding-bottom: 0.5rem;
+      scrollbar-width: thin;
+    }
+
+    .step-pill {
+      background: var(--surface-card);
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      padding: 0.5rem 0.9rem;
+      border-radius: 999px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    .step-pill.active {
+      border-color: var(--accent);
+      background: rgba(255, 138, 0, 0.15);
+      color: #FFA726;
+      box-shadow: 0 0 12px var(--orange-glow);
+    }
+
+    .step-pill.completed {
+      border-color: var(--primary-light);
+      background: rgba(76, 175, 80, 0.15);
+      color: #81C784;
+    }
+
+    .workflow-detail-box {
+      background: var(--surface-card);
+      border: 1px dashed var(--border-bright);
+      border-radius: 12px;
+      padding: 1.25rem 1.5rem;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+      margin-top: 1rem;
+    }
+
+    @media (max-width: 850px) {
+      .workflow-detail-box {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .detail-heading {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--accent);
+      font-weight: 700;
+      margin-bottom: 0.4rem;
+    }
+
+    .detail-title {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 0.5rem;
+    }
+
+    .detail-desc {
+      font-size: 0.9rem;
+      color: #CBD5E1;
+      line-height: 1.6;
+    }
+
+    .tech-pill-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-top: 0.75rem;
+    }
+
+    .tech-pill {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.75rem;
+      background: rgba(0,0,0,0.4);
+      border: 1px solid var(--border-bright);
+      padding: 0.25rem 0.6rem;
+      border-radius: 6px;
+      color: #A7F3D0;
+    }
+
+    /* Architecture Visual Canvas */
+    .arch-canvas-container {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 2rem;
+      box-shadow: 0 15px 40px rgba(0, 0, 0, 0.6);
+      position: relative;
+    }
+
+    .canvas-title {
+      font-size: 1.25rem;
+      font-weight: 700;
+      margin-bottom: 1.5rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .legend {
+      display: flex;
+      gap: 1.25rem;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    .legend-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 3px;
+    }
+
+    /* Architecture Interactive Grid */
+    .arch-layers {
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+      position: relative;
+    }
+
+    .layer-card {
+      background: var(--surface-card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 1.25rem 1.5rem;
+      position: relative;
+      transition: all 0.3s ease;
+    }
+
+    .layer-card.highlight {
+      border-color: var(--accent);
+      box-shadow: 0 0 25px var(--orange-glow);
+      transform: translateY(-2px);
+    }
+
+    .layer-card.active-layer {
+      border-color: var(--primary-light);
+      box-shadow: 0 0 25px var(--mint-glow);
+    }
+
+    .layer-badge {
+      font-size: 0.7rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #81C784;
+      display: inline-block;
+      margin-bottom: 0.5rem;
+    }
+
+    .layer-title {
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 1rem;
+    }
+
+    .nodes-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 1rem;
+    }
+
+    .arch-node {
+      background: rgba(12, 18, 14, 0.7);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 0.85rem 1rem;
+      position: relative;
+      transition: all 0.25s ease;
+      cursor: default;
+    }
+
+    .arch-node:hover {
+      border-color: var(--primary-light);
+      background: rgba(11, 107, 58, 0.15);
+    }
+
+    .arch-node.highlighted {
+      border-color: #FFA726 !important;
+      background: rgba(255, 138, 0, 0.2) !important;
+      box-shadow: 0 0 15px rgba(255, 138, 0, 0.35);
+    }
+
+    .node-name {
+      font-weight: 700;
+      font-size: 0.88rem;
+      color: #F8FAFC;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .node-sub {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      margin-top: 0.3rem;
+      line-height: 1.4;
+    }
+
+    /* Connection Animated SVG Flow */
+    .flow-connector {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 32px;
+      position: relative;
+    }
+
+    .flow-line {
+      width: 3px;
+      height: 100%;
+      background: linear-gradient(180deg, var(--border-bright), var(--primary-light));
+      position: relative;
+    }
+
+    .flow-pulse {
+      position: absolute;
+      width: 8px;
+      height: 8px;
+      background: #FF8A00;
+      border-radius: 50%;
+      left: -2.5px;
+      top: 0;
+      box-shadow: 0 0 8px #FF8A00;
+      animation: dropPulse 2s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+    }
+
+    @keyframes dropPulse {
+      0% { top: 0; opacity: 0; }
+      20% { opacity: 1; }
+      80% { opacity: 1; }
+      100% { top: 100%; opacity: 0; }
+    }
+
+    /* State Machine Grid */
+    .state-machine-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+      gap: 0.75rem;
+      margin-top: 1rem;
+    }
+
+    .state-box {
+      border-radius: 8px;
+      padding: 0.75rem 0.5rem;
+      text-align: center;
+      font-size: 0.75rem;
+      font-weight: 700;
+      border: 1px solid var(--border);
+      background: rgba(0,0,0,0.3);
+      color: var(--text-muted);
+      transition: all 0.3s ease;
+    }
+
+    .state-box.current {
+      border-color: #FFA726;
+      background: rgba(255, 138, 0, 0.2);
+      color: #FFF;
+      box-shadow: 0 0 15px rgba(255, 138, 0, 0.35);
+      transform: scale(1.05);
+    }
+
+    .state-box.passed {
+      border-color: #4CAF50;
+      background: rgba(76, 175, 80, 0.15);
+      color: #A7F3D0;
+    }
+
+    /* Auto Play Button */
+    .play-btn {
+      background: linear-gradient(135deg, #0B6B3A, #4CAF50);
+      color: white;
+      border: none;
+      padding: 0.55rem 1.25rem;
+      border-radius: 8px;
+      font-weight: 700;
+      font-size: 0.85rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      box-shadow: 0 4px 12px rgba(11, 107, 58, 0.4);
+      transition: all 0.2s;
+    }
+
+    .play-btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 16px rgba(76, 175, 80, 0.4);
+    }
+
+    /* Live Data Log */
+    .log-terminal {
+      background: #080D09;
+      border: 1px solid #1C2D20;
+      border-radius: 12px;
+      padding: 1rem;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.78rem;
+      color: #86EFAC;
+      height: 120px;
+      overflow-y: auto;
+    }
+
+    .log-line {
+      margin-bottom: 0.35rem;
+      display: flex;
+      gap: 0.75rem;
+    }
+
+    .log-time {
+      color: var(--text-muted);
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div>
+      <div class="brand-badge">
+        <span class="pulse-dot"></span>
+        <span>VEGORA MONOREPO ARCHITECTURE</span>
+      </div>
+      <h1>System Architecture & Live Order Lifecycle</h1>
+      <p class="subtitle">Multi-Branch Hyper-Local Vegetable Delivery with Flutter & Supabase</p>
+    </div>
+
+    <div style="display: flex; gap: 0.75rem; align-items: center;">
+      <button class="play-btn" id="playBtn" onclick="toggleAutoPlay()">
+        <span id="playIcon">▶</span>
+        <span id="playText">Auto-Play Lifecycle</span>
+      </button>
+      <div class="controls-panel">
+        <button class="tab-btn active" onclick="setRoleView('all')">🌐 Complete System</button>
+        <button class="tab-btn" onclick="setRoleView('customer')">🛒 Customer</button>
+        <button class="tab-btn" onclick="setRoleView('staff')">🏬 Branch Staff</button>
+        <button class="tab-btn" onclick="setRoleView('delivery')">🛵 Delivery</button>
+        <button class="tab-btn" onclick="setRoleView('admin')">⚙️ Admin Hub</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="main-container">
+
+    <!-- Interactive Stepper -->
+    <section class="stepper-card">
+      <div class="stepper-header">
+        <div class="stepper-title">
+          <span>⚡ Live Order State Progression</span>
+          <span style="font-size: 0.85rem; font-weight: normal; color: var(--text-muted);">(Click any step to inspect system reaction)</span>
+        </div>
+        <div class="step-pills" id="stepPillsContainer">
+          <!-- Dynamically filled -->
+        </div>
+      </div>
+
+      <!-- State Machine Visual Indicators -->
+      <div class="state-machine-grid" id="stateMachineGrid">
+        <div class="state-box" id="sb-NEW">1. NEW</div>
+        <div class="state-box" id="sb-ACCEPTED">2. ACCEPTED</div>
+        <div class="state-box" id="sb-PREPARING">3. PREPARING</div>
+        <div class="state-box" id="sb-READY_FOR_PICKUP">4. READY PICKUP</div>
+        <div class="state-box" id="sb-OUT_FOR_DELIVERY">5. IN TRANSIT</div>
+        <div class="state-box" id="sb-DELIVERED">6. DELIVERED</div>
+      </div>
+
+      <!-- Step Details View -->
+      <div class="workflow-detail-box" id="workflowDetails">
+        <div>
+          <div class="detail-heading" id="wfStepHeading">STEP 1 OF 6</div>
+          <div class="detail-title" id="wfStepTitle">Customer Browse & Cart Selection</div>
+          <div class="detail-desc" id="wfStepDesc">Customer selects branch store, explores vegetable catalog, and modifies cart with real-time stock validations.</div>
+          <div class="tech-pill-list" id="wfTechPills">
+            <span class="tech-pill">BranchProvider</span>
+            <span class="tech-pill">CartNotifier</span>
+            <span class="tech-pill">SupabaseCatalogRepository</span>
+          </div>
+        </div>
+
+        <div>
+          <div class="detail-heading">Backend & Realtime Stream Trigger</div>
+          <div class="log-terminal" id="logTerminal">
+            <div class="log-line"><span class="log-time">[10:30:00]</span> <span>System initialized: Supabase Realtime connected.</span></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Architecture Visual Canvas -->
+    <section class="arch-canvas-container">
+      <div class="canvas-title">
+        <span>🏗️ 5-Tier Layered Architecture</span>
+        <div class="legend">
+          <div class="legend-item"><div class="legend-dot" style="background: #4CAF50;"></div> Presentation</div>
+          <div class="legend-item"><div class="legend-dot" style="background: #0B6B3A;"></div> State Management</div>
+          <div class="legend-item"><div class="legend-dot" style="background: #2563EB;"></div> Repositories</div>
+          <div class="legend-item"><div class="legend-dot" style="background: #FF8A00;"></div> Supabase BaaS</div>
+        </div>
+      </div>
+
+      <div class="arch-layers">
+        
+        <!-- Tier 1: Client Frontends (Monorepo) -->
+        <div class="layer-card" id="layer-apps">
+          <span class="layer-badge">Tier 1: Multi-Platform Presentation & Apps</span>
+          <div class="layer-title">Flutter Monorepo Client Applications</div>
+          <div class="nodes-grid">
+            <div class="arch-node" id="node-customer-app" data-roles="customer all">
+              <div class="node-name">🛒 vegora_customer / Hub</div>
+              <div class="node-sub">Customer app: Branch selector, Category browsing, Instant Cart, Order Tracker</div>
+            </div>
+            <div class="arch-node" id="node-staff-app" data-roles="staff all">
+              <div class="node-name">🏬 Branch Staff Portal</div>
+              <div class="node-sub">In-store staging: Accept orders, bag veggies, weight check, handoff packaging</div>
+            </div>
+            <div class="arch-node" id="node-delivery-app" data-roles="delivery all">
+              <div class="node-name">🛵 vegora_delivery Agent</div>
+              <div class="node-sub">Delivery partner portal: Trip acceptance, transit route, doorstep confirmation</div>
+            </div>
+            <div class="arch-node" id="node-admin-app" data-roles="admin all">
+              <div class="node-name">⚙️ vegora_admin_web Hub</div>
+              <div class="node-sub">Admin dashboard: Multi-branch inventory, price manager, agent assignment, reports</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Flow Connector -->
+        <div class="flow-connector"><div class="flow-line"><div class="flow-pulse"></div></div></div>
+
+        <!-- Tier 2: Routing & State Management -->
+        <div class="layer-card" id="layer-state">
+          <span class="layer-badge">Tier 2: Navigation & Reactive State Orchestration</span>
+          <div class="layer-title">GoRouter RBAC Guards & Riverpod 3.x Providers</div>
+          <div class="nodes-grid">
+            <div class="arch-node" id="node-gorouter" data-roles="all customer staff delivery admin">
+              <div class="node-name">🚦 GoRouter + AuthListenable</div>
+              <div class="node-sub">Dynamic role guards: customer, branchStaff, deliveryStaff, branchAdmin, superAdmin</div>
+            </div>
+            <div class="arch-node" id="node-cart-provider" data-roles="all customer">
+              <div class="node-name">🧺 CartProvider & OrderProvider</div>
+              <div class="node-sub">Async state management for subtotal, delivery charges, item quantities</div>
+            </div>
+            <div class="arch-node" id="node-branch-provider" data-roles="all customer staff admin">
+              <div class="node-name">📍 BranchProvider</div>
+              <div class="node-sub">Geofenced branch context, active stock cache, local pricing multipliers</div>
+            </div>
+            <div class="arch-node" id="node-auth-provider" data-roles="all customer staff delivery admin">
+              <div class="node-name">🔐 AuthProvider</div>
+              <div class="node-sub">Supabase auth session tracking, role claims validation, JWT persistence</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Flow Connector -->
+        <div class="flow-connector"><div class="flow-line"><div class="flow-pulse"></div></div></div>
+
+        <!-- Tier 3: Repository & Domain Layer -->
+        <div class="layer-card" id="layer-repo">
+          <span class="layer-badge">Tier 3: Domain Entities & Repository Contracts</span>
+          <div class="layer-title">Shared Packages (vegora_models & vegora_repositories)</div>
+          <div class="nodes-grid">
+            <div class="arch-node" id="node-repo-order" data-roles="all customer staff delivery admin">
+              <div class="node-name">📦 SupabaseOrderRepository</div>
+              <div class="node-sub">Place orders, fetch branch queues, advance status (NEW → DELIVERED)</div>
+            </div>
+            <div class="arch-node" id="node-repo-catalog" data-roles="all customer admin">
+              <div class="node-name">🥬 SupabaseCatalogRepository</div>
+              <div class="node-sub">Produce catalog, pricing variations, categories, promotions & discounts</div>
+            </div>
+            <div class="arch-node" id="node-repo-branch" data-roles="all customer staff admin">
+              <div class="node-name">🏬 SupabaseBranchRepository</div>
+              <div class="node-sub">Branch coordinates, operating hours, delivery radius, staff roster</div>
+            </div>
+            <div class="arch-node" id="node-repo-auth" data-roles="all customer staff delivery admin">
+              <div class="node-name">🛡️ SupabaseAuthRepository</div>
+              <div class="node-sub">Sign In/Up, Google OAuth, password recovery, profile metadata</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Flow Connector -->
+        <div class="flow-connector"><div class="flow-line"><div class="flow-pulse"></div></div></div>
+
+        <!-- Tier 4: Supabase Backend Infrastructure -->
+        <div class="layer-card" id="layer-supabase">
+          <span class="layer-badge" style="color: #FFA726;">Tier 4: Cloud Backend Infrastructure</span>
+          <div class="layer-title">Supabase Backend as a Service (PostgreSQL & Realtime)</div>
+          <div class="nodes-grid">
+            <div class="arch-node" id="node-pg-orders" data-roles="all customer staff delivery admin">
+              <div class="node-name">🗄️ PostgreSQL Database</div>
+              <div class="node-sub">18+ tables: orders, order_items, branch_inventory, delivery_assignments, user_roles</div>
+            </div>
+            <div class="arch-node" id="node-rls-security" data-roles="all customer staff delivery admin">
+              <div class="node-name">🔒 Row Level Security (RLS)</div>
+              <div class="node-sub">Granular row policies: Customers see own orders; Staff sees branch orders; Admins manage all</div>
+            </div>
+            <div class="arch-node" id="node-realtime-cdc" data-roles="all customer staff delivery">
+              <div class="node-name">⚡ Supabase Realtime (CDC)</div>
+              <div class="node-sub">Postgres WebSocket broadcast on orders table; instant push to Customer & Driver apps</div>
+            </div>
+            <div class="arch-node" id="node-storage-media" data-roles="all customer admin">
+              <div class="node-name">🖼️ Supabase Storage</div>
+              <div class="node-sub">Buckets: product-images, categories, customer delivery photo proofs</div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+  </main>
+
+  <script>
+    const steps = [
+      {
+        id: "step1",
+        status: "NEW",
+        badge: "STEP 1 OF 6",
+        title: "Customer Catalog Browse & Cart Assembly",
+        desc: "Customer selects the nearest Vegora branch store, browses categories (Leafy Greens, Root Veggies, Organics), and adds fresh vegetables with quantity and unit validation.",
+        pills: ["BranchSelectionScreen", "CatalogScreen", "CartProvider", "SupabaseCatalogRepository"],
+        log: "SELECT * FROM products INNER JOIN branch_inventory WHERE branch_id = 'b_madurai_01'",
+        activeNodes: ["node-customer-app", "node-gorouter", "node-branch-provider", "node-cart-provider", "node-repo-catalog", "node-pg-orders"],
+        layers: ["layer-apps", "layer-state", "layer-repo", "layer-supabase"]
+      },
+      {
+        id: "step2",
+        status: "NEW",
+        badge: "STEP 2 OF 6",
+        title: "Instant Checkout & Order Dispatch (Status: NEW)",
+        desc: "Customer selects delivery address and places order. Supabase creates an atomic record in 'orders' and 'order_items' with initial status 'NEW'.",
+        pills: ["CheckoutScreen", "OrderRepository.placeOrder", "Supabase.from('orders').insert()"],
+        log: "INSERT INTO orders (id, branch_id, customer_id, total, status) VALUES ('ord_882', 'b_madurai_01', 'usr_9', 420.00, 'NEW')",
+        activeNodes: ["node-customer-app", "node-cart-provider", "node-repo-order", "node-pg-orders", "node-realtime-cdc"],
+        layers: ["layer-apps", "layer-state", "layer-repo", "layer-supabase"]
+      },
+      {
+        id: "step3",
+        status: "ACCEPTED",
+        badge: "STEP 3 OF 6",
+        title: "Branch Store Acceptance (Status: ACCEPTED)",
+        desc: "Branch store manager receives live WebSocket notification. The store accepts the incoming order and verifies inventory availability.",
+        pills: ["BranchStaffScreen", "Supabase Realtime Stream", "order_status_history"],
+        log: "UPDATE orders SET status = 'ACCEPTED' WHERE id = 'ord_882'; Triggering order_status_history log",
+        activeNodes: ["node-staff-app", "node-realtime-cdc", "node-repo-order", "node-pg-orders"],
+        layers: ["layer-apps", "layer-repo", "layer-supabase"]
+      },
+      {
+        id: "step4",
+        status: "PREPARING",
+        badge: "STEP 4 OF 6",
+        title: "In-Store Picking, Weighing & Packing (Status: PREPARING)",
+        desc: "Store staff hand-picks farm-fresh produce, weights bundles, grades produce quality, and seals eco-friendly bags.",
+        pills: ["BranchStaffScreen", "Packing Checklist", "branch_inventory update"],
+        log: "UPDATE branch_inventory SET stock_quantity = stock_quantity - 2.5 WHERE product_id = 'prod_carrot'",
+        activeNodes: ["node-staff-app", "node-repo-branch", "node-pg-orders"],
+        layers: ["layer-apps", "layer-repo", "layer-supabase"]
+      },
+      {
+        id: "step5",
+        status: "READY_FOR_PICKUP",
+        badge: "STEP 5 OF 6",
+        title: "Delivery Agent Assignment & Pickup (Status: READY_FOR_PICKUP)",
+        desc: "Bag sealed! Order is broadcast to nearby delivery partners. An agent accepts the assignment and navigates to the branch store for pickup.",
+        pills: ["DeliveryScreen", "AdminDeliveryAssignments", "delivery_assignments table"],
+        log: "INSERT INTO delivery_assignments (order_id, delivery_partner_id, status) VALUES ('ord_882', 'dp_selvam', 'ASSIGNED')",
+        activeNodes: ["node-delivery-app", "node-admin-app", "node-repo-order", "node-pg-orders", "node-realtime-cdc"],
+        layers: ["layer-apps", "layer-repo", "layer-supabase"]
+      },
+      {
+        id: "step6",
+        status: "OUT_FOR_DELIVERY",
+        badge: "STEP 6 OF 6",
+        title: "Doorstep Transit & Final Delivery (Status: DELIVERED)",
+        desc: "Agent arrives at customer doorstep, completes handoff, and confirms delivery. Customer order screen updates instantly to 'DELIVERED'.",
+        pills: ["DeliveryScreen", "OrderTrackingScreen", "Realtime CDC Stream", "DELIVERED"],
+        log: "UPDATE orders SET status = 'DELIVERED', delivered_at = NOW() WHERE id = 'ord_882'; Complete!",
+        activeNodes: ["node-delivery-app", "node-customer-app", "node-realtime-cdc", "node-repo-order", "node-pg-orders"],
+        layers: ["layer-apps", "layer-state", "layer-repo", "layer-supabase"]
+      }
+    ];
+
+    let currentStepIndex = 0;
+    let autoPlayInterval = null;
+
+    function renderStepPills() {
+      const container = document.getElementById("stepPillsContainer");
+      container.innerHTML = "";
+      steps.forEach((step, idx) => {
+        const pill = document.createElement("button");
+        pill.className = `step-pill ${idx === currentStepIndex ? 'active' : ''} ${idx < currentStepIndex ? 'completed' : ''}`;
+        pill.innerHTML = `<span>${idx + 1}.</span> <span>${step.title.split('(')[0].trim()}</span>`;
+        pill.onclick = () => goToStep(idx);
+        container.appendChild(pill);
+      });
+    }
+
+    function goToStep(idx) {
+      currentStepIndex = idx;
+      const step = steps[idx];
+
+      // Update pills
+      renderStepPills();
+
+      // Update state boxes
+      const stateStatuses = ["NEW", "ACCEPTED", "PREPARING", "READY_FOR_PICKUP", "OUT_FOR_DELIVERY", "DELIVERED"];
+      const currentStatusIdx = stateStatuses.indexOf(step.status === "READY_FOR_PICKUP" ? "READY_FOR_PICKUP" : (idx === 5 ? "DELIVERED" : step.status));
+
+      stateStatuses.forEach((st, i) => {
+        const box = document.getElementById(`sb-${st}`);
+        if (!box) return;
+        box.classList.remove('current', 'passed');
+        if (i < currentStatusIdx || (idx === 5 && i <= 5)) {
+          box.classList.add('passed');
+        } else if (i === currentStatusIdx) {
+          box.classList.add('current');
+        }
+      });
+
+      // Update text descriptions
+      document.getElementById("wfStepHeading").innerText = step.badge;
+      document.getElementById("wfStepTitle").innerText = step.title;
+      document.getElementById("wfStepDesc").innerText = step.desc;
+
+      const techList = document.getElementById("wfTechPills");
+      techList.innerHTML = "";
+      step.pills.forEach(p => {
+        const span = document.createElement("span");
+        span.className = "tech-pill";
+        span.innerText = p;
+        techList.appendChild(span);
+      });
+
+      // Append log
+      const terminal = document.getElementById("logTerminal");
+      const timeStr = new Date().toLocaleTimeString();
+      const logDiv = document.createElement("div");
+      logDiv.className = "log-line";
+      logDiv.innerHTML = `<span class="log-time">[${timeStr}]</span> <span>${step.log}</span>`;
+      terminal.appendChild(logDiv);
+      terminal.scrollTop = terminal.scrollHeight;
+
+      // Highlight Architecture Nodes & Layers
+      document.querySelectorAll(".arch-node").forEach(node => node.classList.remove("highlighted"));
+      document.querySelectorAll(".layer-card").forEach(l => l.classList.remove("highlight"));
+
+      step.activeNodes.forEach(nid => {
+        const el = document.getElementById(nid);
+        if (el) el.classList.add("highlighted");
+      });
+
+      step.layers.forEach(lid => {
+        const el = document.getElementById(lid);
+        if (el) el.classList.add("highlight");
+      });
+    }
+
+    function toggleAutoPlay() {
+      const btn = document.getElementById("playBtn");
+      const icon = document.getElementById("playIcon");
+      const text = document.getElementById("playText");
+
+      if (autoPlayInterval) {
+        clearInterval(autoPlayInterval);
+        autoPlayInterval = null;
+        icon.innerText = "▶";
+        text.innerText = "Auto-Play Lifecycle";
+      } else {
+        icon.innerText = "⏸";
+        text.innerText = "Pause Lifecycle";
+        autoPlayInterval = setInterval(() => {
+          let next = (currentStepIndex + 1) % steps.length;
+          goToStep(next);
+        }, 3200);
+      }
+    }
+
+    function setRoleView(role) {
+      document.querySelectorAll(".controls-panel .tab-btn").forEach(btn => btn.classList.remove("active"));
+      event.target.classList.add("active");
+
+      document.querySelectorAll(".arch-node").forEach(node => {
+        const roles = (node.dataset.roles || "").split(" ");
+        if (role === "all" || roles.includes(role)) {
+          node.style.opacity = "1";
+          node.style.filter = "none";
+        } else {
+          node.style.opacity = "0.25";
+          node.style.filter = "grayscale(100%)";
+        }
+      });
+    }
+
+    // Initialize
+    goToStep(0);
+  </script>
+</body>
+</html>

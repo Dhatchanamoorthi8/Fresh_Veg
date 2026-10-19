@@ -2,8 +2,12 @@ import 'product.dart';
 
 class CartItem {
   final Product product;
+
+  /// Quantity in canonical integer grams (for weight products) or piece count (for piece/bunch products).
   final int quantity;
   final String branchId;
+
+  /// Selling price in paise (per kg for weight products, or per piece/bunch for count products).
   final int unitPricePaise;
 
   const CartItem({
@@ -13,7 +17,17 @@ class CartItem {
     required this.unitPricePaise,
   });
 
-  int get totalPaise => unitPricePaise * quantity;
+  /// Authoritative line total calculation in paise:
+  /// Weight products: (unitPricePaisePerKg * quantityGrams) / 1000
+  /// Count products:  unitPricePaisePerPiece * quantity
+  int get totalPaise => product.calculatePricePaise(quantity, unitPricePaise);
+
+  /// Convenient alias for totalPaise
+  int get lineTotalPaise => totalPaise;
+
+  /// Human-readable quantity string (e.g. "500 g", "1.5 kg", "2 pcs" or Tamil equivalents)
+  String formattedQuantity({bool isTamil = false}) =>
+      product.formatQuantity(quantity, isTamil: isTamil);
 
   CartItem copyWith({
     Product? product,
