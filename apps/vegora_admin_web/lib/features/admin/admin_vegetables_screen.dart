@@ -8,6 +8,7 @@ import 'package:vegora_core/vegora_core.dart';
 import 'package:vegora_models/vegora_models.dart';
 import 'package:vegora_repositories/vegora_repositories.dart';
 import 'package:vegora_ui/vegora_ui.dart';
+
 import 'admin_shell.dart';
 import 'widgets/admin_status_badge.dart';
 import 'widgets/admin_table_container.dart';
@@ -178,7 +179,8 @@ class _AdminVegetablesScreenState extends ConsumerState<AdminVegetablesScreen> {
             : basePriceCtrl.text,
       );
       final rawStock = existingInv?.stockQuantity ?? 25;
-      final displayStock = (existingProduct != null &&
+      final displayStock =
+          (existingProduct != null &&
               existingProduct.isWeightBased &&
               rawStock >= 1000)
           ? (rawStock / 1000).toStringAsFixed(rawStock % 1000 == 0 ? 0 : 1)
@@ -364,9 +366,12 @@ class _AdminVegetablesScreenState extends ConsumerState<AdminVegetablesScreen> {
                               if (v != null) {
                                 setDialogState(() {
                                   selectedUnitType = v;
-                                  if (v == 'count' && selectedUnit.contains('kg')) {
+                                  if (v == 'count' &&
+                                      selectedUnit.contains('kg')) {
                                     selectedUnit = '1 pc';
-                                  } else if (v == 'weight' && !selectedUnit.contains('g') && !selectedUnit.contains('kg')) {
+                                  } else if (v == 'weight' &&
+                                      !selectedUnit.contains('g') &&
+                                      !selectedUnit.contains('kg')) {
                                     selectedUnit = '1 kg';
                                   }
                                 });
@@ -898,8 +903,12 @@ class _AdminVegetablesScreenState extends ConsumerState<AdminVegetablesScreen> {
                           categoryId: selectedCategory,
                           unit: selectedUnit,
                           unitType: selectedUnitType,
-                          baseUnit: selectedUnitType == 'weight' ? 'g' : 'piece',
-                          minOrderQuantity: selectedUnitType == 'weight' ? 100 : 1,
+                          baseUnit: selectedUnitType == 'weight'
+                              ? 'g'
+                              : 'piece',
+                          minOrderQuantity: selectedUnitType == 'weight'
+                              ? 100
+                              : 1,
                           quantityStep: selectedUnitType == 'weight' ? 100 : 1,
                           allowCustomQuantity: true,
                           description: descCtrl.text.trim(),
@@ -923,7 +932,8 @@ class _AdminVegetablesScreenState extends ConsumerState<AdminVegetablesScreen> {
                         for (final b in _branches.where((b) => b.isActive)) {
                           final isSelected = branchSelections[b.id] ?? false;
                           if (isSelected) {
-                            final stockInput = double.tryParse(
+                            final stockInput =
+                                double.tryParse(
                                   branchStocks[b.id]?.text.trim() ?? '',
                                 ) ??
                                 25.0;
@@ -1359,7 +1369,10 @@ class _AdminVegetablesScreenState extends ConsumerState<AdminVegetablesScreen> {
                 ),
                 const SizedBox(width: 12),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 2),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 2,
+                  ),
                   decoration: BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(8),
@@ -1403,7 +1416,10 @@ class _AdminVegetablesScreenState extends ConsumerState<AdminVegetablesScreen> {
                 ),
                 const SizedBox(width: 12),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 2),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 2,
+                  ),
                   decoration: BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(8),
@@ -1418,7 +1434,10 @@ class _AdminVegetablesScreenState extends ConsumerState<AdminVegetablesScreen> {
                         color: Color(0xFF1E293B),
                       ),
                       items: const [
-                        DropdownMenuItem(value: 'ALL', child: Text('All Status')),
+                        DropdownMenuItem(
+                          value: 'ALL',
+                          child: Text('All Status'),
+                        ),
                         DropdownMenuItem(
                           value: 'ACTIVE',
                           child: Text('Active Only'),
@@ -1456,7 +1475,10 @@ class _AdminVegetablesScreenState extends ConsumerState<AdminVegetablesScreen> {
                   icon: const Icon(Icons.add_rounded, size: 19),
                   label: const Text(
                     'Add Vegetable',
-                    style: TextStyle(fontWeight: FontWeight.w700, fontSize: 13.5),
+                    style: TextStyle(
+                      fontWeight: FontWeight.w700,
+                      fontSize: 13.5,
+                    ),
                   ),
                   onPressed: () => _showAddEditVegetableModal(),
                 ),
@@ -1690,9 +1712,7 @@ class _AdminVegetablesScreenState extends ConsumerState<AdminVegetablesScreen> {
                   ),
                   if (prod.originalPricePaise != null)
                     Text(
-                      CurrencyFormatter.formatPaise(
-                        prod.originalPricePaise!,
-                      ),
+                      CurrencyFormatter.formatPaise(prod.originalPricePaise!),
                       style: const TextStyle(
                         fontSize: 11,
                         decoration: TextDecoration.lineThrough,

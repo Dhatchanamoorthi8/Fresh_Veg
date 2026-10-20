@@ -1,4 +1,5 @@
 import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -60,8 +61,9 @@ class AdminAuthListenable extends ChangeNotifier {
   }
 }
 
-final GlobalKey<NavigatorState> _adminNavigatorKey =
-    GlobalKey<NavigatorState>(debugLabel: 'adminRoot');
+final GlobalKey<NavigatorState> _adminNavigatorKey = GlobalKey<NavigatorState>(
+  debugLabel: 'adminRoot',
+);
 
 final adminRouter = GoRouter(
   navigatorKey: _adminNavigatorKey,
@@ -73,7 +75,8 @@ final adminRouter = GoRouter(
       final isAuthenticated = user != null;
       final loc = state.matchedLocation;
 
-      final isAuthScreen = loc == '/admin/login' ||
+      final isAuthScreen =
+          loc == '/admin/login' ||
           loc == '/staff/login' ||
           loc == '/admin/forgot-password' ||
           loc == '/admin/reset-password';
@@ -92,10 +95,7 @@ final adminRouter = GoRouter(
     return null;
   },
   routes: [
-    GoRoute(
-      path: '/',
-      redirect: (context, state) => '/admin',
-    ),
+    GoRoute(path: '/', redirect: (context, state) => '/admin'),
     GoRoute(
       path: '/admin/login',
       builder: (context, state) => const AdminLoginScreen(),
@@ -112,10 +112,7 @@ final adminRouter = GoRouter(
       path: '/admin',
       builder: (context, state) => const AdminDashboardScreen(),
     ),
-    GoRoute(
-      path: '/admin/dashboard',
-      redirect: (context, state) => '/admin',
-    ),
+    GoRoute(path: '/admin/dashboard', redirect: (context, state) => '/admin'),
     GoRoute(
       path: '/admin/branches',
       builder: (context, state) => const AdminBranchesScreen(),
@@ -174,9 +171,6 @@ final adminRouter = GoRouter(
       path: '/staff',
       builder: (context, state) => const BranchStaffScreen(),
     ),
-    GoRoute(
-      path: '/staff/dashboard',
-      redirect: (context, state) => '/staff',
-    ),
+    GoRoute(path: '/staff/dashboard', redirect: (context, state) => '/staff'),
   ],
 );

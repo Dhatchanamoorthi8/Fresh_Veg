@@ -72,12 +72,13 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         final resolvedName = (profile?.fullName.trim().isNotEmpty ?? false)
             ? profile!.fullName.trim()
             : (user.userMetadata?['full_name'] as String? ??
-                user.userMetadata?['name'] as String? ??
-                user.email?.split('@').first ??
-                'Customer');
+                  user.userMetadata?['name'] as String? ??
+                  user.email?.split('@').first ??
+                  'Customer');
         ref.read(customerNameProvider.notifier).setName(resolvedName);
 
-        final resolvedPhone = profile?.phone ??
+        final resolvedPhone =
+            profile?.phone ??
             user.userMetadata?['phone'] as String? ??
             user.phone;
         if (resolvedPhone != null) {
@@ -150,12 +151,13 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
           final resolvedName = (profile?.fullName.trim().isNotEmpty ?? false)
               ? profile!.fullName.trim()
               : (user.userMetadata?['full_name'] as String? ??
-                  user.userMetadata?['name'] as String? ??
-                  user.email?.split('@').first ??
-                  'Customer');
+                    user.userMetadata?['name'] as String? ??
+                    user.email?.split('@').first ??
+                    'Customer');
           ref.read(customerNameProvider.notifier).setName(resolvedName);
 
-          final resolvedPhone = profile?.phone ??
+          final resolvedPhone =
+              profile?.phone ??
               user.userMetadata?['phone'] as String? ??
               user.phone;
           if (resolvedPhone != null) {
@@ -176,11 +178,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
-            colors: [
-              Color(0xFFE8F5E9),
-              Color(0xFFF7FAF5),
-              Colors.white,
-            ],
+            colors: [Color(0xFFE8F5E9), Color(0xFFF7FAF5), Colors.white],
             stops: [0.0, 0.35, 1.0],
           ),
         ),
@@ -235,7 +233,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                             ),
                             boxShadow: [
                               BoxShadow(
-                                color: AppColors.primary.withValues(alpha: 0.06),
+                                color: AppColors.primary.withValues(
+                                  alpha: 0.06,
+                                ),
                                 blurRadius: 8,
                                 offset: const Offset(0, 2),
                               ),
@@ -396,7 +396,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                                   color: AppColors.errorContainer,
                                   borderRadius: BorderRadius.circular(12),
                                   border: Border.all(
-                                    color: AppColors.error.withValues(alpha: 0.4),
+                                    color: AppColors.error.withValues(
+                                      alpha: 0.4,
+                                    ),
                                   ),
                                 ),
                                 child: Row(
@@ -571,11 +573,13 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                                 ],
                               ),
                               child: FilledButton(
-                                onPressed: _isLoading ? null : _handleEmailSignIn,
+                                onPressed: _isLoading
+                                    ? null
+                                    : _handleEmailSignIn,
                                 style: FilledButton.styleFrom(
                                   backgroundColor: AppColors.primary,
-                                  disabledBackgroundColor:
-                                      AppColors.primary.withValues(alpha: 0.6),
+                                  disabledBackgroundColor: AppColors.primary
+                                      .withValues(alpha: 0.6),
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(14),
                                   ),
@@ -669,11 +673,14 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                               child: Material(
                                 color: Colors.transparent,
                                 child: InkWell(
-                                  onTap: _isLoading ? null : _handleGoogleSignIn,
+                                  onTap: _isLoading
+                                      ? null
+                                      : _handleGoogleSignIn,
                                   borderRadius: BorderRadius.circular(14),
                                   child: const Center(
                                     child: Row(
-                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
                                       children: [
                                         GoogleLogo(size: 22),
                                         SizedBox(width: 12),

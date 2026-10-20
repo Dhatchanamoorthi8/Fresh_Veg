@@ -188,10 +188,8 @@ class _AdminLoginScreenState extends ConsumerState<AdminLoginScreen> {
                         isDense: true,
                         border: OutlineInputBorder(),
                       ),
-                      validator: (v) => EmailValidator.validate(
-                        v,
-                        fieldName: 'admin email',
-                      ),
+                      validator: (v) =>
+                          EmailValidator.validate(v, fieldName: 'admin email'),
                     ),
                     const SizedBox(height: 12),
                     TextFormField(
@@ -298,7 +296,6 @@ class _AdminLoginScreenState extends ConsumerState<AdminLoginScreen> {
       ),
     );
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -467,7 +464,10 @@ class _AdminLoginScreenState extends ConsumerState<AdminLoginScreen> {
                                       height: 1.35,
                                     ),
                                   ),
-                                  if (_errorMessage!.contains('Invalid email address') && _bootstrapAvailable) ...[
+                                  if (_errorMessage!.contains(
+                                        'Invalid email address',
+                                      ) &&
+                                      _bootstrapAvailable) ...[
                                     const SizedBox(height: 8),
                                     const Text(
                                       'First time setting up? The database has no administrator provisioned yet.',
@@ -481,14 +481,25 @@ class _AdminLoginScreenState extends ConsumerState<AdminLoginScreen> {
                                     OutlinedButton.icon(
                                       style: OutlinedButton.styleFrom(
                                         foregroundColor: Colors.amber.shade900,
-                                        side: BorderSide(color: Colors.amber.shade600),
-                                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                                        side: BorderSide(
+                                          color: Colors.amber.shade600,
+                                        ),
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 10,
+                                          vertical: 4,
+                                        ),
                                         visualDensity: VisualDensity.compact,
                                       ),
-                                      icon: const Icon(Icons.key_rounded, size: 14),
+                                      icon: const Icon(
+                                        Icons.key_rounded,
+                                        size: 14,
+                                      ),
                                       label: const Text(
                                         'Provision Root Administrator Now',
-                                        style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold),
+                                        style: TextStyle(
+                                          fontSize: 11,
+                                          fontWeight: FontWeight.bold,
+                                        ),
                                       ),
                                       onPressed: _showBootstrapModal,
                                     ),
@@ -501,7 +512,8 @@ class _AdminLoginScreenState extends ConsumerState<AdminLoginScreen> {
                               color: AppColors.error,
                               padding: EdgeInsets.zero,
                               constraints: const BoxConstraints(),
-                              onPressed: () => setState(() => _errorMessage = null),
+                              onPressed: () =>
+                                  setState(() => _errorMessage = null),
                             ),
                           ],
                         ),
@@ -628,7 +640,10 @@ class _AdminLoginScreenState extends ConsumerState<AdminLoginScreen> {
                         ),
                         const Padding(
                           padding: EdgeInsets.symmetric(horizontal: 4),
-                          child: Text('•', style: TextStyle(color: AppColors.border)),
+                          child: Text(
+                            '•',
+                            style: TextStyle(color: AppColors.border),
+                          ),
                         ),
                         TextButton.icon(
                           icon: const Icon(Icons.refresh_rounded, size: 16),

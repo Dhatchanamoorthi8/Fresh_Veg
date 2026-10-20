@@ -36,9 +36,7 @@ class AdminPaginationBar extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
       decoration: BoxDecoration(
         color: Colors.white,
-        border: Border(
-          top: BorderSide(color: AppColors.neutral200, width: 1),
-        ),
+        border: Border(top: BorderSide(color: AppColors.neutral200, width: 1)),
       ),
       child: LayoutBuilder(
         builder: (context, constraints) {
@@ -49,10 +47,7 @@ class AdminPaginationBar extends StatelessWidget {
             children: [
               Text(
                 'Showing ',
-                style: TextStyle(
-                  fontSize: 13,
-                  color: AppColors.neutral600,
-                ),
+                style: TextStyle(fontSize: 13, color: AppColors.neutral600),
               ),
               Text(
                 '$startItem–$endItem',
@@ -64,10 +59,7 @@ class AdminPaginationBar extends StatelessWidget {
               ),
               Text(
                 ' of ',
-                style: TextStyle(
-                  fontSize: 13,
-                  color: AppColors.neutral600,
-                ),
+                style: TextStyle(fontSize: 13, color: AppColors.neutral600),
               ),
               Text(
                 '$totalItems',
@@ -79,24 +71,14 @@ class AdminPaginationBar extends StatelessWidget {
               ),
               Text(
                 ' $itemName',
-                style: TextStyle(
-                  fontSize: 13,
-                  color: AppColors.neutral600,
-                ),
+                style: TextStyle(fontSize: 13, color: AppColors.neutral600),
               ),
               const SizedBox(width: 16),
-              Container(
-                height: 16,
-                width: 1,
-                color: AppColors.neutral300,
-              ),
+              Container(height: 16, width: 1, color: AppColors.neutral300),
               const SizedBox(width: 16),
               Text(
                 'Per page: ',
-                style: TextStyle(
-                  fontSize: 12.5,
-                  color: AppColors.neutral600,
-                ),
+                style: TextStyle(fontSize: 12.5, color: AppColors.neutral600),
               ),
               DropdownButtonHideUnderline(
                 child: DropdownButton<int>(
@@ -113,10 +95,7 @@ class AdminPaginationBar extends StatelessWidget {
                     color: AppColors.neutral800,
                   ),
                   items: availableRowsPerPage.map((n) {
-                    return DropdownMenuItem<int>(
-                      value: n,
-                      child: Text('$n'),
-                    );
+                    return DropdownMenuItem<int>(value: n, child: Text('$n'));
                   }).toList(),
                   onChanged: (val) {
                     if (val != null) {
@@ -146,7 +125,10 @@ class AdminPaginationBar extends StatelessWidget {
                         ? AppColors.neutral300
                         : AppColors.neutral200,
                   ),
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 8,
+                  ),
                   visualDensity: VisualDensity.compact,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(8),
@@ -173,7 +155,10 @@ class AdminPaginationBar extends StatelessWidget {
                         ? AppColors.neutral300
                         : AppColors.neutral200,
                   ),
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 8,
+                  ),
                   visualDensity: VisualDensity.compact,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(8),
@@ -204,10 +189,7 @@ class AdminPaginationBar extends StatelessWidget {
 
           return Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              countSummary,
-              pageControls,
-            ],
+            children: [countSummary, pageControls],
           );
         },
       ),
@@ -240,7 +222,10 @@ class AdminPaginationBar extends StatelessWidget {
             padding: EdgeInsets.symmetric(horizontal: 4),
             child: Text(
               '…',
-              style: TextStyle(fontWeight: FontWeight.bold, color: AppColors.neutral400),
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                color: AppColors.neutral400,
+              ),
             ),
           ),
         );
@@ -258,7 +243,10 @@ class AdminPaginationBar extends StatelessWidget {
             padding: EdgeInsets.symmetric(horizontal: 4),
             child: Text(
               '…',
-              style: TextStyle(fontWeight: FontWeight.bold, color: AppColors.neutral400),
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                color: AppColors.neutral400,
+              ),
             ),
           ),
         );

@@ -50,6 +50,7 @@ class _OrdersScreenState extends ConsumerState<OrdersScreen>
         .toList();
 
     return Scaffold(
+      backgroundColor: AppColors.background,
       appBar: AppBar(
         title: Text(isTamil ? 'என் ஆர்டர்கள்' : 'My Orders'),
         bottom: TabBar(

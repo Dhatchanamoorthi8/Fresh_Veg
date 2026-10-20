@@ -110,7 +110,10 @@ class Product {
   /// Calculates authoritative line price in paise without floating-point errors.
   /// For weight products: (pricePerKg * quantityGrams) / 1000
   /// For count products: pricePerPiece * quantity
-  int calculatePricePaise(int quantityGramsOrCount, int pricePaisePerKgOrPiece) {
+  int calculatePricePaise(
+    int quantityGramsOrCount,
+    int pricePaisePerKgOrPiece,
+  ) {
     if (quantityGramsOrCount <= 0 || pricePaisePerKgOrPiece <= 0) return 0;
     if (isWeightBased) {
       return ((pricePaisePerKgOrPiece * quantityGramsOrCount) / 1000.0).round();
@@ -123,10 +126,14 @@ class Product {
     if (isWeightBased) {
       if (quantityGramsOrCount >= 1000 && quantityGramsOrCount % 100 == 0) {
         final kg = quantityGramsOrCount / 1000;
-        final kgStr = kg % 1 == 0 ? kg.toInt().toString() : kg.toStringAsFixed(1);
+        final kgStr = kg % 1 == 0
+            ? kg.toInt().toString()
+            : kg.toStringAsFixed(1);
         return isTamil ? '$kgStr கிலோ' : '$kgStr kg';
       }
-      return isTamil ? '$quantityGramsOrCount கிராம்' : '$quantityGramsOrCount g';
+      return isTamil
+          ? '$quantityGramsOrCount கிராம்'
+          : '$quantityGramsOrCount g';
     } else if (isBunchBased) {
       return isTamil
           ? '$quantityGramsOrCount கட்டு'
@@ -168,15 +175,20 @@ class Product {
     final inferredType = (rawUnit.contains('kg') || rawUnit.contains('g'))
         ? 'WEIGHT'
         : (rawUnit.contains('bunch') ? 'BUNCH' : 'COUNT');
-    final resolvedUnitType = (json['unit_type'] as String?)?.toUpperCase() ?? inferredType;
-    final resolvedBaseUnit = json['base_unit'] as String? ??
-        (resolvedUnitType == 'WEIGHT' ? 'g' : (resolvedUnitType == 'BUNCH' ? 'bunch' : 'pc'));
+    final resolvedUnitType =
+        (json['unit_type'] as String?)?.toUpperCase() ?? inferredType;
+    final resolvedBaseUnit =
+        json['base_unit'] as String? ??
+        (resolvedUnitType == 'WEIGHT'
+            ? 'g'
+            : (resolvedUnitType == 'BUNCH' ? 'bunch' : 'pc'));
     final defaultMin = resolvedUnitType == 'WEIGHT' ? 100 : 1;
     final defaultStep = resolvedUnitType == 'WEIGHT' ? 50 : 1;
 
     return Product(
       id: json['id'] as String,
-      sku: json['sku'] as String? ?? (json['id'] as String? ?? '').toUpperCase(),
+      sku:
+          json['sku'] as String? ?? (json['id'] as String? ?? '').toUpperCase(),
       name: json['name'] as String,
       nameTa: json['name_ta'] as String? ?? '',
       localName: json['local_name'] as String? ?? '',
@@ -184,7 +196,8 @@ class Product {
       unit: rawUnit,
       unitType: resolvedUnitType,
       baseUnit: resolvedBaseUnit,
-      minOrderQuantity: (json['min_order_quantity'] as num?)?.toInt() ?? defaultMin,
+      minOrderQuantity:
+          (json['min_order_quantity'] as num?)?.toInt() ?? defaultMin,
       quantityStep: (json['quantity_step'] as num?)?.toInt() ?? defaultStep,
       allowCustomQuantity: json['allow_custom_quantity'] as bool? ?? true,
       description: json['description'] as String? ?? '',

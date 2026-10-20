@@ -11,7 +11,10 @@ class Cart {
   bool get isNotEmpty => items.isNotEmpty;
 
   /// Counts the distinct items / packs in cart for badges
-  int get totalItemCount => items.fold(0, (sum, item) => sum + (item.product.isWeightBased ? 1 : item.quantity));
+  int get totalItemCount => items.fold(
+    0,
+    (sum, item) => sum + (item.product.isWeightBased ? 1 : item.quantity),
+  );
   int get uniqueProductCount => items.length;
 
   int get subtotalPaise => items.fold(0, (sum, item) => sum + item.totalPaise);

@@ -83,7 +83,8 @@ class _BranchSelectionScreenState extends ConsumerState<BranchSelectionScreen> {
                           color: AppColors.textSecondary,
                         ),
                       ),
-                      if (currentBranch.latitude != null && currentBranch.longitude != null) ...[
+                      if (currentBranch.latitude != null &&
+                          currentBranch.longitude != null) ...[
                         const SizedBox(height: 3),
                         Row(
                           children: [
@@ -309,7 +310,8 @@ class _BranchSelectionScreenState extends ConsumerState<BranchSelectionScreen> {
                         ),
                       ],
                     ),
-                    if (branch.latitude != null && branch.longitude != null) ...[
+                    if (branch.latitude != null &&
+                        branch.longitude != null) ...[
                       const SizedBox(height: 4),
                       Row(
                         children: [
@@ -593,7 +595,8 @@ class _BranchSelectionScreenState extends ConsumerState<BranchSelectionScreen> {
                               color: AppColors.textMuted,
                             ),
                           ),
-                          if (addr.latitude != null && addr.longitude != null) ...[
+                          if (addr.latitude != null &&
+                              addr.longitude != null) ...[
                             const SizedBox(height: 5),
                             Container(
                               padding: const EdgeInsets.symmetric(
@@ -682,9 +685,9 @@ class _BranchSelectionScreenState extends ConsumerState<BranchSelectionScreen> {
       );
     } catch (error) {
       if (!context.mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Could not save address: $error')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Could not save address: $error')));
     }
   }
 
@@ -694,7 +697,8 @@ class _BranchSelectionScreenState extends ConsumerState<BranchSelectionScreen> {
   }) async {
     final formKey = GlobalKey<FormState>();
     final currentBranch = ref.read(selectedBranchProvider);
-    final branches = ref.read(branchesListProvider).value ??
+    final branches =
+        ref.read(branchesListProvider).value ??
         MockBranchRepository.sampleBranches;
 
     final labelController = TextEditingController(text: 'Home');
@@ -802,10 +806,12 @@ class _BranchSelectionScreenState extends ConsumerState<BranchSelectionScreen> {
                                 color: Colors.white,
                                 borderRadius: BorderRadius.circular(8),
                                 border: Border.all(
-                                  color: selectedDbBranch?.id == currentBranch.id
+                                  color:
+                                      selectedDbBranch?.id == currentBranch.id
                                       ? AppColors.primary
                                       : AppColors.border,
-                                  width: selectedDbBranch?.id == currentBranch.id
+                                  width:
+                                      selectedDbBranch?.id == currentBranch.id
                                       ? 1.5
                                       : 1,
                                 ),
@@ -997,8 +1003,8 @@ class _BranchSelectionScreenState extends ConsumerState<BranchSelectionScreen> {
         ),
         validator: required
             ? (value) => value == null || value.trim().isEmpty
-                ? 'Please enter ${label.toLowerCase()}'
-                : null
+                  ? 'Please enter ${label.toLowerCase()}'
+                  : null
             : null,
       ),
     );

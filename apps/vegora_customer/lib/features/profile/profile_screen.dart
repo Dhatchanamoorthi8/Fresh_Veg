@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:vegora_core/vegora_core.dart';
 import 'package:vegora_models/vegora_models.dart';
 import 'package:vegora_repositories/vegora_repositories.dart';
+
 import '../../app/customer_router.dart';
 
 class ProfileScreen extends ConsumerWidget {
@@ -18,9 +19,7 @@ class ProfileScreen extends ConsumerWidget {
     final authUser = ref.watch(currentSupabaseUserProvider);
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('My Account'),
-      ),
+      appBar: AppBar(title: const Text('My Account')),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
         child: Column(
@@ -362,7 +361,8 @@ class ProfileScreen extends ConsumerWidget {
                     _buildTile(
                       icon: Icons.help_outline_rounded,
                       title: 'Help & FAQ',
-                      subtitle: 'Multi-branch ordering rules and delivery times',
+                      subtitle:
+                          'Multi-branch ordering rules and delivery times',
                       onTap: () => _showHelpDialog(context),
                     ),
                   ],

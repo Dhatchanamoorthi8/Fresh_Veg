@@ -42,9 +42,7 @@ class _CatalogScreenState extends ConsumerState<CatalogScreen> {
     final currentBranch = ref.watch(selectedBranchProvider);
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Vegetable & Fruit Mandi'),
-      ),
+      appBar: AppBar(title: const Text('Vegetable & Fruit Mandi')),
       body: Column(
         children: [
           // Search & Filter Bar

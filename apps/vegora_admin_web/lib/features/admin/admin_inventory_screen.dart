@@ -5,6 +5,7 @@ import 'package:vegora_core/vegora_core.dart';
 import 'package:vegora_models/vegora_models.dart';
 import 'package:vegora_repositories/vegora_repositories.dart';
 import 'package:vegora_ui/vegora_ui.dart';
+
 import 'admin_shell.dart';
 
 class AdminInventoryScreen extends ConsumerStatefulWidget {
@@ -149,10 +150,7 @@ class _AdminInventoryScreenState extends ConsumerState<AdminInventoryScreen> {
                     final label = p.nameTa.isNotEmpty
                         ? '${p.name} (${p.nameTa}) - ${p.unit}'
                         : '${p.name} (${p.unit})';
-                    return DropdownMenuItem(
-                      value: p,
-                      child: Text(label),
-                    );
+                    return DropdownMenuItem(value: p, child: Text(label));
                   }).toList(),
                   onChanged: (v) {
                     if (v != null) {
@@ -303,18 +301,23 @@ class _AdminInventoryScreenState extends ConsumerState<AdminInventoryScreen> {
     final inv = product.branchInventory[_selectedBranchId];
     final currentPrice = inv?.pricePaise ?? product.basePricePaise;
     final currentStock = inv?.stockQuantity ?? 0;
-    final currentThreshold = inv?.lowStockThreshold ?? (product.isWeightBased ? 5000 : 5);
+    final currentThreshold =
+        inv?.lowStockThreshold ?? (product.isWeightBased ? 5000 : 5);
 
     final isWeight = product.isWeightBased;
     final displayStock = isWeight
         ? (currentStock >= 1000
-            ? (currentStock / 1000).toStringAsFixed(currentStock % 1000 == 0 ? 0 : 1)
-            : currentStock.toString())
+              ? (currentStock / 1000).toStringAsFixed(
+                  currentStock % 1000 == 0 ? 0 : 1,
+                )
+              : currentStock.toString())
         : currentStock.toString();
     final displayThreshold = isWeight
         ? (currentThreshold >= 1000
-            ? (currentThreshold / 1000).toStringAsFixed(currentThreshold % 1000 == 0 ? 0 : 1)
-            : currentThreshold.toString())
+              ? (currentThreshold / 1000).toStringAsFixed(
+                  currentThreshold % 1000 == 0 ? 0 : 1,
+                )
+              : currentThreshold.toString())
         : currentThreshold.toString();
 
     final priceCtrl = TextEditingController(
@@ -429,7 +432,7 @@ class _AdminInventoryScreenState extends ConsumerState<AdminInventoryScreen> {
                             double.tryParse(stockCtrl.text.trim()) ?? 0;
                         final thresholdNum =
                             double.tryParse(thresholdCtrl.text.trim()) ??
-                                (isWeight ? 5.0 : 5.0);
+                            (isWeight ? 5.0 : 5.0);
 
                         final stockVal = isWeight
                             ? (stockNum * 1000).round()
@@ -660,7 +663,9 @@ class _AdminInventoryScreenState extends ConsumerState<AdminInventoryScreen> {
                             borderRadius: BorderRadius.circular(8),
                           ),
                           title: Text(
-                            p.nameTa.isNotEmpty ? '${p.name} (${p.nameTa})' : p.name,
+                            p.nameTa.isNotEmpty
+                                ? '${p.name} (${p.nameTa})'
+                                : p.name,
                             style: const TextStyle(fontWeight: FontWeight.bold),
                           ),
                           subtitle: Text(

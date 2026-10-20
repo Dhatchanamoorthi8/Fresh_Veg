@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:vegora_core/vegora_core.dart';
 import 'package:vegora_models/vegora_models.dart';
 import 'package:vegora_repositories/vegora_repositories.dart';
+
 import 'admin_shell.dart';
 
 final staffListProvider =
@@ -344,13 +345,17 @@ class _AdminStaffManagementScreenState
     List<StoreBranch> branches,
   ) {
     final formKey = GlobalKey<FormState>();
-    final emailCtrl =
-        TextEditingController(text: staff['email'] as String? ?? '');
-    final nameCtrl =
-        TextEditingController(text: staff['full_name'] as String? ?? '');
-    final phoneCtrl =
-        TextEditingController(text: staff['phone'] as String? ?? '');
-    String? selectedBranchId = staff['branch_id'] as String? ??
+    final emailCtrl = TextEditingController(
+      text: staff['email'] as String? ?? '',
+    );
+    final nameCtrl = TextEditingController(
+      text: staff['full_name'] as String? ?? '',
+    );
+    final phoneCtrl = TextEditingController(
+      text: staff['phone'] as String? ?? '',
+    );
+    String? selectedBranchId =
+        staff['branch_id'] as String? ??
         (branches.isNotEmpty ? branches.first.id : null);
     bool isActive = staff['is_active'] as bool? ?? true;
     bool isSubmitting = false;
@@ -465,7 +470,10 @@ class _AdminStaffManagementScreenState
                       decoration: const InputDecoration(
                         labelText: 'Login & Notification Email *',
                         hintText: 'e.g. staff@vegora.com',
-                        prefixIcon: Icon(Icons.alternate_email_rounded, size: 20),
+                        prefixIcon: Icon(
+                          Icons.alternate_email_rounded,
+                          size: 20,
+                        ),
                         isDense: true,
                         border: OutlineInputBorder(),
                         helperText: 'Changing this updates login credentials across Supabase Auth.',
@@ -473,7 +481,9 @@ class _AdminStaffManagementScreenState
                       validator: (v) {
                         final val = v?.trim() ?? '';
                         if (val.isEmpty) return 'Email is required';
-                        if (!RegExp(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$').hasMatch(val)) {
+                        if (!RegExp(
+                          r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$',
+                        ).hasMatch(val)) {
                           return 'Please enter a valid email address';
                         }
                         return null;
@@ -486,7 +496,10 @@ class _AdminStaffManagementScreenState
                       decoration: const InputDecoration(
                         labelText: 'Staff Full Name *',
                         hintText: 'Enter complete name',
-                        prefixIcon: Icon(Icons.person_outline_rounded, size: 20),
+                        prefixIcon: Icon(
+                          Icons.person_outline_rounded,
+                          size: 20,
+                        ),
                         isDense: true,
                         border: OutlineInputBorder(),
                       ),
@@ -610,7 +623,8 @@ class _AdminStaffManagementScreenState
                             value: isActive,
                             activeTrackColor: AppColors.primary,
                             activeThumbColor: Colors.white,
-                            onChanged: (val) => setDialogState(() => isActive = val),
+                            onChanged: (val) =>
+                                setDialogState(() => isActive = val),
                           ),
                         ],
                       ),
@@ -624,7 +638,10 @@ class _AdminStaffManagementScreenState
             TextButton(
               onPressed: isSubmitting ? null : () => Navigator.pop(ctx),
               style: TextButton.styleFrom(
-                padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 18,
+                  vertical: 12,
+                ),
               ),
               child: const Text('Cancel'),
             ),
@@ -643,7 +660,10 @@ class _AdminStaffManagementScreenState
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppColors.primary,
                 foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 12),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 22,
+                  vertical: 12,
+                ),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(10),
                 ),
@@ -696,7 +716,6 @@ class _AdminStaffManagementScreenState
       ),
     );
   }
-
 
   void _showDeleteStaffConfirmation(Map<String, dynamic> staff) {
     bool isDeleting = false;
@@ -924,7 +943,6 @@ class _AdminStaffManagementScreenState
       }
     }
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -1260,7 +1278,7 @@ class _AdminStaffManagementScreenState
                                         isActive
                                             ? Icons.block_rounded
                                             : Icons
-                                                .check_circle_outline_rounded,
+                                                  .check_circle_outline_rounded,
                                         size: 18,
                                         color: isActive
                                             ? AppColors.error

@@ -68,9 +68,9 @@ class _DeliveryScreenState extends ConsumerState<DeliveryScreen>
         ],
         bottom: TabBar(
           controller: _tabController,
-          labelColor: AppColors.statusOutForDelivery,
+          labelColor: AppColors.primary,
           unselectedLabelColor: AppColors.textSecondary,
-          indicatorColor: AppColors.statusOutForDelivery,
+          indicatorColor: AppColors.primary,
           indicatorWeight: 3,
           tabs: [
             Tab(text: 'Active Trips (${activeDeliveries.length})'),

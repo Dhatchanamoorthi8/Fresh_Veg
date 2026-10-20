@@ -6,10 +6,7 @@ class AppLocalizations {
 
   const AppLocalizations(this.locale);
 
-  static const List<Locale> supportedLocales = [
-    Locale('en'),
-    Locale('ta'),
-  ];
+  static const List<Locale> supportedLocales = [Locale('en'), Locale('ta')];
 
   static bool isSupported(Locale locale) =>
       supportedLocales.any((l) => l.languageCode == locale.languageCode);
@@ -28,10 +25,9 @@ class AppLocalizations {
   // Core Branding & App Info
   // --------------------------------------------------------------------------
   String get appName => isTamil ? 'வெகோரா' : 'Vegora';
-  String get appTagline =>
-      isTamil
-          ? 'உங்கள் வீட்டு வாசலில் புத்துணர்ச்சி'
-          : 'Freshness at Your Doorstep';
+  String get appTagline => isTamil
+      ? 'உங்கள் வீட்டு வாசலில் புத்துணர்ச்சி'
+      : 'Freshness at Your Doorstep';
 
   // --------------------------------------------------------------------------
   // Navigation Tabs
@@ -59,10 +55,9 @@ class AppLocalizations {
   String get edit => isTamil ? 'திருத்து' : 'Edit';
   String get save => isTamil ? 'சேமி' : 'Save';
   String get retry => isTamil ? 'மீண்டும் முயற்சி' : 'Retry';
-  String get searchHint =>
-      isTamil
-          ? 'புதிய காய்கறிகள், கீரைகளைத் தேடுங்கள்...'
-          : 'Search fresh vegetables, greens...';
+  String get searchHint => isTamil
+      ? 'புதிய காய்கறிகள், கீரைகளைத் தேடுங்கள்...'
+      : 'Search fresh vegetables, greens...';
 
   // --------------------------------------------------------------------------
   // Produce Badges & Status
@@ -90,11 +85,16 @@ class AppLocalizations {
   String get price => isTamil ? 'விலை' : 'Price';
 
   /// Helper to format quantities dynamically (e.g. 500 g -> "500 கிராம்" or "500 g")
-  String formatQuantity(int quantityGramsOrCount, {String unitType = 'WEIGHT'}) {
+  String formatQuantity(
+    int quantityGramsOrCount, {
+    String unitType = 'WEIGHT',
+  }) {
     if (unitType == 'WEIGHT') {
       if (quantityGramsOrCount >= 1000 && quantityGramsOrCount % 100 == 0) {
         final kg = quantityGramsOrCount / 1000;
-        final kgStr = kg % 1 == 0 ? kg.toInt().toString() : kg.toStringAsFixed(1);
+        final kgStr = kg % 1 == 0
+            ? kg.toInt().toString()
+            : kg.toStringAsFixed(1);
         return isTamil ? '$kgStr கிலோ' : '$kgStr kg';
       }
       return isTamil
@@ -115,11 +115,11 @@ class AppLocalizations {
   // Cart & Pricing
   // --------------------------------------------------------------------------
   String get shoppingCart => isTamil ? 'வணிகக் கூடை' : 'Shopping Cart';
-  String get cartEmptyTitle => isTamil ? 'உங்கள் கூடை காலியாக உள்ளது' : 'Your Cart is Empty';
-  String get cartEmptySubtitle =>
-      isTamil
-          ? 'புதிய நாட்டுத் தக்காளி, கீரைகள் மற்றும் காய்கறிகளைத் தேர்ந்தெடுங்கள்!'
-          : 'Fresh leafy greens, tomatoes, and crunchy veggies are waiting for you!';
+  String get cartEmptyTitle =>
+      isTamil ? 'உங்கள் கூடை காலியாக உள்ளது' : 'Your Cart is Empty';
+  String get cartEmptySubtitle => isTamil
+      ? 'புதிய நாட்டுத் தக்காளி, கீரைகள் மற்றும் காய்கறிகளைத் தேர்ந்தெடுங்கள்!'
+      : 'Fresh leafy greens, tomatoes, and crunchy veggies are waiting for you!';
   String get shopNow => isTamil ? 'காய்கறிகளை வாங்க' : 'Shop Fresh Vegetables';
   String get billDetails => isTamil ? 'கட்டண விவரங்கள்' : 'Bill Summary';
   String get subtotal => isTamil ? 'பொருட்கள் கூட்டுத்தொகை' : 'Item Subtotal';
@@ -135,13 +135,19 @@ class AppLocalizations {
   // --------------------------------------------------------------------------
   String get orderHistory => isTamil ? 'ஆர்டர் வரலாறு' : 'Order History';
   String get trackOrder => isTamil ? 'ஆர்டரைக் கண்காணிக்க' : 'Track Order';
-  String get orderPlaced => isTamil ? 'ஆர்டர் பதிவு செய்யப்பட்டது' : 'Order Placed';
-  String get acceptedByStore => isTamil ? 'அங்காடி ஏற்றது' : 'Accepted by Store';
-  String get packingVeggies => isTamil ? 'காய்கறிகள் பேக் செய்யப்படுகிறது' : 'Packing Fresh Veggies';
-  String get readyForPickup => isTamil ? 'எடுத்துச் செல்ல தயார்' : 'Ready for Pickup';
-  String get outForDelivery => isTamil ? 'டெலிவரிக்கு வருகிறது' : 'Out for Delivery';
+  String get orderPlaced =>
+      isTamil ? 'ஆர்டர் பதிவு செய்யப்பட்டது' : 'Order Placed';
+  String get acceptedByStore =>
+      isTamil ? 'அங்காடி ஏற்றது' : 'Accepted by Store';
+  String get packingVeggies =>
+      isTamil ? 'காய்கறிகள் பேக் செய்யப்படுகிறது' : 'Packing Fresh Veggies';
+  String get readyForPickup =>
+      isTamil ? 'எடுத்துச் செல்ல தயார்' : 'Ready for Pickup';
+  String get outForDelivery =>
+      isTamil ? 'டெலிவரிக்கு வருகிறது' : 'Out for Delivery';
   String get delivered => isTamil ? 'டெலிவரி செய்யப்பட்டது' : 'Delivered';
-  String get orderCancelled => isTamil ? 'ஆர்டர் ரத்து செய்யப்பட்டது' : 'Order Cancelled';
+  String get orderCancelled =>
+      isTamil ? 'ஆர்டர் ரத்து செய்யப்பட்டது' : 'Order Cancelled';
 
   // --------------------------------------------------------------------------
   // Account & Language Settings
@@ -150,10 +156,14 @@ class AppLocalizations {
   String get languageSetting => isTamil ? 'பயன்பாட்டு மொழி' : 'App Language';
   String get englishLang => 'English';
   String get tamilLang => 'தமிழ் (Tamil)';
-  String get chooseLanguage => isTamil ? 'மொழியைத் தேர்வுசெய்க' : 'Choose Language';
-  String get languageUpdated => isTamil ? 'மொழி மாற்றப்பட்டது' : 'Language updated successfully';
-  String get savedAddresses => isTamil ? 'சேமிக்கப்பட்ட முகவரிகள்' : 'Saved Delivery Addresses';
-  String get customerSupport => isTamil ? 'உதவி மையம் & ஆதரவு' : 'Customer Support & Help';
+  String get chooseLanguage =>
+      isTamil ? 'மொழியைத் தேர்வுசெய்க' : 'Choose Language';
+  String get languageUpdated =>
+      isTamil ? 'மொழி மாற்றப்பட்டது' : 'Language updated successfully';
+  String get savedAddresses =>
+      isTamil ? 'சேமிக்கப்பட்ட முகவரிகள்' : 'Saved Delivery Addresses';
+  String get customerSupport =>
+      isTamil ? 'உதவி மையம் & ஆதரவு' : 'Customer Support & Help';
   String get logout => isTamil ? 'வெளியேறு' : 'Log Out';
 }
 
@@ -162,8 +172,7 @@ class _AppLocalizationsDelegate
   const _AppLocalizationsDelegate();
 
   @override
-  bool isSupported(Locale locale) =>
-      ['en', 'ta'].contains(locale.languageCode);
+  bool isSupported(Locale locale) => ['en', 'ta'].contains(locale.languageCode);
 
   @override
   Future<AppLocalizations> load(Locale locale) async =>

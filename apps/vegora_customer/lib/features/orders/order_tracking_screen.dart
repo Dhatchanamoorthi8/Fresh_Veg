@@ -27,9 +27,7 @@ class OrderTrackingScreen extends ConsumerWidget {
     final timeFormat = DateFormat('hh:mm a, dd MMM');
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Order ${order.orderNumber}'),
-      ),
+      appBar: AppBar(title: Text('Order ${order.orderNumber}')),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
         child: Column(

@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:vegora_core/vegora_core.dart';
 import 'package:vegora_models/vegora_models.dart';
 import 'package:vegora_repositories/vegora_repositories.dart';
+
 import 'admin_shell.dart';
 import 'widgets/admin_status_badge.dart';
 import 'widgets/admin_table_container.dart';
@@ -743,7 +744,10 @@ class _AdminBranchesScreenState extends ConsumerState<AdminBranchesScreen> {
                 ),
                 const SizedBox(width: 14),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 2),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 2,
+                  ),
                   decoration: BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(8),
@@ -758,7 +762,10 @@ class _AdminBranchesScreenState extends ConsumerState<AdminBranchesScreen> {
                         color: AppColors.neutral800,
                       ),
                       items: const [
-                        DropdownMenuItem(value: 'ALL', child: Text('All Branches')),
+                        DropdownMenuItem(
+                          value: 'ALL',
+                          child: Text('All Branches'),
+                        ),
                         DropdownMenuItem(
                           value: 'ACTIVE',
                           child: Text('Active Only'),
@@ -796,7 +803,10 @@ class _AdminBranchesScreenState extends ConsumerState<AdminBranchesScreen> {
                   icon: const Icon(Icons.add_rounded, size: 19),
                   label: const Text(
                     'Add Branch',
-                    style: TextStyle(fontWeight: FontWeight.w700, fontSize: 13.5),
+                    style: TextStyle(
+                      fontWeight: FontWeight.w700,
+                      fontSize: 13.5,
+                    ),
                   ),
                   onPressed: () => _showAddEditBranchModal(),
                 ),

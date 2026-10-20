@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:vegora_core/vegora_core.dart';
 import 'package:vegora_repositories/vegora_repositories.dart';
+
 import 'admin_shell.dart';
 
 final deliveryAgentsListProvider =
@@ -239,12 +240,15 @@ class _AdminDeliveryAgentsScreenState
 
   void _showEditAgentDialog(Map<String, dynamic> agent) {
     final formKey = GlobalKey<FormState>();
-    final emailCtrl =
-        TextEditingController(text: agent['email'] as String? ?? '');
-    final nameCtrl =
-        TextEditingController(text: agent['full_name'] as String? ?? '');
-    final phoneCtrl =
-        TextEditingController(text: agent['phone'] as String? ?? '');
+    final emailCtrl = TextEditingController(
+      text: agent['email'] as String? ?? '',
+    );
+    final nameCtrl = TextEditingController(
+      text: agent['full_name'] as String? ?? '',
+    );
+    final phoneCtrl = TextEditingController(
+      text: agent['phone'] as String? ?? '',
+    );
     bool isActive = agent['is_active'] as bool? ?? true;
     bool isSubmitting = false;
     String? dialogError;
@@ -358,7 +362,10 @@ class _AdminDeliveryAgentsScreenState
                       decoration: const InputDecoration(
                         labelText: 'Login & Notification Email *',
                         hintText: 'e.g. partner@vegora.com',
-                        prefixIcon: Icon(Icons.alternate_email_rounded, size: 20),
+                        prefixIcon: Icon(
+                          Icons.alternate_email_rounded,
+                          size: 20,
+                        ),
                         isDense: true,
                         border: OutlineInputBorder(),
                         helperText: 'Changing this updates login credentials across Supabase Auth.',
@@ -366,7 +373,9 @@ class _AdminDeliveryAgentsScreenState
                       validator: (v) {
                         final val = v?.trim() ?? '';
                         if (val.isEmpty) return 'Email is required';
-                        if (!RegExp(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$').hasMatch(val)) {
+                        if (!RegExp(
+                          r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$',
+                        ).hasMatch(val)) {
                           return 'Please enter a valid email address';
                         }
                         return null;
@@ -379,7 +388,10 @@ class _AdminDeliveryAgentsScreenState
                       decoration: const InputDecoration(
                         labelText: 'Partner Full Name *',
                         hintText: 'Enter complete name',
-                        prefixIcon: Icon(Icons.person_outline_rounded, size: 20),
+                        prefixIcon: Icon(
+                          Icons.person_outline_rounded,
+                          size: 20,
+                        ),
                         isDense: true,
                         border: OutlineInputBorder(),
                       ),
@@ -476,7 +488,8 @@ class _AdminDeliveryAgentsScreenState
                             value: isActive,
                             activeTrackColor: AppColors.primary,
                             activeThumbColor: Colors.white,
-                            onChanged: (val) => setDialogState(() => isActive = val),
+                            onChanged: (val) =>
+                                setDialogState(() => isActive = val),
                           ),
                         ],
                       ),
@@ -490,7 +503,10 @@ class _AdminDeliveryAgentsScreenState
             TextButton(
               onPressed: isSubmitting ? null : () => Navigator.pop(ctx),
               style: TextButton.styleFrom(
-                padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 18,
+                  vertical: 12,
+                ),
               ),
               child: const Text('Cancel'),
             ),
@@ -509,7 +525,10 @@ class _AdminDeliveryAgentsScreenState
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppColors.statusDelivered,
                 foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 12),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 22,
+                  vertical: 12,
+                ),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(10),
                 ),
@@ -561,7 +580,6 @@ class _AdminDeliveryAgentsScreenState
       ),
     );
   }
-
 
   void _showDeleteAgentConfirmation(Map<String, dynamic> agent) {
     bool isDeleting = false;
@@ -1041,7 +1059,7 @@ class _AdminDeliveryAgentsScreenState
                                         isActive
                                             ? Icons.block_rounded
                                             : Icons
-                                                .check_circle_outline_rounded,
+                                                  .check_circle_outline_rounded,
                                         size: 18,
                                         color: isActive
                                             ? AppColors.error

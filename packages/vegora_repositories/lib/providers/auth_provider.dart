@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'package:vegora_models/vegora_models.dart';
+
 import '../repositories/supabase_auth_repository.dart';
 import 'app_providers.dart';
 
@@ -90,7 +91,8 @@ class CustomerNameNotifier extends Notifier<String> {
       return profile.fullName.trim();
     }
     final user = ref.watch(currentSupabaseUserProvider);
-    final metaName = user?.userMetadata?['full_name'] as String? ??
+    final metaName =
+        user?.userMetadata?['full_name'] as String? ??
         user?.userMetadata?['name'] as String?;
     if (metaName != null && metaName.trim().isNotEmpty) {
       return metaName.trim();

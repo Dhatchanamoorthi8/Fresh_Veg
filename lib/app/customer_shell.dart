@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../core/constants/app_colors.dart';
+import '../core/localization/app_locale_state.dart';
 import '../shared/providers/cart_provider.dart';
 
 class CustomerShell extends ConsumerWidget {
@@ -13,54 +14,71 @@ class CustomerShell extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final cart = ref.watch(cartProvider);
+    final locale = ref.watch(appLocaleProvider);
+    final isTamil = locale.languageCode == 'ta';
 
     return Scaffold(
       body: navigationShell,
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: navigationShell.currentIndex,
-        onTap: (index) {
-          navigationShell.goBranch(
-            index,
-            initialLocation: index == navigationShell.currentIndex,
-          );
-        },
-        items: [
-          const BottomNavigationBarItem(
-            icon: Icon(Icons.home_outlined),
-            activeIcon: Icon(Icons.home_rounded),
-            label: 'Home',
-          ),
-          const BottomNavigationBarItem(
-            icon: Icon(Icons.search_rounded),
-            activeIcon: Icon(Icons.search_rounded),
-            label: 'Catalog',
-          ),
-          BottomNavigationBarItem(
-            icon: Badge(
-              isLabelVisible: cart.isNotEmpty,
-              label: Text('${cart.totalItemCount}'),
-              backgroundColor: AppColors.primary,
-              child: const Icon(Icons.shopping_basket_outlined),
+      bottomNavigationBar: Container(
+        decoration: const BoxDecoration(
+          color: Colors.white,
+          border: Border(top: BorderSide(color: AppColors.border, width: 1.0)),
+        ),
+        child: BottomNavigationBar(
+          currentIndex: navigationShell.currentIndex,
+          elevation: 0,
+          backgroundColor: Colors.white,
+          selectedItemColor: AppColors.primary,
+          unselectedItemColor: AppColors.textSecondary,
+          selectedFontSize: 12,
+          unselectedFontSize: 12,
+          type: BottomNavigationBarType.fixed,
+          onTap: (index) {
+            navigationShell.goBranch(
+              index,
+              initialLocation: index == navigationShell.currentIndex,
+            );
+          },
+          items: [
+            BottomNavigationBarItem(
+              icon: const Icon(Icons.home_outlined),
+              activeIcon: const Icon(Icons.home_rounded),
+              label: isTamil ? 'முகப்பு' : 'Home',
             ),
-            activeIcon: Badge(
-              isLabelVisible: cart.isNotEmpty,
-              label: Text('${cart.totalItemCount}'),
-              backgroundColor: AppColors.primaryDark,
-              child: const Icon(Icons.shopping_basket_rounded),
+            BottomNavigationBarItem(
+              icon: const Icon(Icons.search_rounded),
+              activeIcon: const Icon(Icons.search_rounded),
+              label: isTamil ? 'பட்டியல்' : 'Catalog',
             ),
-            label: 'Cart',
-          ),
-          const BottomNavigationBarItem(
-            icon: Icon(Icons.receipt_long_outlined),
-            activeIcon: Icon(Icons.receipt_long_rounded),
-            label: 'Orders',
-          ),
-          const BottomNavigationBarItem(
-            icon: Icon(Icons.person_outline_rounded),
-            activeIcon: Icon(Icons.person_rounded),
-            label: 'Profile',
-          ),
-        ],
+            BottomNavigationBarItem(
+              icon: Badge(
+                isLabelVisible: cart.isNotEmpty,
+                label: Text('${cart.totalItemCount}'),
+                backgroundColor: AppColors.primary,
+                textColor: Colors.white,
+                child: const Icon(Icons.shopping_basket_outlined),
+              ),
+              activeIcon: Badge(
+                isLabelVisible: cart.isNotEmpty,
+                label: Text('${cart.totalItemCount}'),
+                backgroundColor: AppColors.primary,
+                textColor: Colors.white,
+                child: const Icon(Icons.shopping_basket_rounded),
+              ),
+              label: isTamil ? 'கூடை' : 'Cart',
+            ),
+            BottomNavigationBarItem(
+              icon: const Icon(Icons.receipt_long_outlined),
+              activeIcon: const Icon(Icons.receipt_long_rounded),
+              label: isTamil ? 'ஆர்டர்கள்' : 'Orders',
+            ),
+            BottomNavigationBarItem(
+              icon: const Icon(Icons.person_outline_rounded),
+              activeIcon: const Icon(Icons.person_rounded),
+              label: isTamil ? 'சுயவிவரம்' : 'Profile',
+            ),
+          ],
+        ),
       ),
     );
   }

@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'package:vegora_models/vegora_models.dart';
+
 import 'order_repository.dart';
 
 class SupabaseOrderRepository implements OrderRepository {

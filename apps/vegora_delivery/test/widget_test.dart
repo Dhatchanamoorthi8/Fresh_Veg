@@ -4,8 +4,9 @@ import 'package:vegora_delivery/app/delivery_app.dart';
 import 'package:vegora_repositories/vegora_repositories.dart';
 
 void main() {
-  testWidgets('Vegora Delivery Partner app boots up cleanly',
-      (WidgetTester tester) async {
+  testWidgets('Vegora Delivery Partner app boots up cleanly', (
+    WidgetTester tester,
+  ) async {
     await tester.pumpWidget(
       ProviderScope(
         overrides: [

@@ -2,9 +2,11 @@ import 'product.dart';
 
 class CartItem {
   final Product product;
+
   /// Quantity in canonical integer grams (for weight products) or piece count (for piece/bunch products).
   final int quantity;
   final String branchId;
+
   /// Selling price in paise (per kg for weight products, or per piece/bunch for count products).
   final int unitPricePaise;
 

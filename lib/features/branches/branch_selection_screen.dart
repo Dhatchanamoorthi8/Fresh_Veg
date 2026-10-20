@@ -31,6 +31,7 @@ class _BranchSelectionScreenState extends ConsumerState<BranchSelectionScreen> {
     final cart = ref.watch(cartProvider);
 
     return Scaffold(
+      backgroundColor: AppColors.background,
       appBar: AppBar(title: const Text('Store Branch & Address')),
       body: Column(
         children: [

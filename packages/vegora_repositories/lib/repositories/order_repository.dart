@@ -1,4 +1,5 @@
 import 'package:vegora_models/vegora_models.dart';
+
 import 'branch_repository.dart';
 import 'catalog_repository.dart';
 

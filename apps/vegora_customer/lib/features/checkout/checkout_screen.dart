@@ -343,10 +343,7 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
             const SizedBox(height: 20),
 
             // Payment Method Selector
-            _buildSectionHeader(
-              'Payment Method (Simulated)',
-              Icons.payment_rounded,
-            ),
+            _buildSectionHeader('Payment Method', Icons.payment_rounded),
             const SizedBox(height: 8),
             Container(
               decoration: BoxDecoration(
@@ -377,13 +374,13 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
                         ),
                       ),
                       subtitle: Text(
-                        'Pay cash or UPI to delivery agent at doorstep',
+                        'Pay cash or UPI to delivery partner at your doorstep',
                         style: TextStyle(fontSize: 11),
                       ),
                     ),
                     Divider(height: 1),
                     RadioListTile<String>(
-                      value: 'Simulated UPI',
+                      value: 'Online UPI',
                       activeColor: AppColors.primary,
                       dense: true,
                       secondary: Icon(
@@ -391,14 +388,14 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
                         color: AppColors.statusPreparing,
                       ),
                       title: Text(
-                        'Simulated Online UPI',
+                        'Online UPI & Netbanking',
                         style: TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
                       subtitle: Text(
-                        'Google Pay / PhonePe / Paytm mock payment',
+                        'Instant payment via Google Pay / PhonePe / BHIM UPI',
                         style: TextStyle(fontSize: 11),
                       ),
                     ),
@@ -509,7 +506,7 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         const Text(
-                          'Place Demo Order',
+                          'Place Order',
                           style: TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.bold,

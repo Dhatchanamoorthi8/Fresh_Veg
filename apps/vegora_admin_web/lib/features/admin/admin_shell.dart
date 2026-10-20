@@ -201,13 +201,13 @@ class AdminScaffold extends ConsumerWidget {
                 style: const TextStyle(fontWeight: FontWeight.bold),
               ),
               backgroundColor: AppColors.surface,
-              elevation: 1,
+              elevation: 0,
               actions: [
                 ...?actions,
                 IconButton(
                   icon: const Icon(
                     Icons.logout_rounded,
-                    color: AppColors.neutral700,
+                    color: AppColors.textSecondary,
                   ),
                   tooltip: 'Logout',
                   onPressed: () => _handleLogout(context, ref),
@@ -238,9 +238,7 @@ class AdminScaffold extends ConsumerWidget {
       padding: const EdgeInsets.symmetric(horizontal: 24),
       decoration: const BoxDecoration(
         color: Colors.white,
-        border: Border(
-          bottom: BorderSide(color: Color(0xFFE2E8F0), width: 1),
-        ),
+        border: Border(bottom: BorderSide(color: AppColors.border, width: 1)),
       ),
       child: Row(
         children: [
@@ -252,12 +250,15 @@ class AdminScaffold extends ConsumerWidget {
                   style: TextStyle(
                     fontSize: 13,
                     fontWeight: FontWeight.w500,
-                    color: Color(0xFF64748B),
+                    color: AppColors.textSecondary,
                   ),
                 ),
                 const Padding(
                   padding: EdgeInsets.symmetric(horizontal: 8),
-                  child: Text('/', style: TextStyle(color: Color(0xFFCBD5E1), fontSize: 13)),
+                  child: Text(
+                    '/',
+                    style: TextStyle(color: AppColors.neutral300, fontSize: 13),
+                  ),
                 ),
                 Flexible(
                   child: Text(
@@ -266,7 +267,7 @@ class AdminScaffold extends ConsumerWidget {
                     style: const TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w700,
-                      color: Color(0xFF0F172A),
+                      color: AppColors.textPrimary,
                     ),
                   ),
                 ),
@@ -279,24 +280,23 @@ class AdminScaffold extends ConsumerWidget {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
             decoration: BoxDecoration(
-              color: const Color(0xFFECFDF5),
+              color: AppColors.primaryLight,
               borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: const Color(0xFFA7F3D0)),
+              border: Border.all(
+                color: AppColors.primary.withValues(alpha: 0.2),
+              ),
             ),
             child: const Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                CircleAvatar(
-                  radius: 3.5,
-                  backgroundColor: Color(0xFF10B981),
-                ),
+                CircleAvatar(radius: 3.5, backgroundColor: AppColors.success),
                 SizedBox(width: 6),
                 Text(
                   'Network Online',
                   style: TextStyle(
                     fontSize: 11,
                     fontWeight: FontWeight.w700,
-                    color: Color(0xFF065F46),
+                    color: AppColors.primaryDark,
                   ),
                 ),
               ],
@@ -307,16 +307,16 @@ class AdminScaffold extends ConsumerWidget {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
             decoration: BoxDecoration(
-              color: const Color(0xFFF8FAFC),
+              color: AppColors.neutral50,
               borderRadius: BorderRadius.circular(20),
-              border: Border.all(color: const Color(0xFFE2E8F0)),
+              border: Border.all(color: AppColors.border),
             ),
             child: const Row(
               mainAxisSize: MainAxisSize.min,
               children: [
                 CircleAvatar(
                   radius: 11,
-                  backgroundColor: Color(0xFF0B6B3A),
+                  backgroundColor: AppColors.primary,
                   child: Text(
                     'A',
                     style: TextStyle(
@@ -332,7 +332,7 @@ class AdminScaffold extends ConsumerWidget {
                   style: TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.w700,
-                    color: Color(0xFF1E293B),
+                    color: AppColors.textPrimary,
                   ),
                 ),
               ],
@@ -344,16 +344,22 @@ class AdminScaffold extends ConsumerWidget {
             icon: const Icon(Icons.storefront_rounded, size: 15),
             label: const Text('Storefront', style: TextStyle(fontSize: 12)),
             style: OutlinedButton.styleFrom(
-              foregroundColor: AppColors.neutral800,
-              side: const BorderSide(color: Color(0xFFE2E8F0)),
+              foregroundColor: AppColors.textPrimary,
+              side: const BorderSide(color: AppColors.border),
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
               visualDensity: VisualDensity.compact,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
             ),
           ),
           const SizedBox(width: 6),
           IconButton(
-            icon: const Icon(Icons.logout_rounded, color: AppColors.error, size: 19),
+            icon: const Icon(
+              Icons.logout_rounded,
+              color: AppColors.error,
+              size: 19,
+            ),
             tooltip: 'Logout',
             onPressed: () => _handleLogout(context, ref),
           ),
@@ -368,9 +374,7 @@ class AdminScaffold extends ConsumerWidget {
       child: Container(
         width: 250,
         decoration: const BoxDecoration(
-          border: Border(
-            right: BorderSide(color: Color(0xFFE2E8F0), width: 1),
-          ),
+          border: Border(right: BorderSide(color: AppColors.border, width: 1)),
         ),
         child: Column(
           children: [
@@ -380,7 +384,7 @@ class AdminScaffold extends ConsumerWidget {
               alignment: Alignment.centerLeft,
               decoration: const BoxDecoration(
                 border: Border(
-                  bottom: BorderSide(color: Color(0xFFE2E8F0), width: 1),
+                  bottom: BorderSide(color: AppColors.border, width: 1),
                 ),
               ),
               child: Row(
@@ -391,13 +395,7 @@ class AdminScaffold extends ConsumerWidget {
                     decoration: BoxDecoration(
                       color: Colors.white,
                       borderRadius: BorderRadius.circular(8),
-                      boxShadow: [
-                        BoxShadow(
-                          color: AppColors.primary.withValues(alpha: 0.12),
-                          blurRadius: 6,
-                          offset: const Offset(0, 2),
-                        ),
-                      ],
+                      border: Border.all(color: AppColors.border),
                     ),
                     padding: const EdgeInsets.all(4),
                     child: ClipRRect(
@@ -409,17 +407,17 @@ class AdminScaffold extends ConsumerWidget {
                     ),
                   ),
                   const SizedBox(width: 12),
-                  Expanded(
+                  const Expanded(
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       crossAxisAlignment: CrossAxisAlignment.start,
-                      children: const [
+                      children: [
                         Text(
                           'Vegora',
                           style: TextStyle(
                             fontSize: 17,
                             fontWeight: FontWeight.w900,
-                            color: Color(0xFF0B6B3A),
+                            color: AppColors.primary,
                             letterSpacing: -0.3,
                           ),
                         ),
@@ -428,7 +426,7 @@ class AdminScaffold extends ConsumerWidget {
                           style: TextStyle(
                             fontSize: 11,
                             fontWeight: FontWeight.w600,
-                            color: Color(0xFF64748B),
+                            color: AppColors.textSecondary,
                           ),
                           overflow: TextOverflow.ellipsis,
                         ),
@@ -458,7 +456,7 @@ class AdminScaffold extends ConsumerWidget {
               padding: const EdgeInsets.all(12),
               decoration: const BoxDecoration(
                 border: Border(
-                  top: BorderSide(color: Color(0xFFE2E8F0), width: 1),
+                  top: BorderSide(color: AppColors.border, width: 1),
                 ),
               ),
               child: Material(
@@ -506,7 +504,7 @@ class AdminScaffold extends ConsumerWidget {
               style: const TextStyle(
                 fontSize: 10,
                 fontWeight: FontWeight.w800,
-                color: Color(0xFF94A3B8), // Slate-400
+                color: AppColors.neutral400,
                 letterSpacing: 0.8,
               ),
             ),
@@ -523,18 +521,18 @@ class AdminScaffold extends ConsumerWidget {
     return Drawer(
       child: Column(
         children: [
-          UserAccountsDrawerHeader(
-            decoration: const BoxDecoration(color: Color(0xFF0B6B3A)),
-            accountName: const Text(
+          const UserAccountsDrawerHeader(
+            decoration: BoxDecoration(color: AppColors.primary),
+            accountName: Text(
               'Vegora Admin Hub',
               style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
             ),
-            accountEmail: const Text('admin@vegora.in'),
-            currentAccountPicture: const CircleAvatar(
+            accountEmail: Text('admin@vegora.in'),
+            currentAccountPicture: CircleAvatar(
               backgroundColor: Colors.white,
               child: Icon(
                 Icons.admin_panel_settings_rounded,
-                color: Color(0xFF0B6B3A),
+                color: AppColors.primary,
                 size: 36,
               ),
             ),
@@ -592,13 +590,11 @@ class AdminScaffold extends ConsumerWidget {
     return Padding(
       padding: const EdgeInsets.only(bottom: 2),
       child: Material(
-        color: isSelected
-            ? const Color(0xFFECFDF5) // Emerald-50
-            : Colors.transparent,
+        color: isSelected ? AppColors.primaryLight : Colors.transparent,
         borderRadius: BorderRadius.circular(8),
         child: InkWell(
           borderRadius: BorderRadius.circular(8),
-          hoverColor: const Color(0xFFF8FAFC),
+          hoverColor: AppColors.neutral50,
           onTap: () {
             if (isDrawer) Navigator.pop(context);
             if (!isSelected) {
@@ -612,7 +608,9 @@ class AdminScaffold extends ConsumerWidget {
                 Icon(
                   item.icon,
                   size: 19,
-                  color: isSelected ? const Color(0xFF0B6B3A) : const Color(0xFF64748B),
+                  color: isSelected
+                      ? AppColors.primary
+                      : AppColors.textSecondary,
                 ),
                 const SizedBox(width: 12),
                 Expanded(
@@ -620,8 +618,12 @@ class AdminScaffold extends ConsumerWidget {
                     item.title,
                     style: TextStyle(
                       fontSize: 13,
-                      fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
-                      color: isSelected ? const Color(0xFF0B6B3A) : const Color(0xFF1E293B),
+                      fontWeight: isSelected
+                          ? FontWeight.w700
+                          : FontWeight.w500,
+                      color: isSelected
+                          ? AppColors.primary
+                          : AppColors.textPrimary,
                       letterSpacing: -0.1,
                     ),
                   ),
@@ -631,7 +633,7 @@ class AdminScaffold extends ConsumerWidget {
                     width: 6,
                     height: 6,
                     decoration: const BoxDecoration(
-                      color: Color(0xFF0B6B3A),
+                      color: AppColors.primary,
                       shape: BoxShape.circle,
                     ),
                   ),

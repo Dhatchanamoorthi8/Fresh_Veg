@@ -48,6 +48,7 @@ class _CatalogScreenState extends ConsumerState<CatalogScreen> {
     final isTamil = locale.languageCode == 'ta';
 
     return Scaffold(
+      backgroundColor: AppColors.background,
       appBar: AppBar(
         title: Text(isTamil ? 'காய்கறி சந்தை' : 'Vegetable & Fruit Mandi'),
       ),

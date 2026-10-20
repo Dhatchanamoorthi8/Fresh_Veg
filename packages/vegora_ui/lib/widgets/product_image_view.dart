@@ -52,7 +52,7 @@ class ProductImageView extends StatelessWidget {
                   color: AppColors.primary,
                   value: progress.expectedTotalBytes != null
                       ? progress.cumulativeBytesLoaded /
-                          progress.expectedTotalBytes!
+                            progress.expectedTotalBytes!
                       : null,
                 ),
               ),
@@ -76,10 +76,7 @@ class ProductImageView extends StatelessWidget {
     }
 
     if (borderRadius != null) {
-      return ClipRRect(
-        borderRadius: borderRadius!,
-        child: imageContent,
-      );
+      return ClipRRect(borderRadius: borderRadius!, child: imageContent);
     }
 
     return imageContent;

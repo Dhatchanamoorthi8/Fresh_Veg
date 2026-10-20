@@ -69,6 +69,7 @@ class _ProductDetailsScreenState extends ConsumerState<ProductDetailsScreen> {
     final isTamil = locale.languageCode == 'ta';
 
     return Scaffold(
+      backgroundColor: AppColors.background,
       appBar: AppBar(
         title: Text(isTamil ? 'காய்கறி விவரங்கள்' : 'Vegetable Details'),
         actions: [

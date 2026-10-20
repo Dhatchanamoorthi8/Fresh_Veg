@@ -23,6 +23,7 @@ class HomeScreen extends ConsumerWidget {
     final catalogRepo = ref.watch(catalogRepositoryProvider);
     final cart = ref.watch(cartProvider);
     final locale = ref.watch(appLocaleProvider);
+    final isTamil = locale.languageCode == 'ta';
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -31,7 +32,7 @@ class HomeScreen extends ConsumerWidget {
           children: [
             CustomScrollView(
               slivers: [
-                // Clean Quick-Commerce Top Header
+                // Premium Compact Header Bar
                 SliverToBoxAdapter(
                   child: Container(
                     padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
@@ -44,43 +45,33 @@ class HomeScreen extends ConsumerWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        // Row 1: Brand & Delivery Hub
+                        // Row 1: Brand Mark, Location Hub, and Header Actions
                         Row(
                           children: [
-                            // Delivery ETA badge
+                            // Vegora Compact Brand Mark
                             Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 8,
-                                vertical: 4,
-                              ),
+                              width: 38,
+                              height: 38,
                               decoration: BoxDecoration(
-                                color: AppColors.primaryContainer,
-                                borderRadius: BorderRadius.circular(6),
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(10),
+                                border: Border.all(
+                                  color: AppColors.border,
+                                  width: 1,
+                                ),
                               ),
-                              child: const Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Icon(
-                                    Icons.bolt_rounded,
-                                    size: 14,
-                                    color: AppColors.primaryDark,
-                                  ),
-                                  SizedBox(width: 2),
-                                  Text(
-                                    '25-35 MINS',
-                                    style: TextStyle(
-                                      fontSize: 11,
-                                      fontWeight: FontWeight.w800,
-                                      color: AppColors.primaryDark,
-                                      letterSpacing: 0.3,
-                                    ),
-                                  ),
-                                ],
+                              padding: const EdgeInsets.all(4),
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(6),
+                                child: Image.asset(
+                                  'assets/branding/vegora_app_icon.jpg',
+                                  fit: BoxFit.contain,
+                                ),
                               ),
                             ),
                             const SizedBox(width: 10),
 
-                            // Address & Hub selection
+                            // Delivery Location & Branch Selector
                             Expanded(
                               child: InkWell(
                                 onTap: () => context.push('/branches'),
@@ -95,12 +86,22 @@ class HomeScreen extends ConsumerWidget {
                                     children: [
                                       Row(
                                         children: [
-                                          Text(
-                                            '${currentAddress.label} • ${currentAddress.area}',
-                                            style: const TextStyle(
-                                              fontSize: 14,
-                                              fontWeight: FontWeight.w800,
-                                              color: AppColors.textPrimary,
+                                          const Icon(
+                                            Icons.location_on_rounded,
+                                            size: 15,
+                                            color: AppColors.primary,
+                                          ),
+                                          const SizedBox(width: 3),
+                                          Flexible(
+                                            child: Text(
+                                              '${currentAddress.label} • ${currentAddress.area}',
+                                              style: const TextStyle(
+                                                fontSize: 13.5,
+                                                fontWeight: FontWeight.w800,
+                                                color: AppColors.textPrimary,
+                                              ),
+                                              maxLines: 1,
+                                              overflow: TextOverflow.ellipsis,
                                             ),
                                           ),
                                           const Icon(
@@ -110,6 +111,7 @@ class HomeScreen extends ConsumerWidget {
                                           ),
                                         ],
                                       ),
+                                      const SizedBox(height: 1),
                                       Text(
                                         'Hub: ${currentBranch.name}',
                                         style: const TextStyle(
@@ -126,21 +128,72 @@ class HomeScreen extends ConsumerWidget {
                               ),
                             ),
 
-                            // Profile avatar button
+                            // Cart Icon with Item Badge
+                            InkWell(
+                              onTap: () => context.go('/cart'),
+                              borderRadius: BorderRadius.circular(20),
+                              child: Container(
+                                width: 38,
+                                height: 38,
+                                decoration: BoxDecoration(
+                                  color: AppColors.neutral50,
+                                  shape: BoxShape.circle,
+                                  border: Border.all(color: AppColors.border),
+                                ),
+                                child: Stack(
+                                  alignment: Alignment.center,
+                                  children: [
+                                    const Icon(
+                                      Icons.shopping_bag_outlined,
+                                      size: 19,
+                                      color: AppColors.textPrimary,
+                                    ),
+                                    if (cart.isNotEmpty)
+                                      Positioned(
+                                        top: 5,
+                                        right: 5,
+                                        child: Container(
+                                          padding: const EdgeInsets.all(3),
+                                          decoration: const BoxDecoration(
+                                            color: AppColors.primary,
+                                            shape: BoxShape.circle,
+                                          ),
+                                          constraints: const BoxConstraints(
+                                            minWidth: 14,
+                                            minHeight: 14,
+                                          ),
+                                          child: Text(
+                                            '${cart.totalItemCount}',
+                                            textAlign: TextAlign.center,
+                                            style: const TextStyle(
+                                              color: Colors.white,
+                                              fontSize: 9,
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+
+                            // Profile Avatar Button
                             InkWell(
                               onTap: () => context.go('/profile'),
                               borderRadius: BorderRadius.circular(20),
                               child: Container(
-                                width: 36,
-                                height: 36,
+                                width: 38,
+                                height: 38,
                                 decoration: BoxDecoration(
-                                  color: AppColors.neutral100,
+                                  color: AppColors.neutral50,
                                   shape: BoxShape.circle,
                                   border: Border.all(color: AppColors.border),
                                 ),
                                 child: const Icon(
                                   Icons.person_outline_rounded,
-                                  size: 20,
+                                  size: 19,
                                   color: AppColors.textPrimary,
                                 ),
                               ),
@@ -150,33 +203,36 @@ class HomeScreen extends ConsumerWidget {
 
                         const SizedBox(height: 12),
 
-                        // Search Bar Button (navigates to catalog with focus)
+                        // Search Bar Button (navigates to catalog)
                         InkWell(
                           onTap: () => context.go('/catalog'),
                           borderRadius: BorderRadius.circular(12),
                           child: Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 14,
-                              vertical: 12,
-                            ),
+                            height: 46,
+                            padding: const EdgeInsets.symmetric(horizontal: 14),
                             decoration: BoxDecoration(
                               color: AppColors.neutral50,
                               borderRadius: BorderRadius.circular(12),
-                              border: Border.all(color: AppColors.border),
+                              border: Border.all(
+                                color: AppColors.border,
+                                width: 1,
+                              ),
                             ),
-                            child: const Row(
+                            child: Row(
                               children: [
-                                Icon(
+                                const Icon(
                                   Icons.search_rounded,
-                                  color: AppColors.neutral500,
+                                  color: AppColors.primary,
                                   size: 20,
                                 ),
-                                SizedBox(width: 10),
+                                const SizedBox(width: 10),
                                 Expanded(
                                   child: Text(
-                                    'Search spinach, potatoes, tomatoes, fruits...',
-                                    style: TextStyle(
-                                      color: AppColors.neutral500,
+                                    isTamil
+                                        ? 'காய்கறிகள், கீரைகள், பழங்களை தேடுங்கள்...'
+                                        : 'Search fresh vegetables, greens, fruits...',
+                                    style: const TextStyle(
+                                      color: AppColors.textSecondary,
                                       fontSize: 13.5,
                                       fontWeight: FontWeight.w400,
                                     ),
@@ -193,12 +249,12 @@ class HomeScreen extends ConsumerWidget {
                   ),
                 ),
 
-                // Authentic Editorial Hero Harvest Banner
+                // Authentic Editorial Promotional Banner
                 SliverToBoxAdapter(
                   child: Container(
-                    margin: const EdgeInsets.fromLTRB(16, 16, 16, 12),
+                    margin: const EdgeInsets.fromLTRB(16, 14, 16, 10),
                     decoration: BoxDecoration(
-                      color: const Color(0xFF074826), // Deep Forest Green
+                      color: AppColors.primaryDark,
                       borderRadius: BorderRadius.circular(16),
                     ),
                     clipBehavior: Clip.antiAlias,
@@ -219,7 +275,7 @@ class HomeScreen extends ConsumerWidget {
                           ),
                         ),
 
-                        // Left-to-right gradient overlay to guarantee text legibility
+                        // Gradient overlay for flawless text contrast
                         Positioned.fill(
                           child: Container(
                             decoration: BoxDecoration(
@@ -227,14 +283,12 @@ class HomeScreen extends ConsumerWidget {
                                 begin: Alignment.centerLeft,
                                 end: Alignment.centerRight,
                                 colors: [
-                                  const Color(0xFF074826),
-                                  const Color(0xFF074826)
-                                      .withValues(alpha: 0.95),
-                                  const Color(0xFF074826)
-                                      .withValues(alpha: 0.6),
+                                  AppColors.primaryDark,
+                                  AppColors.primaryDark.withValues(alpha: 0.96),
+                                  AppColors.primaryDark.withValues(alpha: 0.65),
                                   Colors.transparent,
                                 ],
-                                stops: const [0.0, 0.45, 0.7, 1.0],
+                                stops: const [0.0, 0.45, 0.72, 1.0],
                               ),
                             ),
                           ),
@@ -246,9 +300,11 @@ class HomeScreen extends ConsumerWidget {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              const Text(
-                                'Daily Farm Harvest',
-                                style: TextStyle(
+                              Text(
+                                isTamil
+                                    ? 'தினசரி பண்ணை அறுவடை'
+                                    : 'Daily Farm Harvest',
+                                style: const TextStyle(
                                   color: Colors.white,
                                   fontSize: 18,
                                   fontWeight: FontWeight.w800,
@@ -257,9 +313,11 @@ class HomeScreen extends ConsumerWidget {
                               ),
                               const SizedBox(height: 5),
                               Text(
-                                'Fresh greens & daily veggies sourced direct from local Karnataka growers at mandi rates.',
+                                isTamil
+                                    ? 'நேரடியாக உள்ளூர் பண்ணைகளில் இருந்து பறிக்கப்பட்ட புதிய காய்கறிகள்.'
+                                    : 'Fresh greens & farm-fresh produce sourced direct from local growers.',
                                 style: TextStyle(
-                                  color: Colors.white.withValues(alpha: 0.9),
+                                  color: Colors.white.withValues(alpha: 0.92),
                                   fontSize: 12,
                                   height: 1.35,
                                 ),
@@ -267,21 +325,34 @@ class HomeScreen extends ConsumerWidget {
                               const SizedBox(height: 12),
                               Container(
                                 padding: const EdgeInsets.symmetric(
-                                  horizontal: 8,
-                                  vertical: 3,
+                                  horizontal: 10,
+                                  vertical: 4,
                                 ),
                                 decoration: BoxDecoration(
                                   color: Colors.white.withValues(alpha: 0.18),
-                                  borderRadius: BorderRadius.circular(6),
+                                  borderRadius: BorderRadius.circular(20),
                                 ),
-                                child: const Text(
-                                  'Delivered in 30 mins',
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 10.5,
-                                    fontWeight: FontWeight.w700,
-                                    letterSpacing: 0.2,
-                                  ),
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    const Icon(
+                                      Icons.bolt_rounded,
+                                      size: 13,
+                                      color: Colors.white,
+                                    ),
+                                    const SizedBox(width: 4),
+                                    Text(
+                                      isTamil
+                                          ? '30 நிமிடங்களில் உங்கள் வீடு தேடி'
+                                          : '30-Min Express Delivery',
+                                      style: const TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 11,
+                                        fontWeight: FontWeight.w700,
+                                        letterSpacing: 0.1,
+                                      ),
+                                    ),
+                                  ],
                                 ),
                               ),
                             ],
@@ -300,22 +371,24 @@ class HomeScreen extends ConsumerWidget {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       crossAxisAlignment: CrossAxisAlignment.end,
                       children: [
-                        const Column(
+                        Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              'Shop by Category',
-                              style: TextStyle(
+                              isTamil ? 'வகைகள்' : 'Shop by Category',
+                              style: const TextStyle(
                                 fontSize: 17,
                                 fontWeight: FontWeight.w800,
                                 color: AppColors.textPrimary,
                                 letterSpacing: -0.3,
                               ),
                             ),
-                            SizedBox(height: 2),
+                            const SizedBox(height: 2),
                             Text(
-                              'Farm-fresh produce organized by type',
-                              style: TextStyle(
+                              isTamil
+                                  ? 'பண்ணை காய்கறிகள் வகைவாரியாக'
+                                  : 'Farm-fresh produce organized by type',
+                              style: const TextStyle(
                                 fontSize: 11.5,
                                 color: AppColors.textSecondary,
                               ),
@@ -328,9 +401,9 @@ class HomeScreen extends ConsumerWidget {
                             foregroundColor: AppColors.primary,
                             visualDensity: VisualDensity.compact,
                           ),
-                          child: const Text(
-                            'See all',
-                            style: TextStyle(
+                          child: Text(
+                            isTamil ? 'அனைத்தும்' : 'See all',
+                            style: const TextStyle(
                               fontSize: 13,
                               fontWeight: FontWeight.w700,
                             ),
@@ -341,7 +414,7 @@ class HomeScreen extends ConsumerWidget {
                   ),
                 ),
 
-                // Category Tiles with Natural Organic Tints
+                // Category Horizontal Tiles
                 SliverToBoxAdapter(
                   child: FutureBuilder<List<ProductCategory>>(
                     future: catalogRepo.getCategories(),
@@ -416,22 +489,22 @@ class HomeScreen extends ConsumerWidget {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       crossAxisAlignment: CrossAxisAlignment.end,
                       children: [
-                        const Column(
+                        Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              'Best Sellers',
-                              style: TextStyle(
+                              isTamil ? 'சிறந்த விற்பனை' : 'Best Sellers',
+                              style: const TextStyle(
                                 fontSize: 17,
                                 fontWeight: FontWeight.w800,
                                 color: AppColors.textPrimary,
                                 letterSpacing: -0.3,
                               ),
                             ),
-                            SizedBox(height: 2),
+                            const SizedBox(height: 2),
                             Text(
-                              'Most ordered vegetables & essentials today',
-                              style: TextStyle(
+                              isTamil ? 'இன்று அதிகம் விரும்பப்பட்ட பொருட்கள்' : 'Most ordered vegetables & essentials today',
+                              style: const TextStyle(
                                 fontSize: 11.5,
                                 color: AppColors.textSecondary,
                               ),
@@ -444,9 +517,9 @@ class HomeScreen extends ConsumerWidget {
                             foregroundColor: AppColors.primary,
                             visualDensity: VisualDensity.compact,
                           ),
-                          child: const Text(
-                            'View all',
-                            style: TextStyle(
+                          child: Text(
+                            isTamil ? 'அனைத்தும்' : 'View all',
+                            style: const TextStyle(
                               fontSize: 13,
                               fontWeight: FontWeight.w700,
                             ),
@@ -468,7 +541,7 @@ class HomeScreen extends ConsumerWidget {
                       final products = snapshot.data!;
 
                       return SizedBox(
-                        height: 236,
+                        height: 242,
                         child: ListView.separated(
                           scrollDirection: Axis.horizontal,
                           padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -477,7 +550,7 @@ class HomeScreen extends ConsumerWidget {
                               const SizedBox(width: 12),
                           itemBuilder: (context, index) {
                             return SizedBox(
-                              width: 160,
+                              width: 164,
                               child: ProductCard(
                                 product: products[index],
                                 onTap: () => context.push(
@@ -500,22 +573,26 @@ class HomeScreen extends ConsumerWidget {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       crossAxisAlignment: CrossAxisAlignment.end,
                       children: [
-                        const Column(
+                        Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              'Fresh Greens & Seasonal Harvest',
-                              style: TextStyle(
+                              isTamil
+                                  ? 'புதிய கீரைகள் & பருவக்கால அறுவடை'
+                                  : 'Fresh Greens & Seasonal Harvest',
+                              style: const TextStyle(
                                 fontSize: 17,
                                 fontWeight: FontWeight.w800,
                                 color: AppColors.textPrimary,
                                 letterSpacing: -0.3,
                               ),
                             ),
-                            SizedBox(height: 2),
+                            const SizedBox(height: 2),
                             Text(
-                              'Crisp greens picked fresh this morning',
-                              style: TextStyle(
+                              isTamil
+                                  ? 'தினமும் காலையில் சேகரிக்கப்படும் பசுமை'
+                                  : 'Crisp greens picked fresh this morning',
+                              style: const TextStyle(
                                 fontSize: 11.5,
                                 color: AppColors.textSecondary,
                               ),
@@ -528,9 +605,9 @@ class HomeScreen extends ConsumerWidget {
                             foregroundColor: AppColors.primary,
                             visualDensity: VisualDensity.compact,
                           ),
-                          child: const Text(
-                            'See all',
-                            style: TextStyle(
+                          child: Text(
+                            isTamil ? 'அனைத்தும்' : 'See all',
+                            style: const TextStyle(
                               fontSize: 13,
                               fontWeight: FontWeight.w700,
                             ),
@@ -541,7 +618,7 @@ class HomeScreen extends ConsumerWidget {
                   ),
                 ),
 
-                // Seasonal Products Grid (2 columns)
+                // Seasonal Products Grid (2 columns on mobile, adaptive)
                 FutureBuilder<List<Product>>(
                   future: catalogRepo.getSeasonalProducts(),
                   builder: (context, snapshot) {
@@ -556,7 +633,7 @@ class HomeScreen extends ConsumerWidget {
                         gridDelegate:
                             const SliverGridDelegateWithFixedCrossAxisCount(
                               crossAxisCount: 2,
-                              childAspectRatio: 0.68,
+                              childAspectRatio: 0.67,
                               crossAxisSpacing: 12,
                               mainAxisSpacing: 12,
                             ),
@@ -572,7 +649,7 @@ class HomeScreen extends ConsumerWidget {
                   },
                 ),
 
-                // Bottom Padding for Cart Summary bar
+                // Bottom Padding for Floating Cart Summary
                 const SliverToBoxAdapter(child: SizedBox(height: 100)),
               ],
             ),
@@ -639,9 +716,9 @@ class HomeScreen extends ConsumerWidget {
                           ],
                         ),
                         const Spacer(),
-                        const Text(
-                          'View Cart',
-                          style: TextStyle(
+                        Text(
+                          isTamil ? 'கூடையைப் பார்' : 'View Cart',
+                          style: const TextStyle(
                             color: Colors.white,
                             fontWeight: FontWeight.bold,
                             fontSize: 14,
@@ -668,38 +745,38 @@ class HomeScreen extends ConsumerWidget {
     switch (categoryId) {
       case 'cat_leafy':
         return const _CategoryTone(
-          background: Color(0xFFF0FDF4),
-          border: Color(0xFFDCFCE7),
+          background: Color(0xFFF2F8F4),
+          border: Color(0xFFE0EFE5),
         );
       case 'cat_everyday':
         return const _CategoryTone(
-          background: Color(0xFFFFF7ED),
-          border: Color(0xFFFFEDD5),
+          background: Color(0xFFFAF7F2),
+          border: Color(0xFFEBE5DB),
         );
       case 'cat_roots':
         return const _CategoryTone(
-          background: Color(0xFFFEF3C7),
-          border: Color(0xFFFDE68A),
+          background: Color(0xFFFBF8EE),
+          border: Color(0xFFEBE6D5),
         );
       case 'cat_onions_potatoes':
         return const _CategoryTone(
-          background: Color(0xFFF8FAFC),
-          border: Color(0xFFE2E8F0),
+          background: Color(0xFFF6F8F6),
+          border: Color(0xFFE4EAE4),
         );
       case 'cat_fruits':
         return const _CategoryTone(
-          background: Color(0xFFFFF1F2),
-          border: Color(0xFFFFE4E6),
+          background: Color(0xFFFAF4F4),
+          border: Color(0xFFEBE0E0),
         );
       case 'cat_seasonal_exotic':
         return const _CategoryTone(
-          background: Color(0xFFF5F3FF),
-          border: Color(0xFFEDE9FE),
+          background: Color(0xFFF5F4FA),
+          border: Color(0xFFE5E2F0),
         );
       default:
         return const _CategoryTone(
-          background: Color(0xFFF8FAFC),
-          border: Color(0xFFE2E8F0),
+          background: Color(0xFFF6F8F6),
+          border: Color(0xFFE4EAE4),
         );
     }
   }

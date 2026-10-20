@@ -1,6 +1,7 @@
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
+import 'package:vegora_core/vegora_core.dart';
 
 import 'admin_pagination_bar.dart';
 
@@ -24,10 +25,7 @@ class AdminTableRow {
   final List<Widget> cells;
   final VoidCallback? onTap;
 
-  const AdminTableRow({
-    required this.cells,
-    this.onTap,
-  });
+  const AdminTableRow({required this.cells, this.onTap});
 }
 
 /// Professional 2026 SaaS-style responsive table container for admin consoles.
@@ -70,7 +68,7 @@ class AdminTableContainer extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: const Color(0xFFE2E8F0), width: 1),
+        border: Border.all(color: AppColors.border, width: 1),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.02),
@@ -103,10 +101,7 @@ class AdminTableContainer extends StatelessWidget {
                           emptyWidget ?? _buildDefaultEmptyState()
                         else
                           for (final row in rows!)
-                            _AdminTableRowWidget(
-                              columns: columns!,
-                              row: row,
-                            ),
+                            _AdminTableRowWidget(columns: columns!, row: row),
                       ],
                     ),
                   ),
@@ -144,10 +139,8 @@ class AdminTableContainer extends StatelessWidget {
       height: 48,
       padding: const EdgeInsets.symmetric(horizontal: 20),
       decoration: const BoxDecoration(
-        color: Color(0xFFF8FAFC),
-        border: Border(
-          bottom: BorderSide(color: Color(0xFFE2E8F0), width: 1),
-        ),
+        color: AppColors.background,
+        border: Border(bottom: BorderSide(color: AppColors.border, width: 1)),
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.center,
@@ -163,7 +156,7 @@ class AdminTableContainer extends StatelessWidget {
                         style: const TextStyle(
                           fontSize: 11.5,
                           fontWeight: FontWeight.w700,
-                          color: Color(0xFF64748B),
+                          color: AppColors.textSecondary,
                           letterSpacing: 0.5,
                         ),
                       ),
@@ -195,11 +188,7 @@ class AdminTableContainer extends StatelessWidget {
       alignment: Alignment.center,
       child: Column(
         children: [
-          const Icon(
-            Icons.inbox_rounded,
-            size: 40,
-            color: Color(0xFF94A3B8),
-          ),
+          const Icon(Icons.inbox_rounded, size: 40, color: Color(0xFF94A3B8)),
           const SizedBox(height: 12),
           Text(
             'No $itemName found matching criteria.',
@@ -219,10 +208,7 @@ class _AdminTableRowWidget extends StatefulWidget {
   final List<AdminTableColumn> columns;
   final AdminTableRow row;
 
-  const _AdminTableRowWidget({
-    required this.columns,
-    required this.row,
-  });
+  const _AdminTableRowWidget({required this.columns, required this.row});
 
   @override
   State<_AdminTableRowWidget> createState() => _AdminTableRowWidgetState();

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:vegora_core/vegora_core.dart';
 
 /// 2026 SaaS-style status badge with an indicator dot and muted background tint.
 class AdminStatusBadge extends StatelessWidget {
@@ -18,16 +19,16 @@ class AdminStatusBadge extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final baseColor = isActive
-        ? (activeColor ?? const Color(0xFF15803D)) // Emerald-700
-        : (inactiveColor ?? const Color(0xFF64748B)); // Slate-500
+        ? (activeColor ?? AppColors.success)
+        : (inactiveColor ?? AppColors.textSecondary);
 
     final bgColor = isActive
-        ? (activeColor?.withValues(alpha: 0.12) ?? const Color(0xFFECFDF5)) // Emerald-50
-        : (inactiveColor?.withValues(alpha: 0.12) ?? const Color(0xFFF1F5F9)); // Slate-100
+        ? (activeColor?.withValues(alpha: 0.12) ?? AppColors.primaryContainer)
+        : (inactiveColor?.withValues(alpha: 0.12) ?? AppColors.surfaceVariant);
 
     final dotColor = isActive
-        ? (activeColor ?? const Color(0xFF16A34A)) // Emerald-600
-        : (inactiveColor ?? const Color(0xFF94A3B8)); // Slate-400
+        ? (activeColor ?? AppColors.primary)
+        : (inactiveColor ?? AppColors.textMuted);
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
@@ -42,10 +43,7 @@ class AdminStatusBadge extends StatelessWidget {
           Container(
             width: 6,
             height: 6,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              color: dotColor,
-            ),
+            decoration: BoxDecoration(shape: BoxShape.circle, color: dotColor),
           ),
           const SizedBox(width: 6),
           Text(

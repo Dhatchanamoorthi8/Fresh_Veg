@@ -61,6 +61,7 @@ class _CartScreenState extends ConsumerState<CartScreen> {
     final meetsMinOrder = cart.meetsMinimumOrder(currentBranch);
 
     return Scaffold(
+      backgroundColor: AppColors.background,
       appBar: AppBar(
         title: Text(isTamil ? 'கூடை' : 'Shopping Cart'),
         actions: [
@@ -77,7 +78,10 @@ class _CartScreenState extends ConsumerState<CartScreen> {
             },
             child: Text(
               isTamil ? 'அனைத்தும் நீக்கு' : 'Clear All',
-              style: const TextStyle(color: AppColors.statusCancelled),
+              style: const TextStyle(
+                color: AppColors.statusCancelled,
+                fontWeight: FontWeight.w600,
+              ),
             ),
           ),
         ],
@@ -87,37 +91,55 @@ class _CartScreenState extends ConsumerState<CartScreen> {
           children: [
             // Branch fulfillment info
             Container(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-              color: AppColors.primaryContainer.withValues(alpha: 0.5),
+              margin: const EdgeInsets.fromLTRB(16, 12, 16, 0),
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: AppColors.border),
+              ),
               child: Row(
                 children: [
-                  const Icon(
-                    Icons.storefront_rounded,
-                    size: 18,
-                    color: AppColors.primaryDark,
+                  Container(
+                    padding: const EdgeInsets.all(6),
+                    decoration: BoxDecoration(
+                      color: AppColors.primaryContainer,
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: const Icon(
+                      Icons.storefront_rounded,
+                      size: 18,
+                      color: AppColors.primaryDark,
+                    ),
                   ),
-                  const SizedBox(width: 8),
+                  const SizedBox(width: 10),
                   Expanded(
                     child: Text(
                       isTamil
                           ? 'கிளை: ${currentBranch.name} (~${currentBranch.estimatedDeliveryMinutes} நிமி)'
                           : 'Fulfilling from: ${currentBranch.name} (~${currentBranch.estimatedDeliveryMinutes}m)',
                       style: const TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.bold,
-                        color: AppColors.primaryDark,
+                        fontSize: 12.5,
+                        fontWeight: FontWeight.w700,
+                        color: AppColors.textPrimary,
                       ),
                     ),
                   ),
                   InkWell(
                     onTap: () => context.push('/branches'),
-                    child: Text(
-                      isTamil ? 'மாற்று' : 'Change',
-                      style: const TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.bold,
-                        color: AppColors.primary,
-                        decoration: TextDecoration.underline,
+                    borderRadius: BorderRadius.circular(6),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 6,
+                        vertical: 2,
+                      ),
+                      child: Text(
+                        isTamil ? 'மாற்று' : 'Change',
+                        style: const TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.bold,
+                          color: AppColors.primary,
+                        ),
                       ),
                     ),
                   ),
@@ -127,17 +149,17 @@ class _CartScreenState extends ConsumerState<CartScreen> {
 
             // Free Delivery Progress Banner
             Container(
-              margin: const EdgeInsets.fromLTRB(16, 12, 16, 8),
-              padding: const EdgeInsets.all(12),
+              margin: const EdgeInsets.fromLTRB(16, 10, 16, 12),
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
               decoration: BoxDecoration(
                 color: isFreeDelivery
                     ? AppColors.primaryContainer
-                    : AppColors.secondaryLight.withValues(alpha: 0.6),
+                    : Colors.white,
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(
                   color: isFreeDelivery
                       ? AppColors.primaryLight
-                      : AppColors.secondary.withValues(alpha: 0.4),
+                      : AppColors.border,
                 ),
               ),
               child: Row(
@@ -145,7 +167,7 @@ class _CartScreenState extends ConsumerState<CartScreen> {
                   Icon(
                     isFreeDelivery
                         ? Icons.check_circle_rounded
-                        : Icons.local_shipping_rounded,
+                        : Icons.local_shipping_outlined,
                     color: isFreeDelivery
                         ? AppColors.primary
                         : AppColors.secondary,
@@ -162,11 +184,11 @@ class _CartScreenState extends ConsumerState<CartScreen> {
                                 ? 'இன்னும் ${CurrencyFormatter.formatPaise(remainingForFreeDelivery)} சேர்த்தால் இலவச டெலிவரி!'
                                 : 'Add ${CurrencyFormatter.formatPaise(remainingForFreeDelivery)} more to get FREE Delivery!'),
                       style: TextStyle(
-                        fontSize: 12,
+                        fontSize: 12.5,
                         fontWeight: FontWeight.w700,
                         color: isFreeDelivery
-                            ? AppColors.onPrimaryContainer
-                            : AppColors.secondary,
+                            ? AppColors.primaryDark
+                            : AppColors.textPrimary,
                       ),
                     ),
                   ),

@@ -110,7 +110,9 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
             padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
             child: ConstrainedBox(
               constraints: const BoxConstraints(maxWidth: 440),
-              child: _emailSent ? _buildOtpVerificationView() : _buildEmailFormView(),
+              child: _emailSent
+                  ? _buildOtpVerificationView()
+                  : _buildEmailFormView(),
             ),
           ),
         ),
@@ -363,7 +365,9 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
                         if (mounted) {
                           ScaffoldMessenger.of(context).showSnackBar(
                             const SnackBar(
-                              content: Text('A new confirmation code has been sent!'),
+                              content: Text(
+                                'A new confirmation code has been sent!',
+                              ),
                               backgroundColor: AppColors.primary,
                             ),
                           );
@@ -401,9 +405,7 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
       decoration: BoxDecoration(
         color: AppColors.errorContainer,
         borderRadius: BorderRadius.circular(10),
-        border: Border.all(
-          color: AppColors.error.withValues(alpha: 0.3),
-        ),
+        border: Border.all(color: AppColors.error.withValues(alpha: 0.3)),
       ),
       child: Row(
         children: [

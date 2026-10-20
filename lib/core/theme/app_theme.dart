@@ -2,12 +2,17 @@ import 'package:flutter/material.dart';
 
 import '../constants/app_colors.dart';
 
+/// Vegora Premium Design System Theme
+///
+/// Implements the fresh natural green and clean white identity with calibrated
+/// typography, accessible contrasts, and native Tamil language support.
 class AppTheme {
   AppTheme._();
 
   static const String tamilFontFamily = 'NotoSansTamil';
   static const List<String> fallbackFonts = [
     tamilFontFamily,
+    'Inter',
     'Roboto',
     'sans-serif',
   ];
@@ -25,11 +30,15 @@ class AppTheme {
       onPrimary: Colors.white,
       primaryContainer: AppColors.primaryContainer,
       onPrimaryContainer: AppColors.onPrimaryContainer,
-      secondary: AppColors.secondary,
+      secondary: AppColors.primaryDark,
+      onSecondary: Colors.white,
       surface: AppColors.surface,
       surfaceContainerHighest: AppColors.surfaceVariant,
       onSurface: AppColors.textPrimary,
       outline: AppColors.border,
+      outlineVariant: AppColors.borderDark,
+      error: AppColors.error,
+      onError: Colors.white,
       brightness: Brightness.light,
     );
 
@@ -43,94 +52,157 @@ class AppTheme {
         backgroundColor: Colors.white,
         foregroundColor: AppColors.textPrimary,
         elevation: 0,
-        scrolledUnderElevation: 1,
+        scrolledUnderElevation: 0,
         centerTitle: false,
         titleTextStyle: TextStyle(
           color: AppColors.textPrimary,
           fontSize: 18,
           fontWeight: FontWeight.w700,
-          letterSpacing: -0.2,
+          letterSpacing: -0.3,
           fontFamily: activeFontFamily,
           fontFamilyFallback: fallbackFonts,
           height: lineHeight,
         ),
+        iconTheme: const IconThemeData(color: AppColors.textPrimary, size: 22),
       ),
       textTheme: TextTheme(
+        // Display Headings (28-32 px)
         displayLarge: TextStyle(
+          fontSize: 32,
+          fontWeight: FontWeight.w800,
+          letterSpacing: -0.8,
+          color: AppColors.textPrimary,
           fontFamily: activeFontFamily,
           fontFamilyFallback: fallbackFonts,
           height: lineHeight,
         ),
         displayMedium: TextStyle(
+          fontSize: 28,
+          fontWeight: FontWeight.w800,
+          letterSpacing: -0.6,
+          color: AppColors.textPrimary,
           fontFamily: activeFontFamily,
           fontFamilyFallback: fallbackFonts,
           height: lineHeight,
         ),
         displaySmall: TextStyle(
+          fontSize: 24,
+          fontWeight: FontWeight.w700,
+          letterSpacing: -0.4,
+          color: AppColors.textPrimary,
           fontFamily: activeFontFamily,
           fontFamilyFallback: fallbackFonts,
           height: lineHeight,
         ),
+
+        // Screen & Section Headings (18-28 px)
         headlineLarge: TextStyle(
+          fontSize: 26,
+          fontWeight: FontWeight.w800,
+          letterSpacing: -0.5,
+          color: AppColors.textPrimary,
           fontFamily: activeFontFamily,
           fontFamilyFallback: fallbackFonts,
           height: lineHeight,
         ),
         headlineMedium: TextStyle(
+          fontSize: 22,
+          fontWeight: FontWeight.w700,
+          letterSpacing: -0.3,
+          color: AppColors.textPrimary,
           fontFamily: activeFontFamily,
           fontFamilyFallback: fallbackFonts,
           height: lineHeight,
         ),
         headlineSmall: TextStyle(
+          fontSize: 19,
+          fontWeight: FontWeight.w700,
+          letterSpacing: -0.2,
+          color: AppColors.textPrimary,
           fontFamily: activeFontFamily,
           fontFamilyFallback: fallbackFonts,
           height: lineHeight,
         ),
+
+        // Section & Card Titles (15-20 px)
         titleLarge: TextStyle(
+          fontSize: 18,
+          fontWeight: FontWeight.w700,
+          letterSpacing: -0.2,
+          color: AppColors.textPrimary,
           fontFamily: activeFontFamily,
           fontFamilyFallback: fallbackFonts,
           height: lineHeight,
-          fontWeight: FontWeight.bold,
         ),
         titleMedium: TextStyle(
+          fontSize: 16,
+          fontWeight: FontWeight.w600,
+          letterSpacing: -0.1,
+          color: AppColors.textPrimary,
           fontFamily: activeFontFamily,
           fontFamilyFallback: fallbackFonts,
           height: lineHeight,
-          fontWeight: FontWeight.w600,
         ),
         titleSmall: TextStyle(
-          fontFamily: activeFontFamily,
-          fontFamilyFallback: fallbackFonts,
-          height: lineHeight,
+          fontSize: 14,
           fontWeight: FontWeight.w600,
-        ),
-        bodyLarge: TextStyle(
+          letterSpacing: 0,
+          color: AppColors.textPrimary,
           fontFamily: activeFontFamily,
           fontFamilyFallback: fallbackFonts,
           height: lineHeight,
+        ),
+
+        // Body Text (14-16 px)
+        bodyLarge: TextStyle(
+          fontSize: 16,
+          fontWeight: FontWeight.w400,
+          color: AppColors.textPrimary,
+          fontFamily: activeFontFamily,
+          fontFamilyFallback: fallbackFonts,
+          height: lineHeight + 0.1,
         ),
         bodyMedium: TextStyle(
+          fontSize: 14,
+          fontWeight: FontWeight.w400,
+          color: AppColors.textSecondary,
           fontFamily: activeFontFamily,
           fontFamilyFallback: fallbackFonts,
-          height: lineHeight,
+          height: lineHeight + 0.1,
         ),
         bodySmall: TextStyle(
+          fontSize: 12,
+          fontWeight: FontWeight.w400,
+          color: AppColors.textMuted,
           fontFamily: activeFontFamily,
           fontFamilyFallback: fallbackFonts,
           height: lineHeight,
         ),
+
+        // Buttons & Labels (12-16 px)
         labelLarge: TextStyle(
+          fontSize: 15,
+          fontWeight: FontWeight.w600,
+          letterSpacing: 0.1,
+          color: AppColors.textPrimary,
           fontFamily: activeFontFamily,
           fontFamilyFallback: fallbackFonts,
           height: lineHeight,
-          fontWeight: FontWeight.w600,
         ),
         labelMedium: TextStyle(
+          fontSize: 13,
+          fontWeight: FontWeight.w600,
+          letterSpacing: 0.1,
+          color: AppColors.textSecondary,
           fontFamily: activeFontFamily,
           fontFamilyFallback: fallbackFonts,
           height: lineHeight,
         ),
         labelSmall: TextStyle(
+          fontSize: 11,
+          fontWeight: FontWeight.w600,
+          letterSpacing: 0.2,
+          color: AppColors.textMuted,
           fontFamily: activeFontFamily,
           fontFamilyFallback: fallbackFonts,
           height: lineHeight,
@@ -140,7 +212,7 @@ class AppTheme {
         color: AppColors.surface,
         elevation: 0,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(14),
           side: const BorderSide(color: AppColors.border, width: 1),
         ),
         margin: EdgeInsets.zero,
@@ -166,7 +238,7 @@ class AppTheme {
       outlinedButtonTheme: OutlinedButtonThemeData(
         style: OutlinedButton.styleFrom(
           foregroundColor: AppColors.primary,
-          side: const BorderSide(color: AppColors.primary, width: 1.5),
+          side: const BorderSide(color: AppColors.border, width: 1.2),
           padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
@@ -183,6 +255,7 @@ class AppTheme {
       textButtonTheme: TextButtonThemeData(
         style: TextButton.styleFrom(
           foregroundColor: AppColors.primary,
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
           textStyle: TextStyle(
             fontSize: 14,
             fontWeight: FontWeight.w600,
@@ -194,7 +267,7 @@ class AppTheme {
       ),
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
-        fillColor: AppColors.surface,
+        fillColor: Colors.white,
         contentPadding: const EdgeInsets.symmetric(
           horizontal: 16,
           vertical: 14,
@@ -213,7 +286,11 @@ class AppTheme {
         ),
         errorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: AppColors.statusCancelled),
+          borderSide: const BorderSide(color: AppColors.error),
+        ),
+        focusedErrorBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(color: AppColors.error, width: 1.5),
         ),
         hintStyle: TextStyle(
           color: AppColors.textMuted,
@@ -226,7 +303,7 @@ class AppTheme {
       chipTheme: ChipThemeData(
         backgroundColor: AppColors.surfaceVariant,
         selectedColor: AppColors.primaryContainer,
-        side: BorderSide.none,
+        side: const BorderSide(color: AppColors.border, width: 0.8),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
         labelStyle: TextStyle(
           fontSize: 13,
@@ -239,9 +316,9 @@ class AppTheme {
       bottomNavigationBarTheme: BottomNavigationBarThemeData(
         backgroundColor: Colors.white,
         selectedItemColor: AppColors.primary,
-        unselectedItemColor: AppColors.textMuted,
+        unselectedItemColor: AppColors.textSecondary,
         type: BottomNavigationBarType.fixed,
-        elevation: 8,
+        elevation: 0,
         selectedLabelStyle: TextStyle(
           fontSize: 12,
           fontWeight: FontWeight.w600,

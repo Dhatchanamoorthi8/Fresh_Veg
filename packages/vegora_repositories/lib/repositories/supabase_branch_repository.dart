@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'package:vegora_models/vegora_models.dart';
+
 import 'branch_repository.dart';
 
 class SupabaseBranchRepository implements BranchRepository {
@@ -130,7 +131,9 @@ class SupabaseBranchRepository implements BranchRepository {
       }
 
       await _client.from('customer_addresses').upsert({
-        if (address.id.isNotEmpty && !address.id.startsWith('addr_demo') && !address.id.startsWith('addr_local'))
+        if (address.id.isNotEmpty &&
+            !address.id.startsWith('addr_demo') &&
+            !address.id.startsWith('addr_local'))
           'id': address.id,
         'user_id': uid,
         'title': address.label,

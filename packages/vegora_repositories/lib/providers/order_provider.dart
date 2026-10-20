@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:vegora_models/vegora_models.dart';
+
 import 'app_providers.dart';
 import 'auth_provider.dart';
 

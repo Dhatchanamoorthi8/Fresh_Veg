@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:vegora_core/localization/app_localizations.dart';
 
 import '../../core/constants/app_colors.dart';
@@ -45,20 +46,20 @@ class ProductCard extends ConsumerWidget {
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(14),
-          border: Border.all(color: AppColors.border),
+          border: Border.all(color: AppColors.border, width: 1.0),
         ),
         padding: const EdgeInsets.all(10),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Produce Display Container
+            // Produce Photography Container
             Expanded(
               child: Stack(
                 children: [
                   Container(
                     width: double.infinity,
                     decoration: BoxDecoration(
-                      color: AppColors.neutral50,
+                      color: AppColors.background,
                       borderRadius: BorderRadius.circular(10),
                     ),
                     clipBehavior: Clip.antiAlias,
@@ -72,7 +73,7 @@ class ProductCard extends ConsumerWidget {
                     ),
                   ),
 
-                  // Badges
+                  // Semantic Badges
                   Positioned(
                     top: 6,
                     left: 6,
@@ -84,11 +85,15 @@ class ProductCard extends ConsumerWidget {
                             margin: const EdgeInsets.only(bottom: 4),
                             padding: const EdgeInsets.symmetric(
                               horizontal: 6,
-                              vertical: 2,
+                              vertical: 2.5,
                             ),
                             decoration: BoxDecoration(
-                              color: AppColors.primaryContainer,
+                              color: AppColors.primaryLight,
                               borderRadius: BorderRadius.circular(4),
+                              border: Border.all(
+                                color: AppColors.primary.withValues(alpha: 0.2),
+                                width: 0.8,
+                              ),
                             ),
                             child: Row(
                               mainAxisSize: MainAxisSize.min,
@@ -96,13 +101,13 @@ class ProductCard extends ConsumerWidget {
                                 const Icon(
                                   Icons.eco_rounded,
                                   size: 10,
-                                  color: AppColors.primary,
+                                  color: AppColors.primaryDark,
                                 ),
                                 const SizedBox(width: 3),
                                 Text(
                                   l10n.organic,
                                   style: const TextStyle(
-                                    color: AppColors.primary,
+                                    color: AppColors.primaryDark,
                                     fontSize: 8.5,
                                     fontWeight: FontWeight.w700,
                                     letterSpacing: 0.3,
@@ -115,16 +120,20 @@ class ProductCard extends ConsumerWidget {
                           Container(
                             padding: const EdgeInsets.symmetric(
                               horizontal: 6,
-                              vertical: 2,
+                              vertical: 2.5,
                             ),
                             decoration: BoxDecoration(
-                              color: const Color(0xFFFFEDD5),
+                              color: AppColors.warningContainer,
                               borderRadius: BorderRadius.circular(4),
+                              border: Border.all(
+                                color: AppColors.warning.withValues(alpha: 0.3),
+                                width: 0.8,
+                              ),
                             ),
                             child: Text(
                               l10n.bestSeller,
                               style: const TextStyle(
-                                color: Color(0xFFC2410C),
+                                color: AppColors.warning,
                                 fontSize: 8.5,
                                 fontWeight: FontWeight.w700,
                                 letterSpacing: 0.3,
@@ -148,11 +157,11 @@ class ProductCard extends ConsumerWidget {
                       child: Container(
                         padding: const EdgeInsets.symmetric(
                           horizontal: 8,
-                          vertical: 3,
+                          vertical: 3.5,
                         ),
                         decoration: BoxDecoration(
                           color: AppColors.neutral700,
-                          borderRadius: BorderRadius.circular(4),
+                          borderRadius: BorderRadius.circular(6),
                         ),
                         child: Text(
                           l10n.outOfStock.toUpperCase(),
@@ -176,10 +185,11 @@ class ProductCard extends ConsumerWidget {
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
               style: TextStyle(
-                fontSize: 13.5,
+                fontSize: 14,
                 fontWeight: FontWeight.w700,
                 color: AppColors.textPrimary,
                 height: isTamil ? 1.35 : 1.2,
+                letterSpacing: -0.2,
               ),
             ),
 
@@ -189,7 +199,7 @@ class ProductCard extends ConsumerWidget {
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
               style: const TextStyle(
-                fontSize: 11,
+                fontSize: 11.5,
                 color: AppColors.textSecondary,
                 fontWeight: FontWeight.w500,
               ),
@@ -201,13 +211,13 @@ class ProductCard extends ConsumerWidget {
               product.formatUnitLabel(isTamil: isTamil),
               style: const TextStyle(
                 fontSize: 11,
-                color: AppColors.neutral500,
+                color: AppColors.textMuted,
                 fontWeight: FontWeight.w500,
               ),
             ),
             const SizedBox(height: 8),
 
-            // Price & Add to Cart
+            // Price & Add to Cart Action
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               crossAxisAlignment: CrossAxisAlignment.end,
@@ -218,9 +228,10 @@ class ProductCard extends ConsumerWidget {
                     Text(
                       CurrencyFormatter.formatPaise(pricePaise),
                       style: const TextStyle(
-                        fontSize: 14.5,
+                        fontSize: 15,
                         fontWeight: FontWeight.w800,
                         color: AppColors.textPrimary,
+                        letterSpacing: -0.2,
                       ),
                     ),
                     if (product.originalPricePaise != null &&
@@ -230,7 +241,7 @@ class ProductCard extends ConsumerWidget {
                           product.originalPricePaise!,
                         ),
                         style: const TextStyle(
-                          fontSize: 10.5,
+                          fontSize: 11,
                           color: AppColors.textMuted,
                           decoration: TextDecoration.lineThrough,
                         ),
@@ -243,14 +254,14 @@ class ProductCard extends ConsumerWidget {
                   const SizedBox.shrink()
                 else if (qtyInCart == 0)
                   SizedBox(
-                    height: 30,
+                    height: 32,
                     child: OutlinedButton(
                       style: OutlinedButton.styleFrom(
                         backgroundColor: Colors.white,
                         foregroundColor: AppColors.primary,
                         side: const BorderSide(
                           color: AppColors.primary,
-                          width: 1.4,
+                          width: 1.3,
                         ),
                         padding: const EdgeInsets.symmetric(horizontal: 10),
                         shape: RoundedRectangleBorder(
@@ -271,7 +282,7 @@ class ProductCard extends ConsumerWidget {
                             ),
                           ),
                           const SizedBox(width: 3),
-                          const Icon(Icons.add, size: 13),
+                          const Icon(Icons.add, size: 14),
                         ],
                       ),
                     ),
@@ -284,7 +295,7 @@ class ProductCard extends ConsumerWidget {
                       initialQuantity: qtyInCart,
                     ),
                     child: Container(
-                      height: 30,
+                      height: 32,
                       padding: const EdgeInsets.symmetric(horizontal: 6),
                       decoration: BoxDecoration(
                         color: AppColors.primary,
@@ -301,7 +312,7 @@ class ProductCard extends ConsumerWidget {
                               padding: EdgeInsets.symmetric(horizontal: 4),
                               child: Icon(
                                 Icons.remove,
-                                size: 12,
+                                size: 13,
                                 color: Colors.white,
                               ),
                             ),
@@ -316,19 +327,38 @@ class ProductCard extends ConsumerWidget {
                               style: const TextStyle(
                                 color: Colors.white,
                                 fontWeight: FontWeight.bold,
-                                fontSize: 11,
+                                fontSize: 11.5,
                               ),
                             ),
                           ),
                           InkWell(
-                            onTap: () => ref
-                                .read(cartProvider.notifier)
-                                .incrementQuantity(product.id),
+                            onTap: () {
+                              final currentStock = product.getStockForBranch(
+                                currentBranch.id,
+                              );
+                              final step = product.quantityStep;
+                              if (qtyInCart + step <= currentStock) {
+                                ref
+                                    .read(cartProvider.notifier)
+                                    .incrementQuantity(product.id);
+                              } else {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: Text(
+                                      isTamil
+                                          ? 'அதிகபட்ச இருப்பு அளவு எட்டப்பட்டது'
+                                          : 'Maximum available stock reached',
+                                    ),
+                                    duration: const Duration(seconds: 1),
+                                  ),
+                                );
+                              }
+                            },
                             child: const Padding(
                               padding: EdgeInsets.symmetric(horizontal: 4),
                               child: Icon(
                                 Icons.add,
-                                size: 12,
+                                size: 13,
                                 color: Colors.white,
                               ),
                             ),
@@ -345,30 +375,37 @@ class ProductCard extends ConsumerWidget {
     );
   }
 
-  void _handleAddToCart(
+  Future<void> _handleAddToCart(
     BuildContext context,
     WidgetRef ref,
     Branch currentBranch,
     Cart cart,
-  ) {
-    if (product.isWeightBased) {
-      QuantitySelectorSheet.show(
-        context,
-        product: product,
-        initialQuantity: product.minOrderQuantity,
-      );
+  ) async {
+    final qty = product.isWeightBased ? product.minOrderQuantity : 1;
+    if (product.allowCustomQuantity && product.isWeightBased) {
+      if (!context.mounted) return;
+      QuantitySelectorSheet.show(context, product: product);
       return;
     }
 
     try {
       ref
           .read(cartProvider.notifier)
-          .addItem(product, currentBranch.id, quantity: 1);
+          .addItem(product, currentBranch.id, quantity: qty);
+      final isTamil = ref.read(appLocaleProvider).languageCode == 'ta';
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('${product.displayName()} added to cart'),
-          duration: const Duration(seconds: 1),
-          behavior: SnackBarBehavior.floating,
+          content: Text(
+            isTamil
+                ? '${product.displayName("ta")} கூடையில் சேர்க்கப்பட்டது!'
+                : '${product.name} added to cart!',
+          ),
+          duration: const Duration(seconds: 2),
+          action: SnackBarAction(
+            label: isTamil ? 'கூடை' : 'Cart',
+            textColor: Colors.white,
+            onPressed: () => context.go('/cart'),
+          ),
         ),
       );
     } on BranchMismatchException catch (e) {
@@ -389,18 +426,9 @@ class ProductCard extends ConsumerWidget {
               .switchBranchAndClear(
                 currentBranch.id,
                 initialProduct: product,
-                initialQuantity: product.isWeightBased
-                    ? product.minOrderQuantity
-                    : 1,
+                initialQuantity: qty,
               );
         },
-      );
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('$e'),
-          backgroundColor: AppColors.statusCancelled,
-        ),
       );
     }
   }

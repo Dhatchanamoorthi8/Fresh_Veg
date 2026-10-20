@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:vegora_core/vegora_core.dart';
 import 'package:vegora_models/vegora_models.dart';
 import 'package:vegora_repositories/vegora_repositories.dart';
+
 import 'admin_shell.dart';
 
 class AdminCategoriesScreen extends ConsumerStatefulWidget {
@@ -64,7 +65,9 @@ class _AdminCategoriesScreenState extends ConsumerState<AdminCategoriesScreen> {
     final formKey = GlobalKey<FormState>();
 
     final nameCtrl = TextEditingController(text: existingCategory?.name ?? '');
-    final nameTaCtrl = TextEditingController(text: existingCategory?.nameTa ?? '');
+    final nameTaCtrl = TextEditingController(
+      text: existingCategory?.nameTa ?? '',
+    );
     final subtitleCtrl = TextEditingController(
       text: existingCategory?.subtitle ?? '',
     );
@@ -345,7 +348,10 @@ class _AdminCategoriesScreenState extends ConsumerState<AdminCategoriesScreen> {
                   icon: const Icon(Icons.add_rounded, size: 19),
                   label: const Text(
                     'Add Category',
-                    style: TextStyle(fontWeight: FontWeight.w700, fontSize: 13.5),
+                    style: TextStyle(
+                      fontWeight: FontWeight.w700,
+                      fontSize: 13.5,
+                    ),
                   ),
                   onPressed: () => _showAddEditCategoryModal(),
                 ),

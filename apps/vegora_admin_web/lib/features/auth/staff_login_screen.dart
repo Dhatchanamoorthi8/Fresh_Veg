@@ -261,8 +261,7 @@ class _StaffLoginScreenState extends ConsumerState<StaffLoginScreen> {
                     Align(
                       alignment: Alignment.centerRight,
                       child: TextButton(
-                        onPressed: () =>
-                            context.push('/admin/forgot-password'),
+                        onPressed: () => context.push('/admin/forgot-password'),
                         child: const Text(
                           'Forgot Password?',
                           style: TextStyle(
@@ -313,13 +312,19 @@ class _StaffLoginScreenState extends ConsumerState<StaffLoginScreen> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         TextButton.icon(
-                          icon: const Icon(Icons.admin_panel_settings_rounded, size: 16),
+                          icon: const Icon(
+                            Icons.admin_panel_settings_rounded,
+                            size: 16,
+                          ),
                           label: const Text('Admin Console Login'),
                           onPressed: () => context.go('/admin/login'),
                         ),
                         const Padding(
                           padding: EdgeInsets.symmetric(horizontal: 4),
-                          child: Text('•', style: TextStyle(color: AppColors.border)),
+                          child: Text(
+                            '•',
+                            style: TextStyle(color: AppColors.border),
+                          ),
                         ),
                         TextButton.icon(
                           icon: const Icon(Icons.refresh_rounded, size: 16),

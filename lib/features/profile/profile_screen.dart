@@ -21,6 +21,7 @@ class ProfileScreen extends ConsumerWidget {
     final activeLocale = ref.watch(appLocaleProvider);
 
     return Scaffold(
+      backgroundColor: AppColors.background,
       appBar: AppBar(
         title: Text(
           activeLocale.languageCode == 'ta' ? 'என் கணக்கு' : 'My Account',

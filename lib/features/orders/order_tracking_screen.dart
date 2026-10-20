@@ -37,6 +37,7 @@ class OrderTrackingScreen extends ConsumerWidget {
     final timeFormat = DateFormat('hh:mm a, dd MMM');
 
     return Scaffold(
+      backgroundColor: AppColors.background,
       appBar: AppBar(
         title: Text(
           isTamil
