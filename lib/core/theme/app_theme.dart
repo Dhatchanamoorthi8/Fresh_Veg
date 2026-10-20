@@ -337,6 +337,22 @@ class AppTheme {
         thickness: 1,
         space: 1,
       ),
+      snackBarTheme: SnackBarThemeData(
+        behavior: SnackBarBehavior.floating,
+        backgroundColor: Colors.white,
+        elevation: 6,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+          side: const BorderSide(color: AppColors.border, width: 1.2),
+        ),
+        contentTextStyle: const TextStyle(
+          color: AppColors.textPrimary,
+          fontSize: 13.5,
+          fontWeight: FontWeight.w600,
+          letterSpacing: -0.2,
+        ),
+        insetPadding: const EdgeInsets.fromLTRB(16, 0, 16, 14),
+      ),
     );
   }
 }

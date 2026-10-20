@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:vegora_core/localization/app_localizations.dart';
 
 import '../../core/constants/app_colors.dart';
@@ -9,6 +10,7 @@ import '../models/product.dart';
 import '../providers/branch_provider.dart';
 import '../providers/cart_provider.dart';
 import 'branch_switch_dialog.dart';
+import 'vegora_toast.dart';
 import 'product_image_view.dart';
 
 /// Modal bottom sheet for interactive vegetable quantity selection (Grams / Kilograms / Count).
@@ -517,14 +519,12 @@ class _QuantitySelectorSheetState extends ConsumerState<QuantitySelectorSheet> {
                               quantity: _selectedQuantity,
                             );
                         Navigator.of(context).pop(_selectedQuantity);
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text(
-                              '${p.displayName(locale.languageCode)} (${p.formatQuantity(_selectedQuantity, isTamil: isTamil)}) ${isTamil ? "கூடையில் சேர்க்கப்பட்டது" : "added to cart!"}',
-                            ),
-                            behavior: SnackBarBehavior.floating,
-                            duration: const Duration(seconds: 2),
-                          ),
+                        VegoraToast.showSuccess(
+                          context,
+                          '${p.displayName(locale.languageCode)} (${p.formatQuantity(_selectedQuantity, isTamil: isTamil)}) ${isTamil ? "கூடையில் சேர்க்கப்பட்டது" : "added to cart!"}',
+                          title: isTamil ? 'கூடையில் சேர்க்கப்பட்டது' : 'Added to Cart',
+                          actionLabel: isTamil ? 'கூடை' : 'Cart',
+                          onAction: () => context.go('/cart'),
                         );
                       } on BranchMismatchException catch (e) {
                         Navigator.of(context).pop();
@@ -548,21 +548,19 @@ class _QuantitySelectorSheetState extends ConsumerState<QuantitySelectorSheet> {
                                   initialProduct: p,
                                   initialQuantity: _selectedQuantity,
                                 );
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Text(
-                                  'Switched to ${currentBranch.name}. Cart refreshed.',
-                                ),
-                              ),
+                            VegoraToast.showWarning(
+                              context,
+                              'Switched to ${currentBranch.name}. Cart refreshed.',
+                              title: 'Store Switched',
+                              icon: Icons.storefront_rounded,
                             );
                           },
                         );
                       } catch (e) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text('$e'),
-                            backgroundColor: AppColors.statusCancelled,
-                          ),
+                        VegoraToast.showError(
+                          context,
+                          '$e',
+                          title: 'Error Adding Item',
                         );
                       }
                     },

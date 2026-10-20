@@ -57,8 +57,12 @@ class _CartScreenState extends ConsumerState<CartScreen> {
           TextButton(
             onPressed: () {
               ref.read(cartProvider.notifier).clearCart();
-              ScaffoldMessenger.of(context)
-                  .showSnackBar(const SnackBar(content: Text('Cart cleared')));
+              VegoraToast.showSuccess(
+                context,
+                'Cart cleared',
+                title: 'Cart Cleared',
+                icon: Icons.remove_shopping_cart_rounded,
+              );
             },
             child: const Text(
               'Clear All',

@@ -8,3 +8,4 @@ export 'widgets/role_picker_sheet.dart';
 export 'widgets/google_logo.dart';
 export 'widgets/product_image_view.dart';
 export 'widgets/vegora_button.dart';
+export 'widgets/vegora_toast.dart';

@@ -11,6 +11,7 @@ import '../../shared/providers/branch_provider.dart';
 import '../../shared/providers/cart_provider.dart';
 import '../../shared/repositories/branch_repository.dart';
 import '../../shared/widgets/branch_switch_dialog.dart';
+import '../../shared/widgets/vegora_toast.dart';
 
 class BranchSelectionScreen extends ConsumerStatefulWidget {
   const BranchSelectionScreen({super.key});
@@ -542,13 +543,11 @@ class _BranchSelectionScreenState extends ConsumerState<BranchSelectionScreen> {
                           .read(selectedAddressProvider.notifier)
                           .setAddress(addr);
                       Navigator.pop(context);
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text(
-                            'Address set to ${addr.label}. Fulfilling from ${eligibleBranch.name}',
-                          ),
-                          behavior: SnackBarBehavior.floating,
-                        ),
+                      VegoraToast.showAddressSelected(
+                        context,
+                        addressLabel: addr.label,
+                        area: addr.area,
+                        branchName: eligibleBranch.name,
                       );
                     },
                   );
@@ -558,13 +557,11 @@ class _BranchSelectionScreenState extends ConsumerState<BranchSelectionScreen> {
                       .setBranch(eligibleBranch);
                   ref.read(selectedAddressProvider.notifier).setAddress(addr);
                   Navigator.pop(context);
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text(
-                        'Address set to ${addr.label} (${addr.area})',
-                      ),
-                      behavior: SnackBarBehavior.floating,
-                    ),
+                  VegoraToast.showAddressSelected(
+                    context,
+                    addressLabel: addr.label,
+                    area: addr.area,
+                    branchName: eligibleBranch.name,
                   );
                 }
               },
@@ -1242,13 +1239,11 @@ class _BranchSelectionScreenState extends ConsumerState<BranchSelectionScreen> {
 
                             if (!context.mounted) return;
                             Navigator.pop(sheetContext);
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Text(
-                                  'Delivery address added (${finalAddr.area})! Fulfilling from ${eligibleBranch.name}',
-                                ),
-                                behavior: SnackBarBehavior.floating,
-                              ),
+                            VegoraToast.showSuccess(
+                              context,
+                              'Delivery address added (${finalAddr.area})! Fulfilling from ${eligibleBranch.name}',
+                              title: 'Address Saved',
+                              icon: Icons.location_on_rounded,
                             );
                           },
                           style: FilledButton.styleFrom(
@@ -1303,22 +1298,22 @@ class _BranchSelectionScreenState extends ConsumerState<BranchSelectionScreen> {
           ref.read(cartProvider.notifier).clearCart();
           ref.read(selectedBranchProvider.notifier).setBranch(branch);
           Navigator.pop(context);
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('Switched store to ${branch.name}. Cart cleared.'),
-              behavior: SnackBarBehavior.floating,
-            ),
+          VegoraToast.showWarning(
+            context,
+            'Switched store to ${branch.name}. Cart cleared.',
+            title: 'Store Switched',
+            icon: Icons.storefront_rounded,
           );
         },
       );
     } else {
       ref.read(selectedBranchProvider.notifier).setBranch(branch);
       Navigator.pop(context);
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Store branch updated to ${branch.name}'),
-          behavior: SnackBarBehavior.floating,
-        ),
+      VegoraToast.showSuccess(
+        context,
+        'Store branch updated to ${branch.name}',
+        title: 'Store Selected',
+        icon: Icons.storefront_rounded,
       );
     }
   }

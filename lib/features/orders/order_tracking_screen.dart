@@ -9,6 +9,7 @@ import '../../shared/models/order.dart';
 import '../../shared/models/order_status.dart';
 import '../../shared/providers/order_provider.dart';
 import '../../shared/widgets/order_status_badge.dart';
+import '../../shared/widgets/vegora_toast.dart';
 import '../../shared/widgets/product_image_view.dart';
 
 class OrderTrackingScreen extends ConsumerWidget {
@@ -641,8 +642,11 @@ class OrderTrackingScreen extends ConsumerWidget {
                       reason: reasonController.text.trim(),
                     );
                 if (context.mounted) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Order has been cancelled.')),
+                  VegoraToast.showWarning(
+                    context,
+                    'Order has been cancelled.',
+                    title: 'Order Cancelled',
+                    icon: Icons.cancel_outlined,
                   );
                 }
               },

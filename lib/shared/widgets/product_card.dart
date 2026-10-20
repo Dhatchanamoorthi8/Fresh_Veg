@@ -9,6 +9,7 @@ import '../../core/utils/currency_formatter.dart';
 import '../models/branch.dart';
 import '../models/cart.dart';
 import '../models/product.dart';
+import 'vegora_toast.dart';
 import '../providers/branch_provider.dart';
 import '../providers/cart_provider.dart';
 import 'branch_switch_dialog.dart';
@@ -342,15 +343,12 @@ class ProductCard extends ConsumerWidget {
                                     .read(cartProvider.notifier)
                                     .incrementQuantity(product.id);
                               } else {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(
-                                    content: Text(
-                                      isTamil
-                                          ? 'அதிகபட்ச இருப்பு அளவு எட்டப்பட்டது'
-                                          : 'Maximum available stock reached',
-                                    ),
-                                    duration: const Duration(seconds: 1),
-                                  ),
+                                VegoraToast.showWarning(
+                                  context,
+                                  isTamil
+                                      ? 'அதிகபட்ச இருப்பு அளவு எட்டப்பட்டது'
+                                      : 'Maximum available stock reached',
+                                  title: isTamil ? 'இருப்பு வரம்பு' : 'Stock Limit',
                                 );
                               }
                             },
@@ -393,20 +391,14 @@ class ProductCard extends ConsumerWidget {
           .read(cartProvider.notifier)
           .addItem(product, currentBranch.id, quantity: qty);
       final isTamil = ref.read(appLocaleProvider).languageCode == 'ta';
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            isTamil
-                ? '${product.displayName("ta")} கூடையில் சேர்க்கப்பட்டது!'
-                : '${product.name} added to cart!',
-          ),
-          duration: const Duration(seconds: 2),
-          action: SnackBarAction(
-            label: isTamil ? 'கூடை' : 'Cart',
-            textColor: Colors.white,
-            onPressed: () => context.go('/cart'),
-          ),
-        ),
+      VegoraToast.showSuccess(
+        context,
+        isTamil
+            ? '${product.displayName("ta")} கூடையில் சேர்க்கப்பட்டது!'
+            : '${product.name} added to cart!',
+        title: isTamil ? 'கூடையில் சேர்க்கப்பட்டது' : 'Added to Cart',
+        actionLabel: isTamil ? 'கூடை' : 'Cart',
+        onAction: () => context.go('/cart'),
       );
     } on BranchMismatchException catch (e) {
       final branches = ref.read(branchesListProvider).value ?? [];

@@ -13,6 +13,7 @@ import '../../shared/widgets/branch_switch_dialog.dart';
 import '../../shared/widgets/product_card.dart';
 import '../../shared/widgets/product_image_view.dart';
 import '../../shared/widgets/quantity_selector_sheet.dart';
+import '../../shared/widgets/vegora_toast.dart';
 
 class ProductDetailsScreen extends ConsumerStatefulWidget {
   final String productId;
@@ -426,19 +427,12 @@ class _ProductDetailsScreenState extends ConsumerState<ProductDetailsScreen> {
                                               _selectedQuantity = next;
                                             });
                                           } else {
-                                            ScaffoldMessenger.of(
+                                            VegoraToast.showWarning(
                                               context,
-                                            ).showSnackBar(
-                                              SnackBar(
-                                                content: Text(
-                                                  isTamil
-                                                      ? 'அதிகபட்ச இருப்பு ${product.formatQuantity(stock, isTamil: true)} மட்டுமே'
-                                                      : 'Maximum stock is ${product.formatQuantity(stock)}',
-                                                ),
-                                                duration: const Duration(
-                                                  seconds: 1,
-                                                ),
-                                              ),
+                                              isTamil
+                                                  ? 'அதிகபட்ச இருப்பு ${product.formatQuantity(stock, isTamil: true)} மட்டுமே'
+                                                  : 'Maximum stock is ${product.formatQuantity(stock)}',
+                                              title: isTamil ? 'இருப்பு வரம்பு' : 'Stock Limit',
                                             );
                                           }
                                         },
@@ -868,19 +862,14 @@ class _ProductDetailsScreenState extends ConsumerState<ProductDetailsScreen> {
       ref
           .read(cartProvider.notifier)
           .addItem(product, currentBranch.id, quantity: requestedQuantity);
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            isTamil
-                ? '${product.displayName("ta")} (${product.formatQuantity(requestedQuantity, isTamil: true)}) கூடையில் சேர்க்கப்பட்டது!'
-                : '${product.name} (${product.formatQuantity(requestedQuantity)}) added to cart!',
-          ),
-          action: SnackBarAction(
-            label: isTamil ? 'கூடையைப் பார்' : 'View Cart',
-            textColor: Colors.white,
-            onPressed: () => context.go('/cart'),
-          ),
-        ),
+      VegoraToast.showSuccess(
+        context,
+        isTamil
+            ? '${product.displayName("ta")} (${product.formatQuantity(requestedQuantity, isTamil: true)}) கூடையில் சேர்க்கப்பட்டது!'
+            : '${product.name} (${product.formatQuantity(requestedQuantity)}) added to cart!',
+        title: isTamil ? 'கூடையில் சேர்க்கப்பட்டது' : 'Added to Cart',
+        actionLabel: isTamil ? 'கூடை' : 'View Cart',
+        onAction: () => context.go('/cart'),
       );
     } on BranchMismatchException catch (e) {
       final branches = ref.read(branchesListProvider).value ?? [];
@@ -902,12 +891,11 @@ class _ProductDetailsScreenState extends ConsumerState<ProductDetailsScreen> {
                 initialProduct: product,
                 initialQuantity: requestedQuantity,
               );
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(
-                'Switched to ${currentBranch.name}. Cart refreshed.',
-              ),
-            ),
+          VegoraToast.showWarning(
+            context,
+            'Switched to ${currentBranch.name}. Cart refreshed.',
+            title: 'Store Switched',
+            icon: Icons.storefront_rounded,
           );
         },
       );

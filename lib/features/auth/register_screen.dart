@@ -9,6 +9,7 @@ import '../../shared/providers/auth_provider.dart';
 import '../../core/utils/auth_error_parser.dart';
 import '../../core/utils/email_validator.dart';
 import '../../shared/widgets/google_logo.dart';
+import '../../shared/widgets/vegora_toast.dart';
 
 class RegisterScreen extends ConsumerStatefulWidget {
   const RegisterScreen({super.key});
@@ -93,11 +94,10 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
         ref
             .read(customerNameProvider.notifier)
             .setName(_nameController.text.trim());
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Account successfully created! Welcome to Vegora.'),
-            backgroundColor: AppColors.primary,
-          ),
+        VegoraToast.showSuccess(
+          context,
+          'Account successfully created! Welcome to Vegora.',
+          title: 'Welcome to Vegora',
         );
         context.go('/home');
       } else if (user != null) {
@@ -113,13 +113,10 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                 .read(customerNameProvider.notifier)
                 .setName(_nameController.text.trim());
             if (!mounted) return;
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text(
-                  'Account successfully created! Welcome to Vegora.',
-                ),
-                backgroundColor: AppColors.primary,
-              ),
+            VegoraToast.showSuccess(
+              context,
+              'Account successfully created! Welcome to Vegora.',
+              title: 'Welcome to Vegora',
             );
             context.go('/home');
             return;

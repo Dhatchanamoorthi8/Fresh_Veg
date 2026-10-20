@@ -12,6 +12,7 @@ import '../../shared/providers/auth_provider.dart';
 import '../../shared/providers/branch_provider.dart';
 import '../../shared/providers/cart_provider.dart';
 import '../../shared/providers/order_provider.dart';
+import '../../shared/widgets/vegora_toast.dart';
 
 class CheckoutScreen extends ConsumerStatefulWidget {
   final String? initialInstructions;
@@ -58,25 +59,22 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
 
     final currentUser = ref.read(currentSupabaseUserProvider);
     if (currentUser == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: const Text(
-            'Please sign in to your customer account to place your order.',
-          ),
-          action: SnackBarAction(
-            label: 'Sign In',
-            onPressed: () => context.push('/login'),
-          ),
-        ),
+      VegoraToast.showWarning(
+        context,
+        'Please sign in to your customer account to place your order.',
+        title: 'Sign In Required',
+        actionLabel: 'Sign In',
+        onAction: () => context.push('/login'),
       );
       return;
     }
 
     if (cart.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Cart is empty. Please add items to order.'),
-        ),
+      VegoraToast.showInfo(
+        context,
+        'Cart is empty. Please add fresh produce to order.',
+        title: 'Empty Cart',
+        icon: Icons.shopping_basket_outlined,
       );
       return;
     }
@@ -133,13 +131,10 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
     } catch (e) {
       if (!mounted) return;
       setState(() => _isSubmitting = false);
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          backgroundColor: AppColors.statusCancelled,
-          content: Text(
-            'Order placement failed: ${e.toString().replaceAll('Exception: ', '')}',
-          ),
-        ),
+      VegoraToast.showError(
+        context,
+        'Order placement failed: ${e.toString().replaceAll('Exception: ', '')}',
+        title: 'Order Failed',
       );
     }
   }

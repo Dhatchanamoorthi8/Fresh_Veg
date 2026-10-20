@@ -5,6 +5,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'package:vegora_core/vegora_core.dart';
 import 'package:vegora_repositories/vegora_repositories.dart';
+import 'package:vegora_ui/vegora_ui.dart';
 
 class RegisterScreen extends ConsumerStatefulWidget {
   const RegisterScreen({super.key});
@@ -89,11 +90,10 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
         ref
             .read(customerNameProvider.notifier)
             .setName(_nameController.text.trim());
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Account successfully created! Welcome to Vegora.'),
-            backgroundColor: AppColors.primary,
-          ),
+        VegoraToast.showSuccess(
+          context,
+          'Account successfully created! Welcome to Vegora.',
+          title: 'Welcome to Vegora',
         );
         context.go('/home');
       } else if (user != null) {
@@ -109,13 +109,10 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                 .read(customerNameProvider.notifier)
                 .setName(_nameController.text.trim());
             if (!mounted) return;
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text(
-                  'Account successfully created! Welcome to Vegora.',
-                ),
-                backgroundColor: AppColors.primary,
-              ),
+            VegoraToast.showSuccess(
+              context,
+              'Account successfully created! Welcome to Vegora.',
+              title: 'Welcome to Vegora',
             );
             context.go('/home');
             return;

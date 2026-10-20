@@ -510,15 +510,12 @@ class ProductDetailsScreen extends ConsumerWidget {
 
     try {
       ref.read(cartProvider.notifier).addItem(product, currentBranch.id);
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('${product.name} added to cart!'),
-          action: SnackBarAction(
-            label: 'View Cart',
-            textColor: Colors.white,
-            onPressed: () => context.go('/cart'),
-          ),
-        ),
+      VegoraToast.showSuccess(
+        context,
+        '${product.name} added to cart!',
+        title: 'Added to Cart',
+        actionLabel: 'View Cart',
+        onAction: () => context.go('/cart'),
       );
     } on BranchMismatchException catch (e) {
       final branches = ref.read(branchesListProvider).value ?? [];
@@ -536,12 +533,11 @@ class ProductDetailsScreen extends ConsumerWidget {
           ref
               .read(cartProvider.notifier)
               .switchBranchAndClear(currentBranch.id, initialProduct: product);
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(
-                'Switched to ${currentBranch.name}. Cart refreshed.',
-              ),
-            ),
+          VegoraToast.showWarning(
+            context,
+            'Switched to ${currentBranch.name}. Cart refreshed.',
+            title: 'Store Switched',
+            icon: Icons.storefront_rounded,
           );
         },
       );

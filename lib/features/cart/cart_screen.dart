@@ -9,6 +9,7 @@ import '../../shared/providers/branch_provider.dart';
 import '../../shared/providers/cart_provider.dart';
 import '../../shared/widgets/empty_state_view.dart';
 import '../../shared/widgets/product_image_view.dart';
+import '../../shared/widgets/vegora_toast.dart';
 
 class CartScreen extends ConsumerStatefulWidget {
   const CartScreen({super.key});
@@ -68,12 +69,11 @@ class _CartScreenState extends ConsumerState<CartScreen> {
           TextButton(
             onPressed: () {
               ref.read(cartProvider.notifier).clearCart();
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text(
-                    isTamil ? 'கூடை நீக்கப்பட்டது' : 'Cart cleared',
-                  ),
-                ),
+              VegoraToast.showSuccess(
+                context,
+                isTamil ? 'கூடை நீக்கப்பட்டது' : 'Cart cleared',
+                title: isTamil ? 'கூடை' : 'Cart Cleared',
+                icon: Icons.remove_shopping_cart_rounded,
               );
             },
             child: Text(
@@ -319,15 +319,12 @@ class _CartScreenState extends ConsumerState<CartScreen> {
                                         .read(cartProvider.notifier)
                                         .incrementQuantity(product.id);
                                   } else {
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      SnackBar(
-                                        content: Text(
-                                          isTamil
+                                    VegoraToast.showWarning(
+                                      context,
+                                      isTamil
                                               ? 'அதிகபட்ச இருப்பு ${product.formatQuantity(stock, isTamil: true)} மட்டுமே'
                                               : 'Maximum available stock is ${product.formatQuantity(stock)}',
-                                        ),
-                                        duration: const Duration(seconds: 1),
-                                      ),
+                                      title: isTamil ? 'இருப்பு வரம்பு' : 'Stock Limit',
                                     );
                                   }
                                 },

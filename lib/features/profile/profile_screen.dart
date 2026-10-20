@@ -8,6 +8,7 @@ import '../../shared/models/user_role.dart';
 import '../../shared/providers/app_providers.dart';
 import '../../shared/providers/auth_provider.dart';
 import '../../app/router.dart';
+import '../../shared/widgets/vegora_toast.dart';
 
 class ProfileScreen extends ConsumerWidget {
   const ProfileScreen({super.key});
@@ -397,10 +398,11 @@ class ProfileScreen extends ConsumerWidget {
                       title: 'Notification Preferences',
                       subtitle: 'Order updates and morning harvest alerts',
                       onTap: () {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text('Notifications simulated: Enabled'),
-                          ),
+                        VegoraToast.showInfo(
+                          context,
+                          'Notifications simulated: Enabled',
+                          title: 'Notifications',
+                          icon: Icons.notifications_active_rounded,
                         );
                       },
                     ),
@@ -437,8 +439,11 @@ class ProfileScreen extends ConsumerWidget {
                   ref.invalidate(userProfileProvider);
                   AppAuthListenable.instance.notify();
                   if (context.mounted) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Successfully signed out.')),
+                    VegoraToast.showSuccess(
+                      context,
+                      'Successfully signed out.',
+                      title: 'Signed Out',
+                      icon: Icons.logout_rounded,
                     );
                     context.go('/login');
                   }
@@ -580,11 +585,11 @@ class ProfileScreen extends ConsumerWidget {
                         .read(appLocaleProvider.notifier)
                         .setLanguage('en');
                     if (context.mounted) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('Language updated to English'),
-                          duration: Duration(seconds: 2),
-                        ),
+                      VegoraToast.showSuccess(
+                        context,
+                        'Language updated to English',
+                        title: 'Language Updated',
+                        icon: Icons.translate_rounded,
                       );
                     }
                   },
@@ -634,13 +639,11 @@ class ProfileScreen extends ConsumerWidget {
                         .read(appLocaleProvider.notifier)
                         .setLanguage('ta');
                     if (context.mounted) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text(
-                            'செயலி மொழி தமிழில் மாற்றப்பட்டது (Tamil set)',
-                          ),
-                          duration: Duration(seconds: 2),
-                        ),
+                      VegoraToast.showSuccess(
+                        context,
+                        'செயலி மொழி தமிழில் மாற்றப்பட்டது (Tamil set)',
+                        title: 'மொழி மாற்றப்பட்டது',
+                        icon: Icons.translate_rounded,
                       );
                     }
                   },

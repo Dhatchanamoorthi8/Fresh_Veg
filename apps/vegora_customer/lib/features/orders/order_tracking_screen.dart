@@ -618,8 +618,11 @@ class OrderTrackingScreen extends ConsumerWidget {
                       reason: reasonController.text.trim(),
                     );
                 if (context.mounted) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Order has been cancelled.')),
+                  VegoraToast.showWarning(
+                    context,
+                    'Order has been cancelled.',
+                    title: 'Order Cancelled',
+                    icon: Icons.cancel_outlined,
                   );
                 }
               },

@@ -9,6 +9,7 @@ import '../../core/utils/email_validator.dart';
 import '../../shared/providers/app_providers.dart';
 import '../../shared/providers/auth_provider.dart';
 import '../../app/router.dart';
+import '../../shared/widgets/vegora_toast.dart';
 
 class ForgotPasswordScreen extends ConsumerStatefulWidget {
   const ForgotPasswordScreen({super.key});
@@ -510,13 +511,11 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
                     : () async {
                         await _handleSendResetLink();
                         if (mounted) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text(
-                                'A fresh password reset link has been sent to your email.',
-                              ),
-                              backgroundColor: AppColors.primary,
-                            ),
+                          VegoraToast.showSuccess(
+                            context,
+                            'A fresh password reset link has been sent to your email.',
+                            title: 'Reset Link Sent',
+                            icon: Icons.mark_email_read_rounded,
                           );
                         }
                       },

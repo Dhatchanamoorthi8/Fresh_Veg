@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:vegora_core/vegora_core.dart';
 import 'package:vegora_models/vegora_models.dart';
 import 'package:vegora_repositories/vegora_repositories.dart';
+import 'package:vegora_ui/vegora_ui.dart';
 
 import '../../app/customer_router.dart';
 
@@ -350,10 +351,11 @@ class ProfileScreen extends ConsumerWidget {
                       title: 'Notification Preferences',
                       subtitle: 'Order updates and morning harvest alerts',
                       onTap: () {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text('Notifications simulated: Enabled'),
-                          ),
+                        VegoraToast.showInfo(
+                          context,
+                          'Notifications simulated: Enabled',
+                          title: 'Notifications',
+                          icon: Icons.notifications_active_rounded,
                         );
                       },
                     ),
@@ -390,8 +392,11 @@ class ProfileScreen extends ConsumerWidget {
                   ref.invalidate(userProfileProvider);
                   CustomerAuthListenable.instance.notify();
                   if (context.mounted) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Successfully signed out.')),
+                    VegoraToast.showSuccess(
+                      context,
+                      'Successfully signed out.',
+                      title: 'Signed Out',
+                      icon: Icons.logout_rounded,
                     );
                     context.go('/login');
                   }

@@ -8,6 +8,7 @@ import '../../shared/models/order.dart';
 import '../../shared/models/order_status.dart';
 import '../../shared/providers/order_provider.dart';
 import '../../shared/repositories/order_repository.dart';
+import '../../shared/widgets/vegora_toast.dart';
 import '../../shared/widgets/empty_state_view.dart';
 import '../../shared/widgets/order_status_badge.dart';
 import '../../shared/widgets/role_picker_sheet.dart';
@@ -349,12 +350,11 @@ class _DeliveryScreenState extends ConsumerState<DeliveryScreen>
                       ),
                       tooltip: 'Simulate Call',
                       onPressed: () {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text(
-                              'Simulated calling customer: +91 ${order.customerPhone}',
-                            ),
-                          ),
+                        VegoraToast.showInfo(
+                          context,
+                          'Simulated calling customer: +91 ${order.customerPhone}',
+                          title: 'Calling Customer',
+                          icon: Icons.phone_forwarded_rounded,
                         );
                       },
                     ),

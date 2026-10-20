@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import 'package:vegora_core/vegora_core.dart';
 import 'package:vegora_repositories/vegora_repositories.dart';
+import 'package:vegora_ui/vegora_ui.dart';
 
 class ResetPasswordScreen extends ConsumerStatefulWidget {
   const ResetPasswordScreen({super.key});
@@ -46,13 +47,10 @@ class _ResetPasswordScreenState extends ConsumerState<ResetPasswordScreen> {
       if (!mounted) return;
       setState(() => _isLoading = false);
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text(
-            'Password updated successfully! You can now log in with your new password.',
-          ),
-          backgroundColor: AppColors.primary,
-        ),
+      VegoraToast.showSuccess(
+        context,
+        'Password updated successfully! You can now log in with your new password.',
+        title: 'Password Updated',
       );
       context.go('/login');
     } catch (e) {
