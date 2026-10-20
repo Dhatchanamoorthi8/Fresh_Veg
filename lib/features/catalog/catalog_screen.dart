@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../core/constants/app_colors.dart';
 import '../../core/localization/app_locale_state.dart';
+import '../../core/theme/app_typography.dart';
 import '../../shared/models/category.dart';
 import '../../shared/models/product.dart';
 import '../../shared/providers/app_providers.dart';
@@ -50,7 +51,10 @@ class _CatalogScreenState extends ConsumerState<CatalogScreen> {
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
-        title: Text(isTamil ? 'காய்கறி சந்தை' : 'Vegetable & Fruit Mandi'),
+        title: Text(
+          isTamil ? 'காய்கறி சந்தை' : 'Vegetable & Fruit Mandi',
+          style: AppTypography.screenHeading(fontSize: 20, isTamil: isTamil),
+        ),
       ),
       body: Column(
         children: [
@@ -149,18 +153,19 @@ class _CatalogScreenState extends ConsumerState<CatalogScreen> {
               children: [
                 Text(
                   'Store: ${currentBranch.area}',
-                  style: const TextStyle(
+                  style: AppTypography.supporting(
                     fontSize: 12,
-                    fontWeight: FontWeight.bold,
+                    fontWeight: FontWeight.w600,
                     color: AppColors.textSecondary,
                   ),
                 ),
                 const Spacer(),
-                const Text(
-                  'In Stock Only',
-                  style: TextStyle(
+                Text(
+                  isTamil ? 'இருப்பில் உள்ளவை மட்டும்' : 'In Stock Only',
+                  style: AppTypography.supporting(
                     fontSize: 12,
                     color: AppColors.textSecondary,
+                    isTamil: isTamil,
                   ),
                 ),
                 const SizedBox(width: 4),
@@ -283,11 +288,11 @@ class _CatalogScreenState extends ConsumerState<CatalogScreen> {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Padding(
-                padding: EdgeInsets.fromLTRB(20, 16, 20, 8),
+              Padding(
+                padding: const EdgeInsets.fromLTRB(20, 16, 20, 8),
                 child: Text(
                   'Sort Produce By',
-                  style: TextStyle(fontSize: 17, fontWeight: FontWeight.bold),
+                  style: AppTypography.sectionHeading(fontSize: 17),
                 ),
               ),
               _buildSortTile(
@@ -310,8 +315,10 @@ class _CatalogScreenState extends ConsumerState<CatalogScreen> {
     return ListTile(
       title: Text(
         title,
-        style: TextStyle(
-          fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+        style: AppTypography.body(
+          fontSize: 14,
+          fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
+          color: isSelected ? AppColors.primary : AppColors.textPrimary,
         ),
       ),
       trailing: isSelected

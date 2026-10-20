@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../core/constants/app_colors.dart';
 import '../../core/localization/app_locale_state.dart';
+import '../../core/theme/app_typography.dart';
 import '../../core/utils/currency_formatter.dart';
 import '../../shared/models/category.dart';
 import '../../shared/models/product.dart';
@@ -95,11 +96,10 @@ class HomeScreen extends ConsumerWidget {
                                           Flexible(
                                             child: Text(
                                               '${currentAddress.label} • ${currentAddress.area}',
-                                              style: const TextStyle(
-                                                fontSize: 13.5,
-                                                fontWeight: FontWeight.w800,
-                                                color: AppColors.textPrimary,
-                                              ),
+                                              style: AppTypography.body(
+                                                fontWeight: FontWeight.w600,
+                                                isTamil: isTamil,
+                                              ).copyWith(fontSize: 13.5),
                                               maxLines: 1,
                                               overflow: TextOverflow.ellipsis,
                                             ),
@@ -114,11 +114,10 @@ class HomeScreen extends ConsumerWidget {
                                       const SizedBox(height: 1),
                                       Text(
                                         'Hub: ${currentBranch.name}',
-                                        style: const TextStyle(
-                                          fontSize: 11,
-                                          fontWeight: FontWeight.w500,
+                                        style: AppTypography.supporting(
                                           color: AppColors.textSecondary,
-                                        ),
+                                          isTamil: isTamil,
+                                        ).copyWith(fontSize: 11),
                                         maxLines: 1,
                                         overflow: TextOverflow.ellipsis,
                                       ),
@@ -231,11 +230,10 @@ class HomeScreen extends ConsumerWidget {
                                     isTamil
                                         ? 'காய்கறிகள், கீரைகள், பழங்களை தேடுங்கள்...'
                                         : 'Search fresh vegetables, greens, fruits...',
-                                    style: const TextStyle(
+                                    style: AppTypography.input(
                                       color: AppColors.textSecondary,
-                                      fontSize: 13.5,
-                                      fontWeight: FontWeight.w400,
-                                    ),
+                                      isTamil: isTamil,
+                                    ).copyWith(fontSize: 13.5),
                                     maxLines: 1,
                                     overflow: TextOverflow.ellipsis,
                                   ),
@@ -304,11 +302,9 @@ class HomeScreen extends ConsumerWidget {
                                 isTamil
                                     ? 'தினசரி பண்ணை அறுவடை'
                                     : 'Daily Farm Harvest',
-                                style: const TextStyle(
+                                style: AppTypography.sectionHeading(
                                   color: Colors.white,
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.w800,
-                                  letterSpacing: -0.3,
+                                  isTamil: isTamil,
                                 ),
                               ),
                               const SizedBox(height: 5),
@@ -316,11 +312,10 @@ class HomeScreen extends ConsumerWidget {
                                 isTamil
                                     ? 'நேரடியாக உள்ளூர் பண்ணைகளில் இருந்து பறிக்கப்பட்ட புதிய காய்கறிகள்.'
                                     : 'Fresh greens & farm-fresh produce sourced direct from local growers.',
-                                style: TextStyle(
+                                style: AppTypography.supporting(
                                   color: Colors.white.withValues(alpha: 0.92),
-                                  fontSize: 12,
-                                  height: 1.35,
-                                ),
+                                  isTamil: isTamil,
+                                ).copyWith(fontSize: 12, height: 1.35),
                               ),
                               const SizedBox(height: 12),
                               Container(
@@ -345,12 +340,10 @@ class HomeScreen extends ConsumerWidget {
                                       isTamil
                                           ? '30 நிமிடங்களில் உங்கள் வீடு தேடி'
                                           : '30-Min Express Delivery',
-                                      style: const TextStyle(
+                                      style: AppTypography.badge(
                                         color: Colors.white,
-                                        fontSize: 11,
-                                        fontWeight: FontWeight.w700,
-                                        letterSpacing: 0.1,
-                                      ),
+                                        isTamil: isTamil,
+                                      ).copyWith(fontSize: 11),
                                     ),
                                   ],
                                 ),
@@ -376,11 +369,8 @@ class HomeScreen extends ConsumerWidget {
                           children: [
                             Text(
                               isTamil ? 'வகைகள்' : 'Shop by Category',
-                              style: const TextStyle(
-                                fontSize: 17,
-                                fontWeight: FontWeight.w800,
-                                color: AppColors.textPrimary,
-                                letterSpacing: -0.3,
+                              style: AppTypography.sectionHeading(
+                                isTamil: isTamil,
                               ),
                             ),
                             const SizedBox(height: 2),
@@ -388,10 +378,10 @@ class HomeScreen extends ConsumerWidget {
                               isTamil
                                   ? 'பண்ணை காய்கறிகள் வகைவாரியாக'
                                   : 'Farm-fresh produce organized by type',
-                              style: const TextStyle(
-                                fontSize: 11.5,
+                              style: AppTypography.supporting(
                                 color: AppColors.textSecondary,
-                              ),
+                                isTamil: isTamil,
+                              ).copyWith(fontSize: 11.5),
                             ),
                           ],
                         ),
@@ -403,10 +393,10 @@ class HomeScreen extends ConsumerWidget {
                           ),
                           child: Text(
                             isTamil ? 'அனைத்தும்' : 'See all',
-                            style: const TextStyle(
-                              fontSize: 13,
-                              fontWeight: FontWeight.w700,
-                            ),
+                            style: AppTypography.button(
+                              color: AppColors.primary,
+                              isTamil: isTamil,
+                            ).copyWith(fontSize: 13),
                           ),
                         ),
                       ],
@@ -463,12 +453,10 @@ class HomeScreen extends ConsumerWidget {
                                       textAlign: TextAlign.center,
                                       maxLines: 2,
                                       overflow: TextOverflow.ellipsis,
-                                      style: const TextStyle(
-                                        fontSize: 11,
-                                        fontWeight: FontWeight.w700,
-                                        height: 1.15,
-                                        color: AppColors.textPrimary,
-                                      ),
+                                      style: AppTypography.body(
+                                        fontWeight: FontWeight.w600,
+                                        isTamil: isTamil,
+                                      ).copyWith(fontSize: 11, height: 1.15),
                                     ),
                                   ],
                                 ),
@@ -494,20 +482,17 @@ class HomeScreen extends ConsumerWidget {
                           children: [
                             Text(
                               isTamil ? 'சிறந்த விற்பனை' : 'Best Sellers',
-                              style: const TextStyle(
-                                fontSize: 17,
-                                fontWeight: FontWeight.w800,
-                                color: AppColors.textPrimary,
-                                letterSpacing: -0.3,
+                              style: AppTypography.sectionHeading(
+                                isTamil: isTamil,
                               ),
                             ),
                             const SizedBox(height: 2),
                             Text(
                               isTamil ? 'இன்று அதிகம் விரும்பப்பட்ட பொருட்கள்' : 'Most ordered vegetables & essentials today',
-                              style: const TextStyle(
-                                fontSize: 11.5,
+                              style: AppTypography.supporting(
                                 color: AppColors.textSecondary,
-                              ),
+                                isTamil: isTamil,
+                              ).copyWith(fontSize: 11.5),
                             ),
                           ],
                         ),
@@ -519,10 +504,10 @@ class HomeScreen extends ConsumerWidget {
                           ),
                           child: Text(
                             isTamil ? 'அனைத்தும்' : 'View all',
-                            style: const TextStyle(
-                              fontSize: 13,
-                              fontWeight: FontWeight.w700,
-                            ),
+                            style: AppTypography.button(
+                              color: AppColors.primary,
+                              isTamil: isTamil,
+                            ).copyWith(fontSize: 13),
                           ),
                         ),
                       ],
@@ -580,11 +565,8 @@ class HomeScreen extends ConsumerWidget {
                               isTamil
                                   ? 'புதிய கீரைகள் & பருவக்கால அறுவடை'
                                   : 'Fresh Greens & Seasonal Harvest',
-                              style: const TextStyle(
-                                fontSize: 17,
-                                fontWeight: FontWeight.w800,
-                                color: AppColors.textPrimary,
-                                letterSpacing: -0.3,
+                              style: AppTypography.sectionHeading(
+                                isTamil: isTamil,
                               ),
                             ),
                             const SizedBox(height: 2),
@@ -592,10 +574,10 @@ class HomeScreen extends ConsumerWidget {
                               isTamil
                                   ? 'தினமும் காலையில் சேகரிக்கப்படும் பசுமை'
                                   : 'Crisp greens picked fresh this morning',
-                              style: const TextStyle(
-                                fontSize: 11.5,
+                              style: AppTypography.supporting(
                                 color: AppColors.textSecondary,
-                              ),
+                                isTamil: isTamil,
+                              ).copyWith(fontSize: 11.5),
                             ),
                           ],
                         ),
@@ -607,10 +589,10 @@ class HomeScreen extends ConsumerWidget {
                           ),
                           child: Text(
                             isTamil ? 'அனைத்தும்' : 'See all',
-                            style: const TextStyle(
-                              fontSize: 13,
-                              fontWeight: FontWeight.w700,
-                            ),
+                            style: AppTypography.button(
+                              color: AppColors.primary,
+                              isTamil: isTamil,
+                            ).copyWith(fontSize: 13),
                           ),
                         ),
                       ],
@@ -700,29 +682,28 @@ class HomeScreen extends ConsumerWidget {
                           children: [
                             Text(
                               '${cart.totalItemCount} items • ${CurrencyFormatter.formatPaise(cart.subtotalPaise)}',
-                              style: const TextStyle(
+                              style: AppTypography.body(
                                 color: Colors.white,
-                                fontWeight: FontWeight.w800,
-                                fontSize: 14,
-                              ),
+                                fontWeight: FontWeight.w700,
+                                isTamil: isTamil,
+                              ).copyWith(fontSize: 14),
                             ),
                             Text(
                               'Fulfilling from ${currentBranch.area}',
-                              style: TextStyle(
+                              style: AppTypography.supporting(
                                 color: Colors.white.withValues(alpha: 0.85),
-                                fontSize: 11,
-                              ),
+                                isTamil: isTamil,
+                              ).copyWith(fontSize: 11),
                             ),
                           ],
                         ),
                         const Spacer(),
                         Text(
                           isTamil ? 'கூடையைப் பார்' : 'View Cart',
-                          style: const TextStyle(
+                          style: AppTypography.button(
                             color: Colors.white,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 14,
-                          ),
+                            isTamil: isTamil,
+                          ).copyWith(fontSize: 14),
                         ),
                         const SizedBox(width: 4),
                         const Icon(

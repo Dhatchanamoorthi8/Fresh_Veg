@@ -5,6 +5,7 @@ import 'package:vegora_core/localization/app_localizations.dart';
 
 import '../../core/constants/app_colors.dart';
 import '../../core/localization/app_locale_state.dart';
+import '../../core/theme/app_typography.dart';
 import '../../core/utils/currency_formatter.dart';
 import '../models/branch.dart';
 import '../models/cart.dart';
@@ -107,12 +108,10 @@ class ProductCard extends ConsumerWidget {
                                 const SizedBox(width: 3),
                                 Text(
                                   l10n.organic,
-                                  style: const TextStyle(
+                                  style: AppTypography.badge(
                                     color: AppColors.primaryDark,
-                                    fontSize: 8.5,
-                                    fontWeight: FontWeight.w700,
-                                    letterSpacing: 0.3,
-                                  ),
+                                    isTamil: isTamil,
+                                  ).copyWith(fontSize: 8.5),
                                 ),
                               ],
                             ),
@@ -133,12 +132,10 @@ class ProductCard extends ConsumerWidget {
                             ),
                             child: Text(
                               l10n.bestSeller,
-                              style: const TextStyle(
+                              style: AppTypography.badge(
                                 color: AppColors.warning,
-                                fontSize: 8.5,
-                                fontWeight: FontWeight.w700,
-                                letterSpacing: 0.3,
-                              ),
+                                isTamil: isTamil,
+                              ).copyWith(fontSize: 8.5),
                             ),
                           ),
                       ],
@@ -165,13 +162,11 @@ class ProductCard extends ConsumerWidget {
                           borderRadius: BorderRadius.circular(6),
                         ),
                         child: Text(
-                          l10n.outOfStock.toUpperCase(),
-                          style: const TextStyle(
+                          l10n.outOfStock,
+                          style: AppTypography.badge(
                             color: Colors.white,
-                            fontSize: 9.5,
-                            fontWeight: FontWeight.w700,
-                            letterSpacing: 0.5,
-                          ),
+                            isTamil: isTamil,
+                          ).copyWith(fontSize: 9.5),
                         ),
                       ),
                     ),
@@ -185,13 +180,7 @@ class ProductCard extends ConsumerWidget {
               displayName,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
-              style: TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.w700,
-                color: AppColors.textPrimary,
-                height: isTamil ? 1.35 : 1.2,
-                letterSpacing: -0.2,
-              ),
+              style: AppTypography.productName(isTamil: isTamil),
             ),
 
             // Secondary Name / Local Name
@@ -199,22 +188,20 @@ class ProductCard extends ConsumerWidget {
               secondaryName.isNotEmpty ? secondaryName : product.origin,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
-              style: const TextStyle(
-                fontSize: 11.5,
+              style: AppTypography.supporting(
                 color: AppColors.textSecondary,
-                fontWeight: FontWeight.w500,
-              ),
+                isTamil: isTamil,
+              ).copyWith(fontSize: 11.5, fontWeight: FontWeight.w500),
             ),
             const SizedBox(height: 2),
 
             // Unit/weight label (e.g. per kg / ஒரு கிலோ)
             Text(
               product.formatUnitLabel(isTamil: isTamil),
-              style: const TextStyle(
-                fontSize: 11,
+              style: AppTypography.supporting(
                 color: AppColors.textMuted,
-                fontWeight: FontWeight.w500,
-              ),
+                isTamil: isTamil,
+              ).copyWith(fontSize: 11, fontWeight: FontWeight.w500),
             ),
             const SizedBox(height: 8),
 
@@ -228,12 +215,7 @@ class ProductCard extends ConsumerWidget {
                   children: [
                     Text(
                       CurrencyFormatter.formatPaise(pricePaise),
-                      style: const TextStyle(
-                        fontSize: 15,
-                        fontWeight: FontWeight.w800,
-                        color: AppColors.textPrimary,
-                        letterSpacing: -0.2,
-                      ),
+                      style: AppTypography.productPrice(),
                     ),
                     if (product.originalPricePaise != null &&
                         product.originalPricePaise! > pricePaise)
@@ -241,11 +223,7 @@ class ProductCard extends ConsumerWidget {
                         CurrencyFormatter.formatPaise(
                           product.originalPricePaise!,
                         ),
-                        style: const TextStyle(
-                          fontSize: 11,
-                          color: AppColors.textMuted,
-                          decoration: TextDecoration.lineThrough,
-                        ),
+                        style: AppTypography.originalPrice(),
                       ),
                   ],
                 ),
@@ -275,12 +253,11 @@ class ProductCard extends ConsumerWidget {
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           Text(
-                            l10n.add.toUpperCase(),
-                            style: const TextStyle(
-                              fontSize: 11.5,
-                              fontWeight: FontWeight.w800,
-                              letterSpacing: 0.2,
-                            ),
+                            l10n.add,
+                            style: AppTypography.button(
+                              color: AppColors.primary,
+                              isTamil: isTamil,
+                            ).copyWith(fontSize: 12),
                           ),
                           const SizedBox(width: 3),
                           const Icon(Icons.add, size: 14),
@@ -325,11 +302,10 @@ class ProductCard extends ConsumerWidget {
                                 qtyInCart,
                                 isTamil: isTamil,
                               ),
-                              style: const TextStyle(
+                              style: AppTypography.button(
                                 color: Colors.white,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 11.5,
-                              ),
+                                isTamil: isTamil,
+                              ).copyWith(fontSize: 11.5),
                             ),
                           ),
                           InkWell(
@@ -348,7 +324,9 @@ class ProductCard extends ConsumerWidget {
                                   isTamil
                                       ? 'அதிகபட்ச இருப்பு அளவு எட்டப்பட்டது'
                                       : 'Maximum available stock reached',
-                                  title: isTamil ? 'இருப்பு வரம்பு' : 'Stock Limit',
+                                  title: isTamil
+                                      ? 'இருப்பு வரம்பு'
+                                      : 'Stock Limit',
                                 );
                               }
                             },

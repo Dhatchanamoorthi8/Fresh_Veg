@@ -5,6 +5,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../core/constants/app_colors.dart';
+import '../../core/localization/app_locale_state.dart';
+import '../../core/theme/app_typography.dart';
 import '../../core/utils/currency_formatter.dart';
 import '../../shared/models/order.dart';
 import '../../shared/models/order_status.dart';
@@ -146,6 +148,8 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
     final currentAddress = ref.watch(selectedAddressProvider);
     final customerName = ref.watch(customerNameProvider);
     final customerPhone = ref.watch(customerPhoneProvider) ?? '9876543210';
+    final locale = ref.watch(appLocaleProvider);
+    final isTamil = locale.languageCode == 'ta';
 
     final subtotal = cart.subtotalPaise;
     final deliveryFee = cart.deliveryFeePaise(currentBranch);
@@ -154,7 +158,12 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
 
     return Scaffold(
       backgroundColor: AppColors.background,
-      appBar: AppBar(title: const Text('Checkout & Review')),
+      appBar: AppBar(
+        title: Text(
+          isTamil ? 'செக்அவுட் & சரிபார்த்தல்' : 'Checkout & Review',
+          style: AppTypography.screenHeading(fontSize: 20, isTamil: isTamil),
+        ),
+      ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
         child: Column(
@@ -181,10 +190,11 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
                   Expanded(
                     child: Text(
                       'Direct Farm-Fresh Guarantee: Hand-picked and packed at ${currentBranch.name} for 30-min delivery.',
-                      style: const TextStyle(
+                      style: AppTypography.supporting(
                         fontSize: 12,
                         color: AppColors.primaryDark,
                         fontWeight: FontWeight.w600,
+                        isTamil: isTamil,
                       ),
                     ),
                   ),
@@ -195,7 +205,11 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
             const SizedBox(height: 16),
 
             // Delivery Address Card
-            _buildSectionHeader('Delivery Location', Icons.pin_drop_rounded),
+            _buildSectionHeader(
+              isTamil ? 'டெலிவரி முகவரி' : 'Delivery Location',
+              Icons.pin_drop_rounded,
+              isTamil: isTamil,
+            ),
             const SizedBox(height: 8),
             Container(
               padding: const EdgeInsets.all(14),
@@ -225,22 +239,22 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
                       children: [
                         Text(
                           '${currentAddress.label} ($customerName)',
-                          style: const TextStyle(
+                          style: AppTypography.body(
                             fontSize: 14,
-                            fontWeight: FontWeight.bold,
+                            fontWeight: FontWeight.w600,
                           ),
                         ),
                         const SizedBox(height: 2),
                         Text(
                           currentAddress.fullAddress,
-                          style: const TextStyle(
+                          style: AppTypography.supporting(
                             fontSize: 13,
                             color: AppColors.textSecondary,
                           ),
                         ),
                         Text(
                           'Phone: +91 $customerPhone',
-                          style: const TextStyle(
+                          style: AppTypography.supporting(
                             fontSize: 12,
                             color: AppColors.textMuted,
                           ),
@@ -250,7 +264,14 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
                   ),
                   TextButton(
                     onPressed: () => context.push('/branches'),
-                    child: const Text('Change'),
+                    child: Text(
+                      isTamil ? 'மாற்று' : 'Change',
+                      style: AppTypography.button(
+                        fontSize: 13,
+                        color: AppColors.primary,
+                        isTamil: isTamil,
+                      ),
+                    ),
                   ),
                 ],
               ),
@@ -260,8 +281,9 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
 
             // Store Fulfillment Branch
             _buildSectionHeader(
-              'Fulfilling Store Branch',
+              isTamil ? 'நிறைவேற்றும் கிளை' : 'Fulfilling Store Branch',
               Icons.storefront_rounded,
+              isTamil: isTamil,
             ),
             const SizedBox(height: 8),
             Container(
@@ -284,14 +306,14 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
                       children: [
                         Text(
                           currentBranch.name,
-                          style: const TextStyle(
+                          style: AppTypography.body(
                             fontSize: 14,
-                            fontWeight: FontWeight.bold,
+                            fontWeight: FontWeight.w600,
                           ),
                         ),
                         Text(
                           '${currentBranch.area} • Est. ${currentBranch.estimatedDeliveryMinutes} min delivery',
-                          style: const TextStyle(
+                          style: AppTypography.supporting(
                             fontSize: 12,
                             color: AppColors.textSecondary,
                           ),
@@ -306,7 +328,13 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
             const SizedBox(height: 20),
 
             // Delivery Time Slot Selector
-            _buildSectionHeader('Choose Delivery Slot', Icons.schedule_rounded),
+            _buildSectionHeader(
+              isTamil
+                  ? 'டெலிவரி நேரத்தைத் தேர்ந்தெடுக்கவும்'
+                  : 'Choose Delivery Slot',
+              Icons.schedule_rounded,
+              isTamil: isTamil,
+            ),
             const SizedBox(height: 8),
             Container(
               decoration: BoxDecoration(
@@ -328,12 +356,15 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
                       dense: true,
                       title: Text(
                         slot,
-                        style: TextStyle(
-                          fontSize: 13,
-                          fontWeight: isSelected
-                              ? FontWeight.bold
-                              : FontWeight.normal,
-                        ),
+                        style: isSelected
+                            ? AppTypography.body(
+                                fontSize: 13,
+                                fontWeight: FontWeight.w600,
+                              )
+                            : AppTypography.body(
+                                fontSize: 13,
+                                color: AppColors.textSecondary,
+                              ),
                       ),
                     );
                   }).toList(),
@@ -344,7 +375,11 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
             const SizedBox(height: 20),
 
             // Payment Method Selector
-            _buildSectionHeader('Payment Method', Icons.payment_rounded),
+            _buildSectionHeader(
+              isTamil ? 'பணம் செலுத்தும் முறை' : 'Payment Method',
+              Icons.payment_rounded,
+              isTamil: isTamil,
+            ),
             const SizedBox(height: 8),
             Container(
               decoration: BoxDecoration(
@@ -357,47 +392,47 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
                 onChanged: (val) {
                   if (val != null) setState(() => _paymentMethod = val);
                 },
-                child: const Column(
+                child: Column(
                   children: [
                     RadioListTile<String>(
                       value: 'Cash on Delivery',
                       activeColor: AppColors.primary,
                       dense: true,
-                      secondary: Icon(
+                      secondary: const Icon(
                         Icons.money_rounded,
                         color: AppColors.primary,
                       ),
                       title: Text(
                         'Cash on Delivery (COD)',
-                        style: TextStyle(
+                        style: AppTypography.body(
                           fontSize: 14,
-                          fontWeight: FontWeight.bold,
+                          fontWeight: FontWeight.w600,
                         ),
                       ),
                       subtitle: Text(
                         'Pay cash or UPI to delivery partner at your doorstep',
-                        style: TextStyle(fontSize: 11),
+                        style: AppTypography.supporting(fontSize: 11),
                       ),
                     ),
-                    Divider(height: 1),
+                    const Divider(height: 1),
                     RadioListTile<String>(
                       value: 'Online UPI',
                       activeColor: AppColors.primary,
                       dense: true,
-                      secondary: Icon(
+                      secondary: const Icon(
                         Icons.qr_code_2_rounded,
                         color: AppColors.statusPreparing,
                       ),
                       title: Text(
                         'Online UPI & Netbanking',
-                        style: TextStyle(
+                        style: AppTypography.body(
                           fontSize: 14,
-                          fontWeight: FontWeight.bold,
+                          fontWeight: FontWeight.w600,
                         ),
                       ),
                       subtitle: Text(
                         'Instant payment via Google Pay / PhonePe / BHIM UPI',
-                        style: TextStyle(fontSize: 11),
+                        style: AppTypography.supporting(fontSize: 11),
                       ),
                     ),
                   ],
@@ -408,7 +443,11 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
             const SizedBox(height: 20),
 
             // Final Bill Summary
-            _buildSectionHeader('Order Summary', Icons.receipt_long_rounded),
+            _buildSectionHeader(
+              isTamil ? 'ஆர்டர் சுருக்கம்' : 'Order Summary',
+              Icons.receipt_long_rounded,
+              isTamil: isTamil,
+            ),
             const SizedBox(height: 8),
             Container(
               padding: const EdgeInsets.all(14),
@@ -443,18 +482,19 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      const Text(
-                        'Total Amount',
-                        style: TextStyle(
+                      Text(
+                        isTamil ? 'மொத்த தொகை' : 'Total Amount',
+                        style: AppTypography.body(
                           fontSize: 16,
-                          fontWeight: FontWeight.bold,
+                          fontWeight: FontWeight.w600,
+                          isTamil: isTamil,
                         ),
                       ),
                       Text(
                         CurrencyFormatter.formatPaise(total),
-                        style: const TextStyle(
+                        style: AppTypography.productPrice(
                           fontSize: 18,
-                          fontWeight: FontWeight.w900,
+                          fontWeight: FontWeight.w700,
                           color: AppColors.primaryDark,
                         ),
                       ),
@@ -506,19 +546,21 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
                   : Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        const Text(
-                          'Place Order',
-                          style: TextStyle(
+                        Text(
+                          isTamil ? 'ஆர்டர் செய்க' : 'Place Order',
+                          style: AppTypography.button(
                             fontSize: 16,
-                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                            isTamil: isTamil,
                           ),
                         ),
                         const SizedBox(width: 8),
                         Text(
                           '• ${CurrencyFormatter.formatPaise(total)}',
-                          style: const TextStyle(
+                          style: AppTypography.productPrice(
                             fontSize: 16,
-                            fontWeight: FontWeight.bold,
+                            fontWeight: FontWeight.w600,
+                            color: Colors.white,
                           ),
                         ),
                       ],
@@ -530,17 +572,21 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
     );
   }
 
-  Widget _buildSectionHeader(String title, IconData icon) {
+  Widget _buildSectionHeader(
+    String title,
+    IconData icon, {
+    bool isTamil = false,
+  }) {
     return Row(
       children: [
         Icon(icon, size: 18, color: AppColors.primary),
         const SizedBox(width: 6),
         Text(
           title,
-          style: const TextStyle(
+          style: AppTypography.sectionHeading(
             fontSize: 15,
-            fontWeight: FontWeight.bold,
             color: AppColors.textPrimary,
+            isTamil: isTamil,
           ),
         ),
       ],
@@ -553,13 +599,16 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
       children: [
         Text(
           label,
-          style: const TextStyle(fontSize: 13, color: AppColors.textSecondary),
+          style: AppTypography.supporting(
+            fontSize: 13,
+            color: AppColors.textSecondary,
+          ),
         ),
         Text(
           value,
-          style: TextStyle(
+          style: AppTypography.productPrice(
             fontSize: 13,
-            fontWeight: FontWeight.w700,
+            fontWeight: FontWeight.w600,
             color: isGreen ? AppColors.primary : AppColors.textPrimary,
           ),
         ),

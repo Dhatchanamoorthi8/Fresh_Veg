@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 
 import '../../core/constants/app_colors.dart';
 import '../../core/localization/app_locale_state.dart';
+import '../../core/theme/app_typography.dart';
 import '../../core/utils/currency_formatter.dart';
 import '../../shared/models/order.dart';
 import '../../shared/models/order_status.dart';
@@ -52,7 +53,10 @@ class _OrdersScreenState extends ConsumerState<OrdersScreen>
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
-        title: Text(isTamil ? 'என் ஆர்டர்கள்' : 'My Orders'),
+        title: Text(
+          isTamil ? 'என் ஆர்டர்கள்' : 'My Orders',
+          style: AppTypography.screenHeading(fontSize: 20, isTamil: isTamil),
+        ),
         bottom: TabBar(
           controller: _tabController,
           labelColor: AppColors.primary,
@@ -154,9 +158,8 @@ class _OrdersScreenState extends ConsumerState<OrdersScreen>
                   children: [
                     Text(
                       order.orderNumber,
-                      style: const TextStyle(
+                      style: AppTypography.sectionHeading(
                         fontSize: 16,
-                        fontWeight: FontWeight.w800,
                         color: AppColors.textPrimary,
                       ),
                     ),
@@ -166,7 +169,7 @@ class _OrdersScreenState extends ConsumerState<OrdersScreen>
                 const SizedBox(height: 4),
                 Text(
                   timeFormat.format(order.createdAt),
-                  style: const TextStyle(
+                  style: AppTypography.supporting(
                     fontSize: 11,
                     color: AppColors.textMuted,
                   ),
@@ -185,9 +188,9 @@ class _OrdersScreenState extends ConsumerState<OrdersScreen>
                     const SizedBox(width: 4),
                     Text(
                       order.branchName,
-                      style: const TextStyle(
+                      style: AppTypography.body(
                         fontSize: 12,
-                        fontWeight: FontWeight.bold,
+                        fontWeight: FontWeight.w600,
                         color: AppColors.primaryDark,
                       ),
                     ),
@@ -206,10 +209,10 @@ class _OrdersScreenState extends ConsumerState<OrdersScreen>
                       .join(', '),
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
+                  style: AppTypography.supporting(
                     fontSize: 13,
                     color: AppColors.textSecondary,
-                    height: isTamil ? 1.35 : 1.2,
+                    isTamil: isTamil,
                   ),
                 ),
 
@@ -224,16 +227,17 @@ class _OrdersScreenState extends ConsumerState<OrdersScreen>
                       children: [
                         Text(
                           isTamil ? 'செலுத்திய தொகை' : 'Total Paid',
-                          style: const TextStyle(
+                          style: AppTypography.supporting(
                             fontSize: 11,
                             color: AppColors.textMuted,
+                            isTamil: isTamil,
                           ),
                         ),
                         Text(
                           CurrencyFormatter.formatPaise(order.totalPaise),
-                          style: const TextStyle(
-                            fontSize: 15,
-                            fontWeight: FontWeight.w900,
+                          style: AppTypography.productPrice(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
                             color: AppColors.textPrimary,
                           ),
                         ),
@@ -242,11 +246,15 @@ class _OrdersScreenState extends ConsumerState<OrdersScreen>
                     Row(
                       children: [
                         Text(
-                          isActive ? 'Track Live' : 'View Details',
-                          style: const TextStyle(
+                          isActive
+                              ? (isTamil ? 'நேரலை கண்காணிப்பு' : 'Track Live')
+                              : (isTamil
+                                    ? 'விவரங்களைப் பார்க்க'
+                                    : 'View Details'),
+                          style: AppTypography.button(
                             fontSize: 13,
-                            fontWeight: FontWeight.bold,
                             color: AppColors.primary,
+                            isTamil: isTamil,
                           ),
                         ),
                         const SizedBox(width: 4),

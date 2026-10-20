@@ -5,6 +5,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../app/router.dart';
 import '../../core/constants/app_colors.dart';
+import '../../core/theme/app_typography.dart';
 import '../../shared/models/user_role.dart';
 import '../../shared/providers/auth_provider.dart';
 
@@ -115,13 +116,10 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
                       ),
                     ),
                     icon: const Icon(Icons.login_rounded, size: 16),
-                    label: const Text(
+                    label: Text(
                       'Sign In',
-                      style: TextStyle(
-                        fontSize: 13,
-                        fontWeight: FontWeight.w700,
-                        letterSpacing: 0.1,
-                      ),
+                      style: AppTypography.button(color: AppColors.primary)
+                          .copyWith(fontSize: 13),
                     ),
                   ),
                 ),
@@ -166,41 +164,29 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
                       const SizedBox(height: 24),
 
                       // Brand Wordmark
-                      const Text(
-                        'Vegora',
-                        style: TextStyle(
-                          fontSize: 32,
-                          fontWeight: FontWeight.w800,
-                          color: AppColors.textPrimary,
-                          letterSpacing: -0.6,
-                        ),
-                      ),
+                      Text('Vegora', style: AppTypography.splashBrand()),
                       const SizedBox(height: 6),
 
                       // Tagline
-                      const Text(
+                      Text(
                         'Freshness at Your Doorstep.',
-                        style: TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w700,
+                        style: AppTypography.body(
                           color: AppColors.primary,
-                          letterSpacing: 0.3,
-                        ),
+                          fontWeight: FontWeight.w600,
+                        ).copyWith(letterSpacing: 0.3),
                       ),
 
                       const SizedBox(height: 14),
 
                       // Narrative supporting statement
-                      const Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 16),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
                         child: Text(
                           'Farm-fresh vegetables & fruits delivered in 30 minutes directly from your neighborhood store branch.',
                           textAlign: TextAlign.center,
-                          style: TextStyle(
-                            fontSize: 14,
+                          style: AppTypography.supporting(
                             color: AppColors.textSecondary,
-                            height: 1.45,
-                          ),
+                          ).copyWith(fontSize: 13.5, height: 1.45),
                         ),
                       ),
 
@@ -247,19 +233,15 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
                         borderRadius: BorderRadius.circular(14),
                       ),
                     ),
-                    child: const Row(
+                    child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Text(
                           'Start Shopping Fresh',
-                          style: TextStyle(
-                            fontSize: 15,
-                            fontWeight: FontWeight.w700,
-                            letterSpacing: 0.1,
-                          ),
+                          style: AppTypography.button(color: Colors.white),
                         ),
-                        SizedBox(width: 8),
-                        Icon(Icons.arrow_forward_rounded, size: 18),
+                        const SizedBox(width: 8),
+                        const Icon(Icons.arrow_forward_rounded, size: 18),
                       ],
                     ),
                   ),
@@ -283,13 +265,10 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
                         borderRadius: BorderRadius.circular(14),
                       ),
                     ),
-                    child: const Text(
+                    child: Text(
                       'Sign In / Register Account',
-                      style: TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w600,
-                        letterSpacing: 0.1,
-                      ),
+                      style: AppTypography.button(color: AppColors.textPrimary)
+                          .copyWith(fontSize: 14),
                     ),
                   ),
                 ),
@@ -318,11 +297,8 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
           const SizedBox(width: 5),
           Text(
             text,
-            style: const TextStyle(
-              fontSize: 12,
-              fontWeight: FontWeight.w600,
-              color: AppColors.textPrimary,
-            ),
+            style: AppTypography.badge(color: AppColors.textPrimary)
+                .copyWith(fontSize: 12),
           ),
         ],
       ),

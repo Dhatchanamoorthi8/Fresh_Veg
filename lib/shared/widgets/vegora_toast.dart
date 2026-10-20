@@ -3,13 +3,7 @@ import 'package:flutter/material.dart';
 import '../../core/constants/app_colors.dart';
 
 /// Type of feedback toast to display
-enum VegoraToastType {
-  success,
-  info,
-  warning,
-  error,
-  address,
-}
+enum VegoraToastType { success, info, warning, error, address }
 
 /// Vegora Premium Feedback & Toast System
 ///
@@ -78,10 +72,9 @@ class VegoraToast {
     String? branchName,
   }) {
     final areaPart = (area != null && area.isNotEmpty) ? ' ($area)' : '';
-    final branchPart =
-        (branchName != null && branchName.isNotEmpty)
-            ? ' • Hub: $branchName'
-            : '';
+    final branchPart = (branchName != null && branchName.isNotEmpty)
+        ? ' • Hub: $branchName'
+        : '';
 
     return show(
       context,
@@ -277,15 +270,15 @@ class VegoraToastWidget extends StatelessWidget {
                   Text(
                     message,
                     style: TextStyle(
-                      fontSize: (title != null && title!.isNotEmpty) ? 12.5 : 13.5,
-                      fontWeight:
-                          (title != null && title!.isNotEmpty)
-                              ? FontWeight.w500
-                              : FontWeight.w600,
-                      color:
-                          (title != null && title!.isNotEmpty)
-                              ? AppColors.textSecondary
-                              : AppColors.textPrimary,
+                      fontSize: (title != null && title!.isNotEmpty)
+                          ? 12.5
+                          : 13.5,
+                      fontWeight: (title != null && title!.isNotEmpty)
+                          ? FontWeight.w500
+                          : FontWeight.w600,
+                      color: (title != null && title!.isNotEmpty)
+                          ? AppColors.textSecondary
+                          : AppColors.textPrimary,
                       letterSpacing: -0.2,
                       height: 1.25,
                     ),
@@ -329,7 +322,8 @@ class VegoraToastWidget extends StatelessWidget {
               // Clean Dismiss Button
               GestureDetector(
                 behavior: HitTestBehavior.opaque,
-                onTap: () => ScaffoldMessenger.of(context).hideCurrentSnackBar(),
+                onTap: () =>
+                    ScaffoldMessenger.of(context).hideCurrentSnackBar(),
                 child: Padding(
                   padding: const EdgeInsets.all(4.0),
                   child: Icon(

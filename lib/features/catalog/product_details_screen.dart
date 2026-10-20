@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../core/constants/app_colors.dart';
 import '../../core/localization/app_locale_state.dart';
+import '../../core/theme/app_typography.dart';
 import '../../core/utils/currency_formatter.dart';
 import '../../shared/models/product.dart';
 import '../../shared/providers/app_providers.dart';
@@ -191,24 +192,18 @@ class _ProductDetailsScreenState extends ConsumerState<ProductDetailsScreen> {
                       // Name & Local Name with proper Tamil Line Height
                       Text(
                         primaryTitle,
-                        style: TextStyle(
-                          fontSize: 22,
-                          fontWeight: FontWeight.w800,
-                          color: AppColors.textPrimary,
-                          height: isTamil ? 1.35 : 1.2,
-                        ),
+                        style: AppTypography.screenHeading(isTamil: isTamil)
+                            .copyWith(fontSize: 22),
                       ),
                       if (secondaryTitle.isNotEmpty &&
                           secondaryTitle != primaryTitle) ...[
                         const SizedBox(height: 4),
                         Text(
                           secondaryTitle,
-                          style: TextStyle(
-                            fontSize: 15,
-                            fontWeight: FontWeight.w500,
+                          style: AppTypography.supporting(
                             color: AppColors.textSecondary,
-                            height: isTamil ? 1.2 : 1.35,
-                          ),
+                            isTamil: isTamil,
+                          ).copyWith(fontSize: 15, fontWeight: FontWeight.w500),
                         ),
                       ],
 
@@ -219,11 +214,9 @@ class _ProductDetailsScreenState extends ConsumerState<ProductDetailsScreen> {
                         children: [
                           Text(
                             CurrencyFormatter.formatPaise(pricePaise),
-                            style: const TextStyle(
-                              fontSize: 24,
-                              fontWeight: FontWeight.w900,
+                            style: AppTypography.productPrice(
                               color: AppColors.textPrimary,
-                            ),
+                            ).copyWith(fontSize: 24),
                           ),
                           if (product.originalPricePaise != null &&
                               product.originalPricePaise! > pricePaise) ...[
@@ -232,22 +225,22 @@ class _ProductDetailsScreenState extends ConsumerState<ProductDetailsScreen> {
                               CurrencyFormatter.formatPaise(
                                 product.originalPricePaise!,
                               ),
-                              style: const TextStyle(
+                              style: AppTypography.originalPrice().copyWith(
                                 fontSize: 16,
-                                color: AppColors.textMuted,
-                                decoration: TextDecoration.lineThrough,
                               ),
                             ),
                           ],
                           const SizedBox(width: 8),
                           Text(
                             product.formatUnitLabel(isTamil: isTamil),
-                            style: TextStyle(
-                              fontSize: 15,
-                              color: AppColors.textSecondary,
-                              fontWeight: FontWeight.w500,
-                              height: isTamil ? 1.3 : 1.2,
-                            ),
+                            style:
+                                AppTypography.supporting(
+                                  color: AppColors.textSecondary,
+                                  isTamil: isTamil,
+                                ).copyWith(
+                                  fontSize: 15,
+                                  fontWeight: FontWeight.w500,
+                                ),
                           ),
                         ],
                       ),
@@ -432,7 +425,9 @@ class _ProductDetailsScreenState extends ConsumerState<ProductDetailsScreen> {
                                               isTamil
                                                   ? 'அதிகபட்ச இருப்பு ${product.formatQuantity(stock, isTamil: true)} மட்டுமே'
                                                   : 'Maximum stock is ${product.formatQuantity(stock)}',
-                                              title: isTamil ? 'இருப்பு வரம்பு' : 'Stock Limit',
+                                              title: isTamil
+                                                  ? 'இருப்பு வரம்பு'
+                                                  : 'Stock Limit',
                                             );
                                           }
                                         },
@@ -770,9 +765,9 @@ class _ProductDetailsScreenState extends ConsumerState<ProductDetailsScreen> {
                                     ? 'கூடையில் சேர்க்கவும் (+)'
                                     : 'Add More to Cart')
                               : (isTamil ? 'கூடையில் சேர்' : 'Add to Cart'),
-                          style: const TextStyle(
-                            fontSize: 15,
-                            fontWeight: FontWeight.bold,
+                          style: AppTypography.button(
+                            color: Colors.white,
+                            isTamil: isTamil,
                           ),
                         ),
                       ),
@@ -795,15 +790,7 @@ class _ProductDetailsScreenState extends ConsumerState<ProductDetailsScreen> {
         borderRadius: BorderRadius.circular(6),
         border: Border.all(color: color.withValues(alpha: 0.3)),
       ),
-      child: Text(
-        label,
-        style: TextStyle(
-          color: color,
-          fontSize: 11,
-          fontWeight: FontWeight.w700,
-          letterSpacing: 0.2,
-        ),
-      ),
+      child: Text(label, style: AppTypography.badge(color: color)),
     );
   }
 

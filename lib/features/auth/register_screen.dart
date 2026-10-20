@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../core/constants/app_colors.dart';
+import '../../core/theme/app_typography.dart';
 import '../../shared/providers/app_providers.dart';
 import '../../shared/providers/auth_provider.dart';
 import '../../core/utils/auth_error_parser.dart';
@@ -252,21 +253,19 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                           ),
                         ),
                         const SizedBox(width: 12),
-                        const Column(
+                        Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
                               'Vegora',
-                              style: TextStyle(
+                              style: AppTypography.screenHeading(
                                 fontSize: 20,
-                                fontWeight: FontWeight.w800,
                                 color: AppColors.primary,
-                                letterSpacing: -0.4,
                               ),
                             ),
                             Text(
                               'Direct from Local Farms',
-                              style: TextStyle(
+                              style: AppTypography.supporting(
                                 fontSize: 12,
                                 fontWeight: FontWeight.w500,
                                 color: AppColors.textSecondary,
@@ -279,22 +278,19 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                     const SizedBox(height: 24),
 
                     // Heading
-                    const Text(
+                    Text(
                       'Create your account',
-                      style: TextStyle(
+                      style: AppTypography.screenHeading(
                         fontSize: 26,
-                        fontWeight: FontWeight.w800,
                         color: AppColors.textPrimary,
-                        letterSpacing: -0.5,
                       ),
                     ),
                     const SizedBox(height: 6),
-                    const Text(
+                    Text(
                       'Get fresh vegetables and daily essentials delivered to your doorstep in 30 minutes.',
-                      style: TextStyle(
+                      style: AppTypography.body(
                         fontSize: 14,
                         color: AppColors.textSecondary,
-                        height: 1.4,
                       ),
                     ),
                     const SizedBox(height: 24),
@@ -616,12 +612,11 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                                   color: Colors.white,
                                 ),
                               )
-                            : const Text(
+                            : Text(
                                 'Create Account',
-                                style: TextStyle(
+                                style: AppTypography.button(
                                   fontSize: 15,
-                                  fontWeight: FontWeight.w700,
-                                  letterSpacing: 0.2,
+                                  color: Colors.white,
                                 ),
                               ),
                       ),
@@ -629,23 +624,23 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                     const SizedBox(height: 22),
 
                     // Divider
-                    const Row(
+                    Row(
                       children: [
-                        Expanded(
+                        const Expanded(
                           child: Divider(color: AppColors.border, height: 1),
                         ),
                         Padding(
-                          padding: EdgeInsets.symmetric(horizontal: 14),
+                          padding: const EdgeInsets.symmetric(horizontal: 14),
                           child: Text(
                             'or',
-                            style: TextStyle(
+                            style: AppTypography.supporting(
                               fontSize: 13,
                               color: AppColors.neutral400,
                               fontWeight: FontWeight.w500,
                             ),
                           ),
                         ),
-                        Expanded(
+                        const Expanded(
                           child: Divider(color: AppColors.border, height: 1),
                         ),
                       ],
@@ -663,18 +658,16 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                         ),
                       ),
                       onPressed: _isLoading ? null : _handleGoogleSignIn,
-                      child: const Row(
+                      child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          GoogleLogo(size: 20),
-                          SizedBox(width: 12),
+                          const GoogleLogo(size: 20),
+                          const SizedBox(width: 12),
                           Text(
                             'Continue with Google',
-                            style: TextStyle(
+                            style: AppTypography.button(
                               fontSize: 14.5,
-                              fontWeight: FontWeight.w600,
                               color: AppColors.textPrimary,
-                              letterSpacing: 0.1,
                             ),
                           ),
                         ],
@@ -687,9 +680,9 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                       alignment: WrapAlignment.center,
                       crossAxisAlignment: WrapCrossAlignment.center,
                       children: [
-                        const Text(
+                        Text(
                           'Already have an account? ',
-                          style: TextStyle(
+                          style: AppTypography.body(
                             color: AppColors.textSecondary,
                             fontSize: 14,
                           ),
@@ -702,9 +695,9 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                               context.go('/login');
                             }
                           },
-                          child: const Text(
+                          child: Text(
                             'Sign in',
-                            style: TextStyle(
+                            style: AppTypography.body(
                               color: AppColors.primary,
                               fontWeight: FontWeight.w700,
                               fontSize: 14,

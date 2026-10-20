@@ -110,15 +110,7 @@ class VegoraButton extends StatelessWidget {
                 Icon(prefixIcon, size: 18, color: fg),
                 const SizedBox(width: 8),
               ],
-              Text(
-                label,
-                style: TextStyle(
-                  fontSize: 15,
-                  fontWeight: FontWeight.w600,
-                  color: fg,
-                  letterSpacing: 0.1,
-                ),
-              ),
+              Text(label, style: AppTypography.button(color: fg)),
               if (suffixIcon != null) ...[
                 const SizedBox(width: 8),
                 Icon(suffixIcon, size: 18, color: fg),

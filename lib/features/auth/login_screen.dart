@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../core/constants/app_colors.dart';
+import '../../core/theme/app_typography.dart';
 import '../../shared/models/user_role.dart';
 import '../../shared/providers/app_providers.dart';
 import '../../shared/providers/auth_provider.dart';
@@ -246,21 +247,19 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                         ),
                       ),
                       const SizedBox(width: 12),
-                      const Column(
+                      Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
                             'Vegora',
-                            style: TextStyle(
+                            style: AppTypography.screenHeading(
                               fontSize: 22,
-                              fontWeight: FontWeight.w800,
                               color: AppColors.primary,
-                              letterSpacing: -0.4,
                             ),
                           ),
                           Text(
                             'Fresh Mandi Produce',
-                            style: TextStyle(
+                            style: AppTypography.supporting(
                               fontSize: 12,
                               fontWeight: FontWeight.w500,
                               color: AppColors.textSecondary,
@@ -273,22 +272,19 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   const SizedBox(height: 28),
 
                   // Human-Designed Header
-                  const Text(
+                  Text(
                     'Welcome back',
-                    style: TextStyle(
+                    style: AppTypography.screenHeading(
                       fontSize: 26,
-                      fontWeight: FontWeight.w800,
                       color: AppColors.textPrimary,
-                      letterSpacing: -0.5,
                     ),
                   ),
                   const SizedBox(height: 6),
-                  const Text(
+                  Text(
                     'Log in with your email to view your basket, reorder fresh essentials, and track delivery.',
-                    style: TextStyle(
+                    style: AppTypography.body(
                       fontSize: 14,
                       color: AppColors.textSecondary,
-                      height: 1.4,
                     ),
                   ),
                   const SizedBox(height: 28),
@@ -471,11 +467,11 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                               ),
                               visualDensity: VisualDensity.compact,
                             ),
-                            child: const Text(
+                            child: Text(
                               'Forgot Password?',
-                              style: TextStyle(
+                              style: AppTypography.button(
                                 fontSize: 13,
-                                fontWeight: FontWeight.w600,
+                                color: AppColors.primary,
                               ),
                             ),
                           ),
@@ -504,12 +500,11 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                                       color: Colors.white,
                                     ),
                                   )
-                                : const Text(
+                                : Text(
                                     'Sign In',
-                                    style: TextStyle(
+                                    style: AppTypography.button(
                                       fontSize: 15,
-                                      fontWeight: FontWeight.w700,
-                                      letterSpacing: 0.2,
+                                      color: Colors.white,
                                     ),
                                   ),
                           ),
@@ -520,23 +515,23 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   const SizedBox(height: 24),
 
                   // Divider
-                  const Row(
+                  Row(
                     children: [
-                      Expanded(
+                      const Expanded(
                         child: Divider(color: AppColors.border, height: 1),
                       ),
                       Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 14),
+                        padding: const EdgeInsets.symmetric(horizontal: 14),
                         child: Text(
                           'or',
-                          style: TextStyle(
+                          style: AppTypography.supporting(
                             fontSize: 13,
                             color: AppColors.neutral400,
                             fontWeight: FontWeight.w500,
                           ),
                         ),
                       ),
-                      Expanded(
+                      const Expanded(
                         child: Divider(color: AppColors.border, height: 1),
                       ),
                     ],
@@ -554,18 +549,16 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                         borderRadius: BorderRadius.circular(12),
                       ),
                     ),
-                    child: const Row(
+                    child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        GoogleLogo(size: 20),
-                        SizedBox(width: 12),
+                        const GoogleLogo(size: 20),
+                        const SizedBox(width: 12),
                         Text(
                           'Continue with Google',
-                          style: TextStyle(
+                          style: AppTypography.button(
                             fontSize: 14.5,
-                            fontWeight: FontWeight.w600,
                             color: AppColors.textPrimary,
-                            letterSpacing: 0.1,
                           ),
                         ),
                       ],
@@ -578,18 +571,18 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     alignment: WrapAlignment.center,
                     crossAxisAlignment: WrapCrossAlignment.center,
                     children: [
-                      const Text(
+                      Text(
                         "Don't have an account? ",
-                        style: TextStyle(
+                        style: AppTypography.body(
                           fontSize: 14,
                           color: AppColors.textSecondary,
                         ),
                       ),
                       GestureDetector(
                         onTap: () => context.push('/customer/register'),
-                        child: const Text(
+                        child: Text(
                           'Sign up',
-                          style: TextStyle(
+                          style: AppTypography.body(
                             fontSize: 14,
                             fontWeight: FontWeight.w700,
                             color: AppColors.primary,

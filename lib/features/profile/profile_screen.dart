@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../core/constants/app_colors.dart';
 import '../../core/localization/app_locale_state.dart';
+import '../../core/theme/app_typography.dart';
 import '../../shared/models/user_role.dart';
 import '../../shared/providers/app_providers.dart';
 import '../../shared/providers/auth_provider.dart';
@@ -469,12 +470,9 @@ class ProfileScreen extends ConsumerWidget {
       leading: Icon(icon, color: AppColors.primary),
       title: Text(
         title,
-        style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+        style: AppTypography.body(fontWeight: FontWeight.w600),
       ),
-      subtitle: Text(
-        subtitle,
-        style: const TextStyle(fontSize: 12, color: AppColors.textSecondary),
-      ),
+      subtitle: Text(subtitle, style: AppTypography.supporting()),
       trailing:
           trailingWidget ??
           const Icon(
@@ -519,24 +517,19 @@ class ProfileScreen extends ConsumerWidget {
                       ),
                     ),
                     const SizedBox(width: 12),
-                    const Expanded(
+                    Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
                             'Choose Language / மொழியைத் தேர்ந்தெடுக்கவும்',
-                            style: TextStyle(
+                            style: AppTypography.sectionHeading().copyWith(
                               fontSize: 15,
-                              fontWeight: FontWeight.bold,
-                              color: AppColors.textPrimary,
                             ),
                           ),
                           Text(
                             'Select your preferred app language',
-                            style: TextStyle(
-                              fontSize: 12,
-                              color: AppColors.textSecondary,
-                            ),
+                            style: AppTypography.supporting(),
                           ),
                         ],
                       ),
@@ -568,11 +561,14 @@ class ProfileScreen extends ConsumerWidget {
                       ),
                     ),
                   ),
-                  title: const Text(
+                  title: Text(
                     'English',
-                    style: TextStyle(fontWeight: FontWeight.bold),
+                    style: AppTypography.body(fontWeight: FontWeight.w600),
                   ),
-                  subtitle: const Text('Default interface language'),
+                  subtitle: Text(
+                    'Default interface language',
+                    style: AppTypography.supporting(),
+                  ),
                   trailing: currentLocale.languageCode == 'en'
                       ? const Icon(
                           Icons.check_circle_rounded,
@@ -619,13 +615,17 @@ class ProfileScreen extends ConsumerWidget {
                       ),
                     ),
                   ),
-                  title: const Text(
+                  title: Text(
                     'தமிழ் (Tamil)',
-                    style: TextStyle(fontWeight: FontWeight.bold, height: 1.3),
+                    style: AppTypography.body(
+                      fontWeight: FontWeight.w600,
+                      isTamil: true,
+                    ),
                   ),
-                  subtitle: const Text(
+                  subtitle: Text(
                     'முழுமையான தமிழ் இடைமுகம் மற்றும் காய்கறி பெயர்கள்',
-                    style: TextStyle(fontSize: 11, height: 1.3),
+                    style: AppTypography.supporting(isTamil: true)
+                        .copyWith(fontSize: 11),
                   ),
                   trailing: currentLocale.languageCode == 'ta'
                       ? const Icon(

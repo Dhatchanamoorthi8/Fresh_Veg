@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../core/constants/app_colors.dart';
 import '../../core/localization/app_locale_state.dart';
+import '../../core/theme/app_typography.dart';
 import '../../core/utils/currency_formatter.dart';
 import '../../shared/providers/branch_provider.dart';
 import '../../shared/providers/cart_provider.dart';
@@ -246,30 +247,25 @@ class _CartScreenState extends ConsumerState<CartScreen> {
                             children: [
                               Text(
                                 product.displayName(locale.languageCode),
-                                style: TextStyle(
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.bold,
-                                  color: AppColors.textPrimary,
-                                  height: isTamil ? 1.35 : 1.2,
+                                style: AppTypography.productName(
+                                  isTamil: isTamil,
                                 ),
                               ),
                               const SizedBox(height: 2),
                               Text(
                                 '${CurrencyFormatter.formatPaise(item.unitPricePaise)} / ${product.formatUnitLabel(isTamil: isTamil)}',
-                                style: TextStyle(
-                                  fontSize: 12,
+                                style: AppTypography.supporting(
                                   color: AppColors.textSecondary,
-                                  height: isTamil ? 1.3 : 1.2,
+                                  isTamil: isTamil,
                                 ),
                               ),
                               const SizedBox(height: 4),
                               Text(
                                 '${isTamil ? "மொத்தம்" : "Item Total"}: ${CurrencyFormatter.formatPaise(item.totalPaise)}',
-                                style: const TextStyle(
-                                  fontSize: 13,
-                                  fontWeight: FontWeight.w800,
+                                style: AppTypography.productPrice(
                                   color: AppColors.primaryDark,
-                                ),
+                                  isTamil: isTamil,
+                                ).copyWith(fontSize: 13),
                               ),
                             ],
                           ),
@@ -322,9 +318,11 @@ class _CartScreenState extends ConsumerState<CartScreen> {
                                     VegoraToast.showWarning(
                                       context,
                                       isTamil
-                                              ? 'அதிகபட்ச இருப்பு ${product.formatQuantity(stock, isTamil: true)} மட்டுமே'
-                                              : 'Maximum available stock is ${product.formatQuantity(stock)}',
-                                      title: isTamil ? 'இருப்பு வரம்பு' : 'Stock Limit',
+                                          ? 'அதிகபட்ச இருப்பு ${product.formatQuantity(stock, isTamil: true)} மட்டுமே'
+                                          : 'Maximum available stock is ${product.formatQuantity(stock)}',
+                                      title: isTamil
+                                          ? 'இருப்பு வரம்பு'
+                                          : 'Stock Limit',
                                     );
                                   }
                                 },
@@ -478,20 +476,17 @@ class _CartScreenState extends ConsumerState<CartScreen> {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Text(
-                        isTamil ? 'மொத்த தொகை' : 'TOTAL AMOUNT',
-                        style: const TextStyle(
-                          fontSize: 10,
-                          fontWeight: FontWeight.bold,
+                        isTamil ? 'மொத்த தொகை' : 'Total Amount',
+                        style: AppTypography.supporting(
                           color: AppColors.textMuted,
-                        ),
+                          isTamil: isTamil,
+                        ).copyWith(fontSize: 10, fontWeight: FontWeight.w600),
                       ),
                       Text(
                         CurrencyFormatter.formatPaise(total),
-                        style: const TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.w900,
+                        style: AppTypography.productPrice(
                           color: AppColors.textPrimary,
-                        ),
+                        ).copyWith(fontSize: 20),
                       ),
                     ],
                   ),
@@ -523,9 +518,9 @@ class _CartScreenState extends ConsumerState<CartScreen> {
                               isTamil
                                   ? 'செக் அவுட் செய்க'
                                   : 'Proceed to Checkout',
-                              style: const TextStyle(
-                                fontSize: 15,
-                                fontWeight: FontWeight.bold,
+                              style: AppTypography.button(
+                                color: Colors.white,
+                                isTamil: isTamil,
                               ),
                             ),
                             const SizedBox(width: 6),
@@ -548,17 +543,12 @@ class _CartScreenState extends ConsumerState<CartScreen> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text(
-          label,
-          style: const TextStyle(fontSize: 14, color: AppColors.textSecondary),
-        ),
+        Text(label, style: AppTypography.body(color: AppColors.textSecondary)),
         Text(
           value,
-          style: TextStyle(
-            fontSize: 14,
-            fontWeight: FontWeight.w700,
+          style: AppTypography.productPrice(
             color: isGreen ? AppColors.primary : AppColors.textPrimary,
-          ),
+          ).copyWith(fontSize: 14),
         ),
       ],
     );

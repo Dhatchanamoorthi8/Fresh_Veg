@@ -166,14 +166,10 @@ class ProductCard extends ConsumerWidget {
                           color: AppColors.neutral700,
                           borderRadius: BorderRadius.circular(4),
                         ),
-                        child: const Text(
-                          'SOLD OUT',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 9.5,
-                            fontWeight: FontWeight.w700,
-                            letterSpacing: 0.5,
-                          ),
+                        child: Text(
+                          'Sold Out',
+                          style: AppTypography.badge(color: Colors.white)
+                              .copyWith(fontSize: 9.5),
                         ),
                       ),
                     ),
@@ -187,12 +183,7 @@ class ProductCard extends ConsumerWidget {
               product.name,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
-              style: const TextStyle(
-                fontSize: 13.5,
-                fontWeight: FontWeight.w700,
-                color: AppColors.textPrimary,
-                letterSpacing: -0.2,
-              ),
+              style: AppTypography.productName(),
             ),
 
             // Local name & origin
@@ -200,22 +191,16 @@ class ProductCard extends ConsumerWidget {
               product.localName.isNotEmpty ? product.localName : product.origin,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
-              style: const TextStyle(
-                fontSize: 11,
-                color: AppColors.textSecondary,
-                fontWeight: FontWeight.w500,
-              ),
+              style: AppTypography.supporting(color: AppColors.textSecondary)
+                  .copyWith(fontSize: 11, fontWeight: FontWeight.w500),
             ),
             const SizedBox(height: 2),
 
             // Unit/weight label
             Text(
               product.unit,
-              style: const TextStyle(
-                fontSize: 11,
-                color: AppColors.neutral500,
-                fontWeight: FontWeight.w500,
-              ),
+              style: AppTypography.supporting(color: AppColors.neutral500)
+                  .copyWith(fontSize: 11, fontWeight: FontWeight.w500),
             ),
             const SizedBox(height: 8),
 
@@ -229,11 +214,7 @@ class ProductCard extends ConsumerWidget {
                   children: [
                     Text(
                       CurrencyFormatter.formatPaise(pricePaise),
-                      style: const TextStyle(
-                        fontSize: 14.5,
-                        fontWeight: FontWeight.w800,
-                        color: AppColors.textPrimary,
-                      ),
+                      style: AppTypography.productPrice(),
                     ),
                     if (product.originalPricePaise != null &&
                         product.originalPricePaise! > pricePaise)
@@ -241,11 +222,7 @@ class ProductCard extends ConsumerWidget {
                         CurrencyFormatter.formatPaise(
                           product.originalPricePaise!,
                         ),
-                        style: const TextStyle(
-                          fontSize: 10.5,
-                          color: AppColors.textMuted,
-                          decoration: TextDecoration.lineThrough,
-                        ),
+                        style: AppTypography.originalPrice(),
                       ),
                   ],
                 ),
@@ -271,19 +248,17 @@ class ProductCard extends ConsumerWidget {
                       ),
                       onPressed: () =>
                           _handleAddToCart(context, ref, currentBranch, cart),
-                      child: const Row(
+                      child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           Text(
-                            'ADD',
-                            style: TextStyle(
-                              fontSize: 11.5,
-                              fontWeight: FontWeight.w800,
-                              letterSpacing: 0.2,
-                            ),
+                            'Add',
+                            style: AppTypography.button(
+                              color: AppColors.primary,
+                            ).copyWith(fontSize: 12),
                           ),
-                          SizedBox(width: 3),
-                          Icon(Icons.add, size: 13),
+                          const SizedBox(width: 3),
+                          const Icon(Icons.add, size: 13),
                         ],
                       ),
                     ),
@@ -310,11 +285,8 @@ class ProductCard extends ConsumerWidget {
                           padding: const EdgeInsets.symmetric(horizontal: 6),
                           child: Text(
                             '$qtyInCart',
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 12.5,
-                            ),
+                            style: AppTypography.button(color: Colors.white)
+                                .copyWith(fontSize: 12.5),
                           ),
                         ),
                         _buildStepperButton(

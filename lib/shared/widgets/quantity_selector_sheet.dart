@@ -5,6 +5,7 @@ import 'package:vegora_core/localization/app_localizations.dart';
 
 import '../../core/constants/app_colors.dart';
 import '../../core/localization/app_locale_state.dart';
+import '../../core/theme/app_typography.dart';
 import '../../core/utils/currency_formatter.dart';
 import '../models/product.dart';
 import '../providers/branch_provider.dart';
@@ -221,21 +222,14 @@ class _QuantitySelectorSheetState extends ConsumerState<QuantitySelectorSheet> {
                   children: [
                     Text(
                       displayName,
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.w800,
-                        color: AppColors.textPrimary,
-                        height: isTamil ? 1.35 : 1.2,
-                      ),
+                      style: AppTypography.sectionHeading(isTamil: isTamil),
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                     ),
                     const SizedBox(height: 2),
                     Text(
                       '${CurrencyFormatter.formatPaise(branchPricePaise)} $displayUnit',
-                      style: const TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.bold,
+                      style: AppTypography.productPrice(
                         color: AppColors.primary,
                       ),
                     ),
@@ -244,15 +238,17 @@ class _QuantitySelectorSheetState extends ConsumerState<QuantitySelectorSheet> {
                       isAvailable
                           ? '${isTamil ? "கையிருப்பு" : "Stock"}: ${p.formatQuantity(maxStock, isTamil: isTamil)}'
                           : l10n.outOfStock,
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: isAvailable
-                            ? AppColors.textSecondary
-                            : AppColors.statusCancelled,
-                        fontWeight: isAvailable
-                            ? FontWeight.normal
-                            : FontWeight.bold,
-                      ),
+                      style:
+                          AppTypography.supporting(
+                            color: isAvailable
+                                ? AppColors.textSecondary
+                                : AppColors.statusCancelled,
+                            isTamil: isTamil,
+                          ).copyWith(
+                            fontWeight: isAvailable
+                                ? FontWeight.w400
+                                : FontWeight.w600,
+                          ),
                     ),
                   ],
                 ),
@@ -420,18 +416,16 @@ class _QuantitySelectorSheetState extends ConsumerState<QuantitySelectorSheet> {
                   children: [
                     Text(
                       '${l10n.quantity}: ${p.formatQuantity(_selectedQuantity, isTamil: isTamil)}',
-                      style: const TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.bold,
+                      style: AppTypography.body(
                         color: AppColors.textPrimary,
+                        fontWeight: FontWeight.w600,
+                        isTamil: isTamil,
                       ),
                     ),
                     const SizedBox(height: 2),
                     Text(
                       '${l10n.price}: ${CurrencyFormatter.formatPaise(lineTotalPaise)}',
-                      style: const TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w900,
+                      style: AppTypography.productPrice(
                         color: AppColors.primaryDark,
                       ),
                     ),
@@ -522,7 +516,9 @@ class _QuantitySelectorSheetState extends ConsumerState<QuantitySelectorSheet> {
                         VegoraToast.showSuccess(
                           context,
                           '${p.displayName(locale.languageCode)} (${p.formatQuantity(_selectedQuantity, isTamil: isTamil)}) ${isTamil ? "கூடையில் சேர்க்கப்பட்டது" : "added to cart!"}',
-                          title: isTamil ? 'கூடையில் சேர்க்கப்பட்டது' : 'Added to Cart',
+                          title: isTamil
+                              ? 'கூடையில் சேர்க்கப்பட்டது'
+                              : 'Added to Cart',
                           actionLabel: isTamil ? 'கூடை' : 'Cart',
                           onAction: () => context.go('/cart'),
                         );
@@ -575,10 +571,9 @@ class _QuantitySelectorSheetState extends ConsumerState<QuantitySelectorSheet> {
                   const SizedBox(width: 8),
                   Text(
                     '${l10n.addToCart} • ${CurrencyFormatter.formatPaise(lineTotalPaise)}',
-                    style: const TextStyle(
-                      fontSize: 15,
-                      fontWeight: FontWeight.bold,
+                    style: AppTypography.button(
                       color: Colors.white,
+                      isTamil: isTamil,
                     ),
                   ),
                 ],

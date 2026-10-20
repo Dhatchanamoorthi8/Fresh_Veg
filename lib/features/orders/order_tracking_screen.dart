@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 
 import '../../core/constants/app_colors.dart';
 import '../../core/localization/app_locale_state.dart';
+import '../../core/theme/app_typography.dart';
 import '../../core/utils/currency_formatter.dart';
 import '../../shared/models/order.dart';
 import '../../shared/models/order_status.dart';
@@ -70,16 +71,14 @@ class OrderTrackingScreen extends ConsumerWidget {
                         children: [
                           Text(
                             order.orderNumber,
-                            style: const TextStyle(
+                            style: AppTypography.sectionHeading(
                               fontSize: 18,
-                              fontWeight: FontWeight.w800,
                               color: AppColors.textPrimary,
                             ),
                           ),
                           Text(
                             timeFormat.format(order.createdAt),
-                            style: const TextStyle(
-                              fontSize: 12,
+                            style: AppTypography.supporting(
                               color: AppColors.textMuted,
                             ),
                           ),
@@ -91,10 +90,10 @@ class OrderTrackingScreen extends ConsumerWidget {
                   const SizedBox(height: 12),
                   Text(
                     status.description,
-                    style: const TextStyle(
+                    style: AppTypography.body(
                       fontSize: 13,
                       color: AppColors.textSecondary,
-                      height: 1.3,
+                      isTamil: isTamil,
                     ),
                   ),
 
@@ -143,9 +142,12 @@ class OrderTrackingScreen extends ConsumerWidget {
             const SizedBox(height: 20),
 
             // Live Step Timeline
-            const Text(
-              'Order Status Journey',
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+            Text(
+              isTamil ? 'ஆர்டர் நிலை பாதை' : 'Order Status Journey',
+              style: AppTypography.sectionHeading(
+                fontSize: 16,
+                isTamil: isTamil,
+              ),
             ),
             const SizedBox(height: 12),
             Container(
@@ -162,9 +164,12 @@ class OrderTrackingScreen extends ConsumerWidget {
 
             // Delivery Partner Card (if assigned)
             if (order.assignedDeliveryPartner != null) ...[
-              const Text(
-                'Delivery Partner',
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              Text(
+                isTamil ? 'டெலிவரி பார்ட்னர்' : 'Delivery Partner',
+                style: AppTypography.sectionHeading(
+                  fontSize: 16,
+                  isTamil: isTamil,
+                ),
               ),
               const SizedBox(height: 8),
               Container(
@@ -195,15 +200,14 @@ class OrderTrackingScreen extends ConsumerWidget {
                         children: [
                           Text(
                             order.assignedDeliveryPartner!.name,
-                            style: const TextStyle(
+                            style: AppTypography.body(
                               fontSize: 15,
-                              fontWeight: FontWeight.bold,
+                              fontWeight: FontWeight.w600,
                             ),
                           ),
                           Text(
                             'Vehicle: ${order.assignedDeliveryPartner!.vehicleNumber}',
-                            style: const TextStyle(
-                              fontSize: 12,
+                            style: AppTypography.supporting(
                               color: AppColors.textSecondary,
                             ),
                           ),
@@ -217,7 +221,7 @@ class OrderTrackingScreen extends ConsumerWidget {
                               const SizedBox(width: 3),
                               Text(
                                 '${order.assignedDeliveryPartner!.rating} Rating (${order.assignedDeliveryPartner!.totalDeliveriesCompleted}+ deliveries)',
-                                style: const TextStyle(
+                                style: AppTypography.smallBadge(
                                   fontSize: 11,
                                   color: AppColors.textMuted,
                                 ),
@@ -234,9 +238,12 @@ class OrderTrackingScreen extends ConsumerWidget {
             ],
 
             // Delivery & Store Branch Info
-            const Text(
-              'Delivery & Store Details',
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+            Text(
+              isTamil ? 'டெலிவரி & கடை விவரங்கள்' : 'Delivery & Store Details',
+              style: AppTypography.sectionHeading(
+                fontSize: 16,
+                isTamil: isTamil,
+              ),
             ),
             const SizedBox(height: 8),
             Container(
@@ -281,9 +288,12 @@ class OrderTrackingScreen extends ConsumerWidget {
             const SizedBox(height: 20),
 
             // Itemized Items List
-            const Text(
-              'Items in this Order',
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+            Text(
+              isTamil ? 'ஆர்டர் செய்யப்பட்ட பொருட்கள்' : 'Items in this Order',
+              style: AppTypography.sectionHeading(
+                fontSize: 16,
+                isTamil: isTamil,
+              ),
             ),
             const SizedBox(height: 8),
             Container(
@@ -315,18 +325,17 @@ class OrderTrackingScreen extends ConsumerWidget {
                               children: [
                                 Text(
                                   item.product.displayName(locale.languageCode),
-                                  style: TextStyle(
+                                  style: AppTypography.productName(
                                     fontSize: 13,
-                                    fontWeight: FontWeight.bold,
-                                    height: isTamil ? 1.35 : 1.2,
+                                    isTamil: isTamil,
                                   ),
                                 ),
                                 Text(
                                   '${item.formattedQuantity(isTamil: isTamil)} • ${CurrencyFormatter.formatPaise(item.unitPricePaise)} / ${item.product.formatUnitLabel(isTamil: isTamil)}',
-                                  style: TextStyle(
+                                  style: AppTypography.supporting(
                                     fontSize: 11,
                                     color: AppColors.textSecondary,
-                                    height: isTamil ? 1.3 : 1.2,
+                                    isTamil: isTamil,
                                   ),
                                 ),
                               ],
@@ -334,10 +343,7 @@ class OrderTrackingScreen extends ConsumerWidget {
                           ),
                           Text(
                             CurrencyFormatter.formatPaise(item.totalPaise),
-                            style: const TextStyle(
-                              fontSize: 13,
-                              fontWeight: FontWeight.w700,
-                            ),
+                            style: AppTypography.productPrice(fontSize: 14),
                           ),
                         ],
                       ),
@@ -347,18 +353,19 @@ class OrderTrackingScreen extends ConsumerWidget {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      const Text(
-                        'Total Bill',
-                        style: TextStyle(
+                      Text(
+                        isTamil ? 'மொத்த தொகை' : 'Total Bill',
+                        style: AppTypography.body(
                           fontSize: 15,
-                          fontWeight: FontWeight.bold,
+                          fontWeight: FontWeight.w600,
+                          isTamil: isTamil,
                         ),
                       ),
                       Text(
                         CurrencyFormatter.formatPaise(order.totalPaise),
-                        style: const TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w900,
+                        style: AppTypography.productPrice(
+                          fontSize: 17,
+                          fontWeight: FontWeight.w700,
                           color: AppColors.primaryDark,
                         ),
                       ),

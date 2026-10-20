@@ -1,28 +1,28 @@
 import 'package:flutter/material.dart';
 
 import '../constants/app_colors.dart';
+import 'app_typography.dart';
 
 /// Vegora Premium Design System Theme
 ///
-/// Implements the fresh natural green and clean white identity with calibrated
-/// typography, accessible contrasts, and native Tamil language support.
+/// Implements Poppins for modern, friendly English grocery shopping
+/// and Noto Sans Tamil for native, high-fidelity Tamil script rendering.
 class AppTheme {
   AppTheme._();
 
-  static const String tamilFontFamily = 'NotoSansTamil';
-  static const List<String> fallbackFonts = [
-    tamilFontFamily,
-    'Inter',
-    'Roboto',
-    'sans-serif',
-  ];
+  static const String englishFontFamily = AppTypography.englishFontFamily;
+  static const String tamilFontFamily = AppTypography.tamilFontFamily;
+
+  static List<String> fallbackFonts({bool isTamil = false}) =>
+      AppTypography.fallbackFonts(isTamil: isTamil);
 
   static ThemeData get lightTheme => getTheme();
 
   static ThemeData getTheme({Locale? locale}) {
     final isTamil = locale?.languageCode == 'ta';
-    final activeFontFamily = isTamil ? tamilFontFamily : null;
-    final lineHeight = isTamil ? 1.38 : 1.25;
+    final activeFontFamily = AppTypography.fontFamily(isTamil: isTamil);
+    final activeFallbacks = AppTypography.fallbackFonts(isTamil: isTamil);
+    final lineHeight = AppTypography.lineHeight(isTamil: isTamil);
 
     final colorScheme = ColorScheme.fromSeed(
       seedColor: AppColors.primary,
@@ -47,7 +47,7 @@ class AppTheme {
       colorScheme: colorScheme,
       scaffoldBackgroundColor: AppColors.background,
       fontFamily: activeFontFamily,
-      fontFamilyFallback: fallbackFonts,
+      fontFamilyFallback: activeFallbacks,
       appBarTheme: AppBarTheme(
         backgroundColor: Colors.white,
         foregroundColor: AppColors.textPrimary,
@@ -57,154 +57,154 @@ class AppTheme {
         titleTextStyle: TextStyle(
           color: AppColors.textPrimary,
           fontSize: 18,
-          fontWeight: FontWeight.w700,
-          letterSpacing: -0.3,
+          fontWeight: FontWeight.w600,
+          letterSpacing: isTamil ? 0 : -0.3,
           fontFamily: activeFontFamily,
-          fontFamilyFallback: fallbackFonts,
+          fontFamilyFallback: activeFallbacks,
           height: lineHeight,
         ),
         iconTheme: const IconThemeData(color: AppColors.textPrimary, size: 22),
       ),
       textTheme: TextTheme(
-        // Display Headings (28-32 px)
+        // Display Headings (28-32 px, Bold 700 / SemiBold 600)
         displayLarge: TextStyle(
           fontSize: 32,
-          fontWeight: FontWeight.w800,
-          letterSpacing: -0.8,
+          fontWeight: FontWeight.w700,
+          letterSpacing: isTamil ? 0 : -0.6,
           color: AppColors.textPrimary,
           fontFamily: activeFontFamily,
-          fontFamilyFallback: fallbackFonts,
+          fontFamilyFallback: activeFallbacks,
           height: lineHeight,
         ),
         displayMedium: TextStyle(
           fontSize: 28,
-          fontWeight: FontWeight.w800,
-          letterSpacing: -0.6,
+          fontWeight: FontWeight.w600,
+          letterSpacing: isTamil ? 0 : -0.4,
           color: AppColors.textPrimary,
           fontFamily: activeFontFamily,
-          fontFamilyFallback: fallbackFonts,
+          fontFamilyFallback: activeFallbacks,
           height: lineHeight,
         ),
         displaySmall: TextStyle(
           fontSize: 24,
-          fontWeight: FontWeight.w700,
-          letterSpacing: -0.4,
+          fontWeight: FontWeight.w600,
+          letterSpacing: isTamil ? 0 : -0.3,
           color: AppColors.textPrimary,
           fontFamily: activeFontFamily,
-          fontFamilyFallback: fallbackFonts,
+          fontFamilyFallback: activeFallbacks,
           height: lineHeight,
         ),
 
-        // Screen & Section Headings (18-28 px)
+        // Screen & Section Headings (18-28 px, SemiBold 600)
         headlineLarge: TextStyle(
           fontSize: 26,
-          fontWeight: FontWeight.w800,
-          letterSpacing: -0.5,
+          fontWeight: FontWeight.w600,
+          letterSpacing: isTamil ? 0 : -0.4,
           color: AppColors.textPrimary,
           fontFamily: activeFontFamily,
-          fontFamilyFallback: fallbackFonts,
+          fontFamilyFallback: activeFallbacks,
           height: lineHeight,
         ),
         headlineMedium: TextStyle(
           fontSize: 22,
-          fontWeight: FontWeight.w700,
-          letterSpacing: -0.3,
+          fontWeight: FontWeight.w600,
+          letterSpacing: isTamil ? 0 : -0.2,
           color: AppColors.textPrimary,
           fontFamily: activeFontFamily,
-          fontFamilyFallback: fallbackFonts,
+          fontFamilyFallback: activeFallbacks,
           height: lineHeight,
         ),
         headlineSmall: TextStyle(
           fontSize: 19,
-          fontWeight: FontWeight.w700,
-          letterSpacing: -0.2,
+          fontWeight: FontWeight.w600,
+          letterSpacing: isTamil ? 0 : -0.1,
           color: AppColors.textPrimary,
           fontFamily: activeFontFamily,
-          fontFamilyFallback: fallbackFonts,
+          fontFamilyFallback: activeFallbacks,
           height: lineHeight,
         ),
 
         // Section & Card Titles (15-20 px)
         titleLarge: TextStyle(
-          fontSize: 18,
-          fontWeight: FontWeight.w700,
-          letterSpacing: -0.2,
+          fontSize: 19,
+          fontWeight: FontWeight.w600,
+          letterSpacing: isTamil ? 0 : -0.2,
           color: AppColors.textPrimary,
           fontFamily: activeFontFamily,
-          fontFamilyFallback: fallbackFonts,
+          fontFamilyFallback: activeFallbacks,
           height: lineHeight,
         ),
         titleMedium: TextStyle(
-          fontSize: 16,
-          fontWeight: FontWeight.w600,
-          letterSpacing: -0.1,
+          fontSize: 15,
+          fontWeight: FontWeight.w500,
+          letterSpacing: isTamil ? 0 : -0.1,
           color: AppColors.textPrimary,
           fontFamily: activeFontFamily,
-          fontFamilyFallback: fallbackFonts,
+          fontFamilyFallback: activeFallbacks,
           height: lineHeight,
         ),
         titleSmall: TextStyle(
           fontSize: 14,
-          fontWeight: FontWeight.w600,
+          fontWeight: FontWeight.w500,
           letterSpacing: 0,
           color: AppColors.textPrimary,
           fontFamily: activeFontFamily,
-          fontFamilyFallback: fallbackFonts,
+          fontFamilyFallback: activeFallbacks,
           height: lineHeight,
         ),
 
-        // Body Text (14-16 px)
+        // Body Text (14-16 px, Regular 400)
         bodyLarge: TextStyle(
-          fontSize: 16,
+          fontSize: 15,
           fontWeight: FontWeight.w400,
           color: AppColors.textPrimary,
           fontFamily: activeFontFamily,
-          fontFamilyFallback: fallbackFonts,
-          height: lineHeight + 0.1,
+          fontFamilyFallback: activeFallbacks,
+          height: lineHeight + 0.05,
         ),
         bodyMedium: TextStyle(
           fontSize: 14,
           fontWeight: FontWeight.w400,
           color: AppColors.textSecondary,
           fontFamily: activeFontFamily,
-          fontFamilyFallback: fallbackFonts,
-          height: lineHeight + 0.1,
+          fontFamilyFallback: activeFallbacks,
+          height: lineHeight + 0.05,
         ),
         bodySmall: TextStyle(
-          fontSize: 12,
+          fontSize: 12.5,
           fontWeight: FontWeight.w400,
           color: AppColors.textMuted,
           fontFamily: activeFontFamily,
-          fontFamilyFallback: fallbackFonts,
+          fontFamilyFallback: activeFallbacks,
           height: lineHeight,
         ),
 
-        // Buttons & Labels (12-16 px)
+        // Buttons & Labels (11-16 px, SemiBold 600 / Medium 500)
         labelLarge: TextStyle(
           fontSize: 15,
           fontWeight: FontWeight.w600,
-          letterSpacing: 0.1,
+          letterSpacing: isTamil ? 0 : 0.1,
           color: AppColors.textPrimary,
           fontFamily: activeFontFamily,
-          fontFamilyFallback: fallbackFonts,
+          fontFamilyFallback: activeFallbacks,
           height: lineHeight,
         ),
         labelMedium: TextStyle(
           fontSize: 13,
-          fontWeight: FontWeight.w600,
-          letterSpacing: 0.1,
+          fontWeight: FontWeight.w500,
+          letterSpacing: 0,
           color: AppColors.textSecondary,
           fontFamily: activeFontFamily,
-          fontFamilyFallback: fallbackFonts,
+          fontFamilyFallback: activeFallbacks,
           height: lineHeight,
         ),
         labelSmall: TextStyle(
-          fontSize: 11,
-          fontWeight: FontWeight.w600,
-          letterSpacing: 0.2,
+          fontSize: 11.5,
+          fontWeight: FontWeight.w500,
+          letterSpacing: isTamil ? 0 : 0.1,
           color: AppColors.textMuted,
           fontFamily: activeFontFamily,
-          fontFamilyFallback: fallbackFonts,
+          fontFamilyFallback: activeFallbacks,
           height: lineHeight,
         ),
       ),
@@ -230,7 +230,7 @@ class AppTheme {
             fontSize: 15,
             fontWeight: FontWeight.w600,
             fontFamily: activeFontFamily,
-            fontFamilyFallback: fallbackFonts,
+            fontFamilyFallback: activeFallbacks,
             height: lineHeight,
           ),
         ),
@@ -244,10 +244,10 @@ class AppTheme {
             borderRadius: BorderRadius.circular(12),
           ),
           textStyle: TextStyle(
-            fontSize: 14,
+            fontSize: 15,
             fontWeight: FontWeight.w600,
             fontFamily: activeFontFamily,
-            fontFamilyFallback: fallbackFonts,
+            fontFamilyFallback: activeFallbacks,
             height: lineHeight,
           ),
         ),
@@ -260,7 +260,7 @@ class AppTheme {
             fontSize: 14,
             fontWeight: FontWeight.w600,
             fontFamily: activeFontFamily,
-            fontFamilyFallback: fallbackFonts,
+            fontFamilyFallback: activeFallbacks,
             height: lineHeight,
           ),
         ),
@@ -295,9 +295,16 @@ class AppTheme {
         hintStyle: TextStyle(
           color: AppColors.textMuted,
           fontSize: 14,
-          fontWeight: FontWeight.normal,
+          fontWeight: FontWeight.w400,
           fontFamily: activeFontFamily,
-          fontFamilyFallback: fallbackFonts,
+          fontFamilyFallback: activeFallbacks,
+        ),
+        labelStyle: TextStyle(
+          color: AppColors.textSecondary,
+          fontSize: 13,
+          fontWeight: FontWeight.w500,
+          fontFamily: activeFontFamily,
+          fontFamilyFallback: activeFallbacks,
         ),
       ),
       chipTheme: ChipThemeData(
@@ -306,11 +313,11 @@ class AppTheme {
         side: const BorderSide(color: AppColors.border, width: 0.8),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
         labelStyle: TextStyle(
-          fontSize: 13,
+          fontSize: 12.5,
           fontWeight: FontWeight.w500,
           color: AppColors.textSecondary,
           fontFamily: activeFontFamily,
-          fontFamilyFallback: fallbackFonts,
+          fontFamilyFallback: activeFallbacks,
         ),
       ),
       bottomNavigationBarTheme: BottomNavigationBarThemeData(
@@ -323,13 +330,13 @@ class AppTheme {
           fontSize: 12,
           fontWeight: FontWeight.w600,
           fontFamily: activeFontFamily,
-          fontFamilyFallback: fallbackFonts,
+          fontFamilyFallback: activeFallbacks,
         ),
         unselectedLabelStyle: TextStyle(
           fontSize: 12,
           fontWeight: FontWeight.w500,
           fontFamily: activeFontFamily,
-          fontFamilyFallback: fallbackFonts,
+          fontFamilyFallback: activeFallbacks,
         ),
       ),
       dividerTheme: const DividerThemeData(
