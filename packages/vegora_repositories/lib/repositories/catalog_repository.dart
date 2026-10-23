@@ -25,6 +25,7 @@ class MockCatalogRepository implements CatalogRepository {
       icon: Icons.local_grocery_store_rounded,
       emoji: '🍅',
       badgeColor: Color(0xFFDC2626),
+      imageUrl: 'https://images.unsplash.com/photo-1540420773420-3366772f4999?auto=format&fit=crop&w=600&q=80',
     ),
     ProductCategory(
       id: 'cat_leafy',
@@ -33,6 +34,7 @@ class MockCatalogRepository implements CatalogRepository {
       icon: Icons.eco_rounded,
       emoji: '🥬',
       badgeColor: Color(0xFF16A34A),
+      imageUrl: 'https://images.unsplash.com/photo-1576045057995-568f588f82fb?auto=format&fit=crop&w=600&q=80',
     ),
     ProductCategory(
       id: 'cat_roots',
@@ -41,6 +43,7 @@ class MockCatalogRepository implements CatalogRepository {
       icon: Icons.grass_rounded,
       emoji: '🥕',
       badgeColor: Color(0xFFEA580C),
+      imageUrl: 'https://images.unsplash.com/photo-1582515073490-39981397c445?auto=format&fit=crop&w=600&q=80',
     ),
     ProductCategory(
       id: 'cat_onions_potatoes',
@@ -49,6 +52,7 @@ class MockCatalogRepository implements CatalogRepository {
       icon: Icons.egg_rounded,
       emoji: '🥔',
       badgeColor: Color(0xFFD97706),
+      imageUrl: 'https://images.unsplash.com/photo-1518977676601-b53f82aba655?auto=format&fit=crop&w=600&q=80',
     ),
     ProductCategory(
       id: 'cat_fruits',
@@ -57,6 +61,7 @@ class MockCatalogRepository implements CatalogRepository {
       icon: Icons.apple_rounded,
       emoji: '🍎',
       badgeColor: Color(0xFFE11D48),
+      imageUrl: 'https://images.unsplash.com/photo-1619566636858-adf3ef46400b?auto=format&fit=crop&w=600&q=80',
     ),
     ProductCategory(
       id: 'cat_seasonal_exotic',
@@ -65,6 +70,7 @@ class MockCatalogRepository implements CatalogRepository {
       icon: Icons.star_rounded,
       emoji: '🥦',
       badgeColor: Color(0xFF7C3AED),
+      imageUrl: 'https://images.unsplash.com/photo-1459411621453-7b03977f4bfc?auto=format&fit=crop&w=600&q=80',
     ),
   ];
 
@@ -80,6 +86,7 @@ class MockCatalogRepository implements CatalogRepository {
       storageTips: 'Store at room temperature away from direct sunlight.',
       origin: 'Kolar, Karnataka',
       emoji: '🍅',
+      imageUrl: 'https://images.unsplash.com/photo-1592924357228-91a4daadcfea?auto=format&fit=crop&w=600&q=80',
       isBestSeller: true,
       basePricePaise: 3400, // ₹34
       originalPricePaise: 4200, // ₹42
@@ -116,6 +123,7 @@ class MockCatalogRepository implements CatalogRepository {
       storageTips: 'Best used within 4 days. Keep in a breathable basket.',
       origin: 'Chintamani, Karnataka',
       emoji: '🍅',
+      imageUrl: 'https://gmiysmfyxqkpdsyvvjbx.supabase.co/storage/v1/object/public/product-images/products/veg_tomato_desi.jpg',
       isOrganic: true,
       basePricePaise: 2600, // ₹26
       originalPricePaise: 3200,
@@ -138,6 +146,7 @@ class MockCatalogRepository implements CatalogRepository {
       storageTips: 'Dry thoroughly before storing in the refrigerator.',
       origin: 'Ramanagara, Karnataka',
       emoji: '🥒',
+      imageUrl: 'https://images.unsplash.com/photo-1425543103986-22abb7d7e8d2?auto=format&fit=crop&w=600&q=80',
       isBestSeller: true,
       basePricePaise: 2800, // ₹28
       originalPricePaise: 3500,
@@ -152,6 +161,7 @@ class MockCatalogRepository implements CatalogRepository {
       storageTips: 'Store unwashed in vegetable crisper drawer.',
       origin: 'Ooty, Tamil Nadu',
       emoji: '🫑',
+      imageUrl: 'https://gmiysmfyxqkpdsyvvjbx.supabase.co/storage/v1/object/public/product-images/products/veg_capsicum_green.jpg',
       basePricePaise: 3800, // ₹38
     ),
     Product(
@@ -165,6 +175,7 @@ class MockCatalogRepository implements CatalogRepository {
           'Remove stems and store in an airtight container lined with tissue.',
       origin: 'Byadagi, Karnataka',
       emoji: '🌶️',
+      imageUrl: 'https://gmiysmfyxqkpdsyvvjbx.supabase.co/storage/v1/object/public/product-images/products/veg_green_chilli.jpg',
       basePricePaise: 1600, // ₹16
     ),
     Product(
@@ -177,6 +188,7 @@ class MockCatalogRepository implements CatalogRepository {
       storageTips: 'Keep chilled in crisper box.',
       origin: 'Mysuru, Karnataka',
       emoji: '🥒',
+      imageUrl: 'https://images.unsplash.com/photo-1449300079323-02e209d9d3a6?auto=format&fit=crop&w=600&q=80',
       basePricePaise: 2400, // ₹24
     ),
 
@@ -191,6 +203,7 @@ class MockCatalogRepository implements CatalogRepository {
       storageTips: 'Wrap in paper towel and refrigerate.',
       origin: 'Hosur Valley Farms',
       emoji: '🥬',
+      imageUrl: 'https://images.unsplash.com/photo-1576045057995-568f588f82fb?auto=format&fit=crop&w=600&q=80',
       isOrganic: true,
       isBestSeller: true,
       basePricePaise: 2200, // ₹22
@@ -211,6 +224,7 @@ class MockCatalogRepository implements CatalogRepository {
       storageTips: 'Pluck leaves, discard hard stems, store dry.',
       origin: 'Malur Farms',
       emoji: '🌿',
+      imageUrl: 'https://gmiysmfyxqkpdsyvvjbx.supabase.co/storage/v1/object/public/product-images/products/veg_methi.jpg',
       basePricePaise: 2000, // ₹20
     ),
     Product(
@@ -224,6 +238,7 @@ class MockCatalogRepository implements CatalogRepository {
           'Submerge root ends in a jar with water or wrap in wet towel.',
       origin: 'Doddaballapur, Karnataka',
       emoji: '🌱',
+      imageUrl: 'https://gmiysmfyxqkpdsyvvjbx.supabase.co/storage/v1/object/public/product-images/products/veg_coriander.jpg',
       basePricePaise: 1500, // ₹15
       originalPricePaise: 2000,
     ),
@@ -237,6 +252,7 @@ class MockCatalogRepository implements CatalogRepository {
       storageTips: 'Refrigerate in a clean container with paper towel.',
       origin: 'Hosur Valley',
       emoji: '🌿',
+      imageUrl: 'https://images.unsplash.com/photo-1608686207856-001b95cf60ca?auto=format&fit=crop&w=600&q=80',
       basePricePaise: 1200, // ₹12
     ),
     Product(
@@ -249,6 +265,7 @@ class MockCatalogRepository implements CatalogRepository {
       storageTips: 'Dry pluck and keep in an airtight glass container.',
       origin: 'Hassan, Karnataka',
       emoji: '🍃',
+      imageUrl: 'https://images.unsplash.com/photo-1601004890684-d8cbf643f5f2?auto=format&fit=crop&w=600&q=80',
       basePricePaise: 800, // ₹8
     ),
 
@@ -263,6 +280,7 @@ class MockCatalogRepository implements CatalogRepository {
       storageTips: 'Trim tops and store in plastic bag inside crisper.',
       origin: 'Ooty Hills, Tamil Nadu',
       emoji: '🥕',
+      imageUrl: 'https://images.unsplash.com/photo-1582515073490-39981397c445?auto=format&fit=crop&w=600&q=80',
       basePricePaise: 3200, // ₹32
       originalPricePaise: 4000,
     ),
@@ -276,6 +294,7 @@ class MockCatalogRepository implements CatalogRepository {
       storageTips: 'Keep in cool dry place or refrigerate.',
       origin: 'Kodaikanal, Tamil Nadu',
       emoji: '🟣',
+      imageUrl: 'https://images.unsplash.com/photo-1593105544559-ecb03bf76f82?auto=format&fit=crop&w=600&q=80',
       basePricePaise: 2600, // ₹26
     ),
     Product(
@@ -288,6 +307,7 @@ class MockCatalogRepository implements CatalogRepository {
       storageTips: 'Store in airtight bag with air squeezed out.',
       origin: 'Chikkaballapur',
       emoji: '🥢',
+      imageUrl: 'https://images.unsplash.com/photo-1594282486552-05b4d80fbb9f?auto=format&fit=crop&w=600&q=80',
       basePricePaise: 2400, // ₹24
     ),
 
@@ -302,6 +322,7 @@ class MockCatalogRepository implements CatalogRepository {
       storageTips: 'Store in an open ventilated basket away from potatoes.',
       origin: 'Nashik, Maharashtra',
       emoji: '🧅',
+      imageUrl: 'https://images.unsplash.com/photo-1618512496248-a07fe83aa8cb?auto=format&fit=crop&w=600&q=80',
       isBestSeller: true,
       basePricePaise: 3800, // ₹38
       originalPricePaise: 4800,
@@ -326,6 +347,7 @@ class MockCatalogRepository implements CatalogRepository {
       storageTips: 'Store in dark, cool pantry. Avoid light exposure.',
       origin: 'Hassan, Karnataka',
       emoji: '🥔',
+      imageUrl: 'https://images.unsplash.com/photo-1518977676601-b53f82aba655?auto=format&fit=crop&w=600&q=80',
       isBestSeller: true,
       basePricePaise: 3200, // ₹32
       originalPricePaise: 3800,
@@ -340,6 +362,7 @@ class MockCatalogRepository implements CatalogRepository {
       storageTips: 'Store unpeeled in paper bag in refrigerator.',
       origin: 'Wayanad, Kerala',
       emoji: '🫚',
+      imageUrl: 'https://gmiysmfyxqkpdsyvvjbx.supabase.co/storage/v1/object/public/product-images/products/veg_ginger.jpg',
       basePricePaise: 4200, // ₹42
     ),
     Product(
@@ -352,6 +375,7 @@ class MockCatalogRepository implements CatalogRepository {
       storageTips: 'Store in mesh wire basket in dry ambient room.',
       origin: 'Mandsaur, Madhya Pradesh',
       emoji: '🧄',
+      imageUrl: 'https://images.unsplash.com/photo-1540148426945-6cf22a6b2383?auto=format&fit=crop&w=600&q=80',
       basePricePaise: 6500, // ₹65
       originalPricePaise: 7500,
     ),
@@ -367,6 +391,7 @@ class MockCatalogRepository implements CatalogRepository {
       storageTips: 'Keep at room temperature hung or on counter.',
       origin: 'Theni, Tamil Nadu',
       emoji: '🍌',
+      imageUrl: 'https://images.unsplash.com/photo-1571771894821-ce9b6c11b08e?auto=format&fit=crop&w=600&q=80',
       isBestSeller: true,
       basePricePaise: 3000, // ₹30
     ),
@@ -380,6 +405,7 @@ class MockCatalogRepository implements CatalogRepository {
       storageTips: 'Refrigerate to preserve crisp snap.',
       origin: 'Kinnaur, Himachal Pradesh',
       emoji: '🍎',
+      imageUrl: 'https://images.unsplash.com/photo-1560806887-1e4cd0b6cbd6?auto=format&fit=crop&w=600&q=80',
       basePricePaise: 11000, // ₹110
       originalPricePaise: 13500,
     ),
@@ -394,6 +420,7 @@ class MockCatalogRepository implements CatalogRepository {
           'Store whole at room temperature or arils in fridge container.',
       origin: 'Solapur, Maharashtra',
       emoji: '🫐',
+      imageUrl: 'https://gmiysmfyxqkpdsyvvjbx.supabase.co/storage/v1/object/public/product-images/products/fruit_pomegranate.jpg',
       isOrganic: true,
       basePricePaise: 9500, // ₹95
     ),
@@ -407,6 +434,7 @@ class MockCatalogRepository implements CatalogRepository {
       storageTips: 'Once ripe, slice and keep in covered bowl in fridge.',
       origin: 'Anantapur, Andhra Pradesh',
       emoji: '🥭',
+      imageUrl: 'https://images.unsplash.com/photo-1517282009859-f000ec3b26fe?auto=format&fit=crop&w=600&q=80',
       basePricePaise: 5500, // ₹55
     ),
 
@@ -421,6 +449,7 @@ class MockCatalogRepository implements CatalogRepository {
       storageTips: 'Keep in loose perforated bag in crisper.',
       origin: 'Nilgiris, Tamil Nadu',
       emoji: '🥦',
+      imageUrl: 'https://images.unsplash.com/photo-1459411621453-7b03977f4bfc?auto=format&fit=crop&w=600&q=80',
       isSeasonal: true,
       basePricePaise: 6800, // ₹68
       originalPricePaise: 8500,
@@ -453,6 +482,7 @@ class MockCatalogRepository implements CatalogRepository {
       storageTips: 'Keep in original paper or punnet box in fridge.',
       origin: 'Kodaikanal, Tamil Nadu',
       emoji: '🍄',
+      imageUrl: 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=600&q=80',
       isSeasonal: true,
       basePricePaise: 5200, // ₹52
       originalPricePaise: 6500,
@@ -467,6 +497,7 @@ class MockCatalogRepository implements CatalogRepository {
       storageTips: 'Keep chilled. Use within 3 days for maximum crunch.',
       origin: 'Devanahalli, Karnataka',
       emoji: '🌽',
+      imageUrl: 'https://images.unsplash.com/photo-1551754655-cd27e38d2076?auto=format&fit=crop&w=600&q=80',
       isSeasonal: true,
       basePricePaise: 4400, // ₹44
     ),

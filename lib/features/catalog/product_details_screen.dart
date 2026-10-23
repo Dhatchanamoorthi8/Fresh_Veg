@@ -144,6 +144,7 @@ class _ProductDetailsScreenState extends ConsumerState<ProductDetailsScreen> {
                     child: ProductImageView(
                       imageUrl: product.imageUrl,
                       fallbackEmoji: product.emoji,
+                      productName: product.name,
                       fit: BoxFit.contain,
                       emojiSize: 96,
                     ),

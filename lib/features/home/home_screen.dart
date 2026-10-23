@@ -443,10 +443,29 @@ class HomeScreen extends ConsumerWidget {
                                 child: Column(
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
-                                    Text(
-                                      cat.emoji,
-                                      style: const TextStyle(fontSize: 26),
-                                    ),
+                                    if (cat.imageUrl != null && cat.imageUrl!.isNotEmpty)
+                                      ClipRRect(
+                                        borderRadius: BorderRadius.circular(18),
+                                        child: Image.network(
+                                          cat.imageUrl!,
+                                          width: 36,
+                                          height: 36,
+                                          fit: BoxFit.cover,
+                                          errorBuilder:
+                                              (context, error, stackTrace) =>
+                                                  Text(
+                                                    cat.emoji,
+                                                    style: const TextStyle(
+                                                      fontSize: 24,
+                                                    ),
+                                                  ),
+                                        ),
+                                      )
+                                    else
+                                      Text(
+                                        cat.emoji,
+                                        style: const TextStyle(fontSize: 26),
+                                      ),
                                     const SizedBox(height: 5),
                                     Text(
                                       cat.displayName(locale.languageCode),
@@ -526,8 +545,9 @@ class HomeScreen extends ConsumerWidget {
                       final products = snapshot.data!;
 
                       return SizedBox(
-                        height: 242,
+                        height: 264,
                         child: ListView.separated(
+                          physics: const BouncingScrollPhysics(),
                           scrollDirection: Axis.horizontal,
                           padding: const EdgeInsets.symmetric(horizontal: 16),
                           itemCount: products.length,
@@ -535,7 +555,7 @@ class HomeScreen extends ConsumerWidget {
                               const SizedBox(width: 12),
                           itemBuilder: (context, index) {
                             return SizedBox(
-                              width: 164,
+                              width: 168,
                               child: ProductCard(
                                 product: products[index],
                                 onTap: () => context.push(
@@ -610,12 +630,12 @@ class HomeScreen extends ConsumerWidget {
                     final products = snapshot.data!;
 
                     return SliverPadding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      padding: const EdgeInsets.fromLTRB(16, 0, 16, 24),
                       sliver: SliverGrid(
                         gridDelegate:
                             const SliverGridDelegateWithFixedCrossAxisCount(
                               crossAxisCount: 2,
-                              childAspectRatio: 0.67,
+                              childAspectRatio: 0.63,
                               crossAxisSpacing: 12,
                               mainAxisSpacing: 12,
                             ),

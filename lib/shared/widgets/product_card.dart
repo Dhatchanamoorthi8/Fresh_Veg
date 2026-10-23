@@ -17,14 +17,24 @@ import 'branch_switch_dialog.dart';
 import 'product_image_view.dart';
 import 'quantity_selector_sheet.dart';
 
-class ProductCard extends ConsumerWidget {
+/// Production-grade quick-commerce product card with high-performance rasterization,
+/// micro-scale tap feedback, concentric radii, content split divider, and animated stepper.
+class ProductCard extends ConsumerStatefulWidget {
   final Product product;
   final VoidCallback? onTap;
 
   const ProductCard({super.key, required this.product, this.onTap});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<ProductCard> createState() => _ProductCardState();
+}
+
+class _ProductCardState extends ConsumerState<ProductCard> {
+  bool _isPressed = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final product = widget.product;
     final currentBranch = ref.watch(selectedBranchProvider);
     final cart = ref.watch(cartProvider);
     final locale = ref.watch(appLocaleProvider);
@@ -41,312 +51,498 @@ class ProductCard extends ConsumerWidget {
         ? (product.name)
         : (product.nameTa.isNotEmpty ? product.nameTa : product.localName);
 
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(14),
-      child: Container(
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(14),
-          border: Border.all(color: AppColors.border, width: 1.0),
-        ),
-        padding: const EdgeInsets.all(10),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Produce Photography Container
-            Expanded(
-              child: Stack(
-                children: [
-                  Container(
-                    width: double.infinity,
-                    decoration: BoxDecoration(
-                      color: AppColors.background,
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    clipBehavior: Clip.antiAlias,
-                    alignment: Alignment.center,
-                    child: ProductImageView(
-                      imageUrl: product.imageUrl,
-                      fallbackEmoji: product.emoji,
-                      fit: BoxFit.cover,
-                      borderRadius: BorderRadius.circular(10),
-                      emojiSize: 44,
-                    ),
-                  ),
+    final hasDiscount = product.originalPricePaise != null &&
+        product.originalPricePaise! > pricePaise;
+    final discountPercent = hasDiscount
+        ? (((product.originalPricePaise! - pricePaise) /
+                    product.originalPricePaise!) *
+                100)
+            .round()
+        : 0;
 
-                  // Semantic Badges
-                  Positioned(
-                    top: 6,
-                    left: 6,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        if (product.isOrganic)
+    return RepaintBoundary(
+      child: AnimatedScale(
+        scale: _isPressed ? 0.975 : 1.0,
+        duration: const Duration(milliseconds: 130),
+        curve: Curves.easeOutCubic,
+        child: Material(
+          color: Colors.transparent,
+          child: InkWell(
+            onTap: widget.onTap,
+            onTapDown: (_) => setState(() => _isPressed = true),
+            onTapUp: (_) => setState(() => _isPressed = false),
+            onTapCancel: () => setState(() => _isPressed = false),
+            borderRadius: BorderRadius.circular(16),
+            splashColor: AppColors.primary.withValues(alpha: 0.08),
+            highlightColor: AppColors.primary.withValues(alpha: 0.04),
+            child: Ink(
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(
+                  color: const Color(0xFFE6EAE7),
+                  width: 1.0,
+                ),
+                boxShadow: const [
+                  BoxShadow(
+                    color: Color(0x0A000000),
+                    blurRadius: 10,
+                    offset: Offset(0, 3),
+                  ),
+                  BoxShadow(
+                    color: Color(0x051F3A24),
+                    blurRadius: 3,
+                    offset: Offset(0, 1),
+                  ),
+                ],
+              ),
+              child: Padding(
+                padding: const EdgeInsets.all(9),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // --- TOP ZONE: PRODUCE IMAGE STAGE ---
+                    Expanded(
+                      child: Stack(
+                        children: [
                           Container(
-                            margin: const EdgeInsets.only(bottom: 4),
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 6,
-                              vertical: 2.5,
-                            ),
+                            width: double.infinity,
+                            height: double.infinity,
                             decoration: BoxDecoration(
-                              color: AppColors.primaryLight,
-                              borderRadius: BorderRadius.circular(4),
-                              border: Border.all(
-                                color: AppColors.primary.withValues(alpha: 0.2),
-                                width: 0.8,
-                              ),
+                              color: const Color(0xFFF6F8F6),
+                              borderRadius: BorderRadius.circular(12),
                             ),
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
+                            clipBehavior: Clip.antiAlias,
+                            alignment: Alignment.center,
+                            child: ProductImageView(
+                              imageUrl: product.imageUrl,
+                              fallbackEmoji: product.emoji,
+                              productName: product.name,
+                              fit: BoxFit.cover,
+                              borderRadius: BorderRadius.circular(12),
+                              emojiSize: 42,
+                            ),
+                          ),
+
+                          // Badges (Top Left: Organic / Bestseller)
+                          Positioned(
+                            top: 6,
+                            left: 6,
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                const Icon(
-                                  Icons.eco_rounded,
-                                  size: 10,
-                                  color: AppColors.primaryDark,
-                                ),
-                                const SizedBox(width: 3),
-                                Text(
-                                  l10n.organic,
-                                  style: AppTypography.badge(
-                                    color: AppColors.primaryDark,
-                                    isTamil: isTamil,
-                                  ).copyWith(fontSize: 8.5),
-                                ),
+                                if (product.isOrganic)
+                                  Container(
+                                    margin: const EdgeInsets.only(bottom: 4),
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 7,
+                                      vertical: 3,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      color: const Color(0xFFE8F5E9),
+                                      borderRadius: BorderRadius.circular(20),
+                                      border: Border.all(
+                                        color: const Color(0xFFC8E6C9),
+                                        width: 0.8,
+                                      ),
+                                    ),
+                                    child: Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        const Icon(
+                                          Icons.eco_rounded,
+                                          size: 10,
+                                          color: Color(0xFF2E7D32),
+                                        ),
+                                        const SizedBox(width: 3),
+                                        Text(
+                                          l10n.organic,
+                                          style: AppTypography.badge(
+                                            color: const Color(0xFF2E7D32),
+                                            isTamil: isTamil,
+                                          ).copyWith(
+                                            fontSize: 9,
+                                            fontWeight: FontWeight.w700,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                if (product.isBestSeller)
+                                  Container(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 7,
+                                      vertical: 3,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      color: const Color(0xFFFFF8E1),
+                                      borderRadius: BorderRadius.circular(20),
+                                      border: Border.all(
+                                        color: const Color(0xFFFFECB3),
+                                        width: 0.8,
+                                      ),
+                                    ),
+                                    child: Text(
+                                      l10n.bestSeller,
+                                      style: AppTypography.badge(
+                                        color: const Color(0xFFE65100),
+                                        isTamil: isTamil,
+                                      ).copyWith(
+                                        fontSize: 8.5,
+                                        fontWeight: FontWeight.w700,
+                                      ),
+                                    ),
+                                  ),
                               ],
                             ),
                           ),
-                        if (product.isBestSeller)
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 6,
-                              vertical: 2.5,
-                            ),
-                            decoration: BoxDecoration(
-                              color: AppColors.warningContainer,
-                              borderRadius: BorderRadius.circular(4),
-                              border: Border.all(
-                                color: AppColors.warning.withValues(alpha: 0.3),
-                                width: 0.8,
+
+                          // Top Right: Discount Pill
+                          if (hasDiscount && discountPercent > 0)
+                            Positioned(
+                              top: 6,
+                              right: 6,
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 6.5,
+                                  vertical: 2.5,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: const Color(0xFF1B5E20),
+                                  borderRadius: BorderRadius.circular(20),
+                                  boxShadow: const [
+                                    BoxShadow(
+                                      color: Color(0x22000000),
+                                      blurRadius: 4,
+                                      offset: Offset(0, 1),
+                                    ),
+                                  ],
+                                ),
+                                child: Text(
+                                  '$discountPercent% OFF',
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 8.5,
+                                    fontWeight: FontWeight.w800,
+                                    letterSpacing: 0.3,
+                                  ),
+                                ),
                               ),
                             ),
-                            child: Text(
-                              l10n.bestSeller,
-                              style: AppTypography.badge(
-                                color: AppColors.warning,
-                                isTamil: isTamil,
-                              ).copyWith(fontSize: 8.5),
+
+                          // Out of Stock Overlay
+                          if (!isAvailable || stock == 0)
+                            Container(
+                              width: double.infinity,
+                              height: double.infinity,
+                              decoration: BoxDecoration(
+                                color: Colors.white.withValues(alpha: 0.90),
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              alignment: Alignment.center,
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 10,
+                                  vertical: 4,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: const Color(0xFF37474F),
+                                  borderRadius: BorderRadius.circular(20),
+                                ),
+                                child: Text(
+                                  l10n.outOfStock,
+                                  style: AppTypography.badge(
+                                    color: Colors.white,
+                                    isTamil: isTamil,
+                                  ).copyWith(
+                                    fontSize: 10,
+                                    fontWeight: FontWeight.w700,
+                                  ),
+                                ),
+                              ),
                             ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+
+                    // --- MIDDLE ZONE: PRODUCT IDENTITY & METADATA ---
+                    // Primary Name
+                    Text(
+                      displayName,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: AppTypography.productName(isTamil: isTamil).copyWith(
+                        fontSize: 13.5,
+                        fontWeight: FontWeight.w700,
+                        color: const Color(0xFF162A1C),
+                      ),
+                    ),
+                    const SizedBox(height: 1.5),
+
+                    // Secondary Name / Local Variety
+                    Text(
+                      secondaryName.isNotEmpty ? secondaryName : product.origin,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: AppTypography.supporting(
+                        color: const Color(0xFF5B7162),
+                        isTamil: isTamil,
+                      ).copyWith(fontSize: 11.5, fontWeight: FontWeight.w500),
+                    ),
+                    const SizedBox(height: 4),
+
+                    // Unit / Pack Tag
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 6,
+                        vertical: 2,
+                      ),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFF3F6F4),
+                        borderRadius: BorderRadius.circular(4),
+                        border: Border.all(
+                          color: const Color(0xFFE2E7E4),
+                          width: 0.7,
+                        ),
+                      ),
+                      child: Text(
+                        product.formatUnitLabel(isTamil: isTamil),
+                        style: const TextStyle(
+                          fontSize: 10,
+                          fontWeight: FontWeight.w600,
+                          color: Color(0xFF4A5F50),
+                        ),
+                      ),
+                    ),
+
+                    // --- CONTENT SPLIT DIVIDER ---
+                    Container(
+                      margin: const EdgeInsets.symmetric(vertical: 8),
+                      height: 0.8,
+                      decoration: const BoxDecoration(
+                        gradient: LinearGradient(
+                          colors: [
+                            Color(0xFFE8EDE9),
+                            Color(0xFFF5F7F5),
+                            Color(0xFFE8EDE9),
+                          ],
+                        ),
+                      ),
+                    ),
+
+                    // --- BOTTOM ZONE: PRICING & QUICK-COMMERCE ACTION ---
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        // Price Column
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Text(
+                                CurrencyFormatter.formatPaise(pricePaise),
+                                style: const TextStyle(
+                                  fontSize: 15.5,
+                                  fontWeight: FontWeight.w800,
+                                  color: Color(0xFF163E22),
+                                  letterSpacing: -0.3,
+                                ),
+                              ),
+                              if (hasDiscount)
+                                Text(
+                                  CurrencyFormatter.formatPaise(
+                                    product.originalPricePaise!,
+                                  ),
+                                  style: const TextStyle(
+                                    fontSize: 11,
+                                    fontWeight: FontWeight.w500,
+                                    color: Color(0xFF8A9A8F),
+                                    decoration: TextDecoration.lineThrough,
+                                    decorationColor: Color(0xFF8A9A8F),
+                                  ),
+                                ),
+                            ],
+                          ),
+                        ),
+
+                        // Animated Quick-Commerce Button / Stepper
+                        if (!isAvailable || stock == 0)
+                          const SizedBox.shrink()
+                        else
+                          AnimatedSwitcher(
+                            duration: const Duration(milliseconds: 200),
+                            transitionBuilder: (child, animation) {
+                              return ScaleTransition(
+                                scale: animation,
+                                child: FadeTransition(
+                                  opacity: animation,
+                                  child: child,
+                                ),
+                              );
+                            },
+                            child: qtyInCart == 0
+                                ? _buildAddButton(
+                                    context,
+                                    ref,
+                                    currentBranch,
+                                    cart,
+                                    isTamil,
+                                    l10n,
+                                  )
+                                : _buildQuantityStepper(
+                                    context,
+                                    ref,
+                                    currentBranch,
+                                    qtyInCart,
+                                    isTamil,
+                                  ),
                           ),
                       ],
                     ),
-                  ),
-
-                  // Out of stock overlay
-                  if (!isAvailable || stock == 0)
-                    Container(
-                      width: double.infinity,
-                      height: double.infinity,
-                      decoration: BoxDecoration(
-                        color: Colors.white.withValues(alpha: 0.88),
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      alignment: Alignment.center,
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 8,
-                          vertical: 3.5,
-                        ),
-                        decoration: BoxDecoration(
-                          color: AppColors.neutral700,
-                          borderRadius: BorderRadius.circular(6),
-                        ),
-                        child: Text(
-                          l10n.outOfStock,
-                          style: AppTypography.badge(
-                            color: Colors.white,
-                            isTamil: isTamil,
-                          ).copyWith(fontSize: 9.5),
-                        ),
-                      ),
-                    ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 8),
-
-            // Product Primary Name
-            Text(
-              displayName,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: AppTypography.productName(isTamil: isTamil),
-            ),
-
-            // Secondary Name / Local Name
-            Text(
-              secondaryName.isNotEmpty ? secondaryName : product.origin,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: AppTypography.supporting(
-                color: AppColors.textSecondary,
-                isTamil: isTamil,
-              ).copyWith(fontSize: 11.5, fontWeight: FontWeight.w500),
-            ),
-            const SizedBox(height: 2),
-
-            // Unit/weight label (e.g. per kg / ஒரு கிலோ)
-            Text(
-              product.formatUnitLabel(isTamil: isTamil),
-              style: AppTypography.supporting(
-                color: AppColors.textMuted,
-                isTamil: isTamil,
-              ).copyWith(fontSize: 11, fontWeight: FontWeight.w500),
-            ),
-            const SizedBox(height: 8),
-
-            // Price & Add to Cart Action
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: [
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      CurrencyFormatter.formatPaise(pricePaise),
-                      style: AppTypography.productPrice(),
-                    ),
-                    if (product.originalPricePaise != null &&
-                        product.originalPricePaise! > pricePaise)
-                      Text(
-                        CurrencyFormatter.formatPaise(
-                          product.originalPricePaise!,
-                        ),
-                        style: AppTypography.originalPrice(),
-                      ),
                   ],
                 ),
-
-                // Quick-Commerce Add / Stepper Button
-                if (!isAvailable || stock == 0)
-                  const SizedBox.shrink()
-                else if (qtyInCart == 0)
-                  SizedBox(
-                    height: 32,
-                    child: OutlinedButton(
-                      style: OutlinedButton.styleFrom(
-                        backgroundColor: Colors.white,
-                        foregroundColor: AppColors.primary,
-                        side: const BorderSide(
-                          color: AppColors.primary,
-                          width: 1.3,
-                        ),
-                        padding: const EdgeInsets.symmetric(horizontal: 10),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                      ),
-                      onPressed: () =>
-                          _handleAddToCart(context, ref, currentBranch, cart),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Text(
-                            l10n.add,
-                            style: AppTypography.button(
-                              color: AppColors.primary,
-                              isTamil: isTamil,
-                            ).copyWith(fontSize: 12),
-                          ),
-                          const SizedBox(width: 3),
-                          const Icon(Icons.add, size: 14),
-                        ],
-                      ),
-                    ),
-                  )
-                else
-                  InkWell(
-                    onTap: () => QuantitySelectorSheet.show(
-                      context,
-                      product: product,
-                      initialQuantity: qtyInCart,
-                    ),
-                    child: Container(
-                      height: 32,
-                      padding: const EdgeInsets.symmetric(horizontal: 6),
-                      decoration: BoxDecoration(
-                        color: AppColors.primary,
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          InkWell(
-                            onTap: () => ref
-                                .read(cartProvider.notifier)
-                                .decrementQuantity(product.id),
-                            child: const Padding(
-                              padding: EdgeInsets.symmetric(horizontal: 4),
-                              child: Icon(
-                                Icons.remove,
-                                size: 13,
-                                color: Colors.white,
-                              ),
-                            ),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 4),
-                            child: Text(
-                              product.formatQuantity(
-                                qtyInCart,
-                                isTamil: isTamil,
-                              ),
-                              style: AppTypography.button(
-                                color: Colors.white,
-                                isTamil: isTamil,
-                              ).copyWith(fontSize: 11.5),
-                            ),
-                          ),
-                          InkWell(
-                            onTap: () {
-                              final currentStock = product.getStockForBranch(
-                                currentBranch.id,
-                              );
-                              final step = product.quantityStep;
-                              if (qtyInCart + step <= currentStock) {
-                                ref
-                                    .read(cartProvider.notifier)
-                                    .incrementQuantity(product.id);
-                              } else {
-                                VegoraToast.showWarning(
-                                  context,
-                                  isTamil
-                                      ? 'அதிகபட்ச இருப்பு அளவு எட்டப்பட்டது'
-                                      : 'Maximum available stock reached',
-                                  title: isTamil
-                                      ? 'இருப்பு வரம்பு'
-                                      : 'Stock Limit',
-                                );
-                              }
-                            },
-                            child: const Padding(
-                              padding: EdgeInsets.symmetric(horizontal: 4),
-                              child: Icon(
-                                Icons.add,
-                                size: 13,
-                                color: Colors.white,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-              ],
+              ),
             ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildAddButton(
+    BuildContext context,
+    WidgetRef ref,
+    Branch currentBranch,
+    Cart cart,
+    bool isTamil,
+    AppLocalizations l10n,
+  ) {
+    return SizedBox(
+      key: const ValueKey('add_btn'),
+      height: 32,
+      child: OutlinedButton(
+        style: OutlinedButton.styleFrom(
+          backgroundColor: Colors.white,
+          foregroundColor: AppColors.primary,
+          side: const BorderSide(
+            color: AppColors.primary,
+            width: 1.3,
+          ),
+          padding: const EdgeInsets.symmetric(horizontal: 10),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(8),
+          ),
+          elevation: 0,
+        ),
+        onPressed: () => _handleAddToCart(context, ref, currentBranch, cart),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              l10n.add,
+              style: AppTypography.button(
+                color: AppColors.primary,
+                isTamil: isTamil,
+              ).copyWith(fontSize: 12, fontWeight: FontWeight.w700),
+            ),
+            const SizedBox(width: 3),
+            const Icon(Icons.add, size: 14),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildQuantityStepper(
+    BuildContext context,
+    WidgetRef ref,
+    Branch currentBranch,
+    int qtyInCart,
+    bool isTamil,
+  ) {
+    final product = widget.product;
+    return Container(
+      key: const ValueKey('stepper_active'),
+      height: 32,
+      padding: const EdgeInsets.symmetric(horizontal: 4),
+      decoration: BoxDecoration(
+        color: AppColors.primary,
+        borderRadius: BorderRadius.circular(8),
+        boxShadow: const [
+          BoxShadow(
+            color: Color(0x221B5E20),
+            blurRadius: 4,
+            offset: Offset(0, 1.5),
+          ),
+        ],
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Material(
+            color: Colors.transparent,
+            child: InkWell(
+              onTap: () => ref
+                  .read(cartProvider.notifier)
+                  .decrementQuantity(product.id),
+              borderRadius: BorderRadius.circular(6),
+              child: const Padding(
+                padding: EdgeInsets.symmetric(horizontal: 5, vertical: 4),
+                child: Icon(Icons.remove, size: 14, color: Colors.white),
+              ),
+            ),
+          ),
+          InkWell(
+            onTap: () => QuantitySelectorSheet.show(
+              context,
+              product: product,
+              initialQuantity: qtyInCart,
+            ),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 5),
+              child: Text(
+                product.formatQuantity(qtyInCart, isTamil: isTamil),
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.w700,
+                  fontSize: 12,
+                ),
+              ),
+            ),
+          ),
+          Material(
+            color: Colors.transparent,
+            child: InkWell(
+              onTap: () {
+                final currentStock = product.getStockForBranch(
+                  currentBranch.id,
+                );
+                final step = product.quantityStep;
+                if (qtyInCart + step <= currentStock) {
+                  ref
+                      .read(cartProvider.notifier)
+                      .incrementQuantity(product.id);
+                } else {
+                  VegoraToast.showWarning(
+                    context,
+                    isTamil
+                        ? 'அதிகபட்ச இருப்பு அளவு எட்டப்பட்டது'
+                        : 'Maximum available stock reached',
+                    title: isTamil ? 'இருப்பு வரம்பு' : 'Stock Limit',
+                  );
+                }
+              },
+              borderRadius: BorderRadius.circular(6),
+              child: const Padding(
+                padding: EdgeInsets.symmetric(horizontal: 5, vertical: 4),
+                child: Icon(Icons.add, size: 14, color: Colors.white),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -357,6 +553,7 @@ class ProductCard extends ConsumerWidget {
     Branch currentBranch,
     Cart cart,
   ) async {
+    final product = widget.product;
     final qty = product.isWeightBased ? product.minOrderQuantity : 1;
     if (product.allowCustomQuantity && product.isWeightBased) {
       if (!context.mounted) return;

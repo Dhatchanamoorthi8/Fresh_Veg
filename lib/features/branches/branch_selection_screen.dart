@@ -12,6 +12,8 @@ import '../../shared/providers/cart_provider.dart';
 import '../../shared/repositories/branch_repository.dart';
 import '../../shared/widgets/branch_switch_dialog.dart';
 import '../../shared/widgets/vegora_toast.dart';
+import '../../core/services/location_service.dart';
+import 'location_picker_map_screen.dart';
 
 class BranchSelectionScreen extends ConsumerStatefulWidget {
   const BranchSelectionScreen({super.key});
@@ -770,6 +772,9 @@ class _BranchSelectionScreenState extends ConsumerState<BranchSelectionScreen> {
     final landmarkController = TextEditingController();
     final pinCodeController = TextEditingController();
     bool isDefault = false;
+    bool isLocatingGps = false;
+    bool showStorePicker = false;
+    String? mapVerifiedAddressSummary;
 
     await showModalBottomSheet<void>(
       context: context,
@@ -788,7 +793,59 @@ class _BranchSelectionScreenState extends ConsumerState<BranchSelectionScreen> {
                 }
                 selectedLat = branch.latitude;
                 selectedLng = branch.longitude;
+                mapVerifiedAddressSummary = '${branch.name} (${branch.area})';
               });
+            }
+
+            Future<void> openMapLocationPicker({bool fetchGpsFirst = false}) async {
+              double targetLat = selectedLat ?? currentBranch.latitude ?? LocationService.defaultLat;
+              double targetLng = selectedLng ?? currentBranch.longitude ?? LocationService.defaultLng;
+
+              if (fetchGpsFirst) {
+                setSheetState(() => isLocatingGps = true);
+                final pos = await LocationService.instance.getCurrentPosition();
+                setSheetState(() => isLocatingGps = false);
+                if (pos != null) {
+                  targetLat = pos.latitude;
+                  targetLng = pos.longitude;
+                }
+              }
+
+              if (!sheetContext.mounted) return;
+
+              final SelectedLocationResult? result =
+                  await Navigator.of(sheetContext).push<SelectedLocationResult>(
+                MaterialPageRoute(
+                  builder: (_) => LocationPickerMapScreen(
+                    initialLatitude: targetLat,
+                    initialLongitude: targetLng,
+                    initialTitle: areaController.text.isNotEmpty
+                        ? areaController.text
+                        : currentBranch.name,
+                  ),
+                ),
+              );
+
+              if (result != null) {
+                setSheetState(() {
+                  selectedLat = result.latitude;
+                  selectedLng = result.longitude;
+                  selectedDbBranch = null; // Verified directly via exact doorstep map pin
+                  if (result.flatBuilding.isNotEmpty &&
+                      addressController.text.trim().isEmpty) {
+                    addressController.text = result.flatBuilding;
+                  }
+                  if (result.areaLocality.isNotEmpty) {
+                    areaController.text = result.areaLocality;
+                  }
+                  if (result.pincode.isNotEmpty) {
+                    pinCodeController.text = result.pincode;
+                  }
+                  mapVerifiedAddressSummary = result.areaLocality.isNotEmpty
+                      ? '${result.areaLocality}, ${result.city}'
+                      : '${result.latitude.toStringAsFixed(4)}, ${result.longitude.toStringAsFixed(4)}';
+                });
+              }
             }
 
             return Container(
@@ -876,176 +933,134 @@ class _BranchSelectionScreenState extends ConsumerState<BranchSelectionScreen> {
                       ),
                       const SizedBox(height: 16),
 
-                      // Store DB Location & GPS Coordinates Selector
+                      // Delivery Location: Current GPS & Map Verification Hero Card
                       Container(
-                        padding: const EdgeInsets.all(12),
+                        padding: const EdgeInsets.all(14),
                         decoration: BoxDecoration(
-                          color: AppColors.primaryContainer.withValues(
-                            alpha: 0.35,
+                          gradient: LinearGradient(
+                            colors: [
+                              AppColors.primaryContainer.withValues(alpha: 0.45),
+                              Colors.white,
+                            ],
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
                           ),
-                          borderRadius: BorderRadius.circular(12),
+                          borderRadius: BorderRadius.circular(14),
                           border: Border.all(
-                            color: AppColors.primaryLight.withValues(
-                              alpha: 0.5,
-                            ),
+                            color: selectedLat != null
+                                ? AppColors.primary
+                                : AppColors.primaryLight.withValues(alpha: 0.5),
+                            width: selectedLat != null ? 1.5 : 1.0,
                           ),
+                          boxShadow: [
+                            BoxShadow(
+                              color: AppColors.primary.withValues(alpha: 0.06),
+                              blurRadius: 8,
+                              offset: const Offset(0, 2),
+                            ),
+                          ],
                         ),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                const Icon(
-                                  Icons.store_mall_directory_rounded,
-                                  size: 16,
-                                  color: AppColors.primaryDark,
-                                ),
-                                const SizedBox(width: 6),
-                                const Text(
-                                  'Pick Store Location (DB Coordinates)',
-                                  style: TextStyle(
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.bold,
-                                    color: AppColors.primaryDark,
+                                Container(
+                                  padding: const EdgeInsets.all(8),
+                                  decoration: BoxDecoration(
+                                    color: AppColors.primary.withValues(alpha: 0.12),
+                                    shape: BoxShape.circle,
                                   ),
+                                  child: isLocatingGps
+                                      ? const SizedBox(
+                                          width: 20,
+                                          height: 20,
+                                          child: CircularProgressIndicator(
+                                            strokeWidth: 2.2,
+                                            color: AppColors.primary,
+                                          ),
+                                        )
+                                      : const Icon(
+                                          Icons.my_location_rounded,
+                                          size: 20,
+                                          color: AppColors.primary,
+                                        ),
                                 ),
-                                const Spacer(),
-                                if (selectedLat != null && selectedLng != null)
-                                  Container(
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: 6,
-                                      vertical: 2,
-                                    ),
-                                    decoration: BoxDecoration(
-                                      color: AppColors.primary,
-                                      borderRadius: BorderRadius.circular(4),
-                                    ),
-                                    child: const Text(
-                                      'GPS LOCKED',
-                                      style: TextStyle(
-                                        fontSize: 9,
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.white,
-                                      ),
-                                    ),
-                                  ),
-                              ],
-                            ),
-                            const SizedBox(height: 8),
-
-                            // Option A: Quick 1-tap button to use CURRENT fulfillment store
-                            InkWell(
-                              onTap: () => applyStoreBranch(currentBranch),
-                              borderRadius: BorderRadius.circular(8),
-                              child: Container(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 10,
-                                  vertical: 8,
-                                ),
-                                decoration: BoxDecoration(
-                                  color: Colors.white,
-                                  borderRadius: BorderRadius.circular(8),
-                                  border: Border.all(
-                                    color:
-                                        selectedDbBranch?.id == currentBranch.id
-                                        ? AppColors.primary
-                                        : AppColors.border,
-                                    width:
-                                        selectedDbBranch?.id == currentBranch.id
-                                        ? 1.5
-                                        : 1,
-                                  ),
-                                ),
-                                child: Row(
-                                  children: [
-                                    const Icon(
-                                      Icons.my_location_rounded,
-                                      size: 16,
-                                      color: AppColors.primary,
-                                    ),
-                                    const SizedBox(width: 8),
-                                    Expanded(
-                                      child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
+                                const SizedBox(width: 10),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Row(
                                         children: [
-                                          Text(
-                                            'Use Current Store: ${currentBranch.name}',
-                                            style: const TextStyle(
-                                              fontSize: 12,
+                                          const Text(
+                                            'Delivery Location',
+                                            style: TextStyle(
+                                              fontSize: 13,
                                               fontWeight: FontWeight.bold,
                                               color: AppColors.textPrimary,
                                             ),
                                           ),
-                                          if (currentBranch.latitude != null &&
-                                              currentBranch.longitude != null)
-                                            Text(
-                                              'Exact GPS: ${currentBranch.latitude!.toStringAsFixed(4)}° N, ${currentBranch.longitude!.toStringAsFixed(4)}° E',
-                                              style: const TextStyle(
-                                                fontSize: 10,
-                                                color: AppColors.textSecondary,
+                                          const SizedBox(width: 6),
+                                          if (selectedLat != null)
+                                            Container(
+                                              padding: const EdgeInsets.symmetric(
+                                                horizontal: 6,
+                                                vertical: 2,
+                                              ),
+                                              decoration: BoxDecoration(
+                                                color: AppColors.primary,
+                                                borderRadius: BorderRadius.circular(4),
+                                              ),
+                                              child: const Row(
+                                                mainAxisSize: MainAxisSize.min,
+                                                children: [
+                                                  Icon(
+                                                    Icons.check_circle_rounded,
+                                                    size: 10,
+                                                    color: Colors.white,
+                                                  ),
+                                                  SizedBox(width: 3),
+                                                  Text(
+                                                    'VERIFIED ON MAP',
+                                                    style: TextStyle(
+                                                      fontSize: 8.5,
+                                                      fontWeight: FontWeight.bold,
+                                                      color: Colors.white,
+                                                      letterSpacing: 0.3,
+                                                    ),
+                                                  ),
+                                                ],
                                               ),
                                             ),
                                         ],
                                       ),
-                                    ),
-                                    const Icon(
-                                      Icons.touch_app_rounded,
-                                      size: 16,
-                                      color: AppColors.primary,
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                            const SizedBox(height: 8),
-
-                            // Option B: Dropdown to pick ANY branch from the database
-                            DropdownButtonFormField<Branch>(
-                              initialValue: selectedDbBranch,
-                              isExpanded: true,
-                              decoration: InputDecoration(
-                                labelText: 'Or Select from Store Network DB',
-                                labelStyle: const TextStyle(fontSize: 12),
-                                contentPadding: const EdgeInsets.symmetric(
-                                  horizontal: 10,
-                                  vertical: 10,
-                                ),
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(8),
-                                ),
-                                filled: true,
-                                fillColor: Colors.white,
-                                prefixIcon: const Icon(
-                                  Icons.hub_outlined,
-                                  size: 18,
-                                  color: AppColors.primary,
-                                ),
-                              ),
-                              hint: const Text(
-                                'Choose store branch...',
-                                style: TextStyle(fontSize: 12),
-                              ),
-                              items: branches.map((b) {
-                                return DropdownMenuItem<Branch>(
-                                  value: b,
-                                  child: Text(
-                                    '${b.name} (${b.area} - ${b.latitude?.toStringAsFixed(4)}, ${b.longitude?.toStringAsFixed(4)})',
-                                    overflow: TextOverflow.ellipsis,
-                                    style: const TextStyle(fontSize: 12),
+                                      const SizedBox(height: 3),
+                                      Text(
+                                        selectedLat != null
+                                            ? (mapVerifiedAddressSummary != null
+                                                ? '📍 $mapVerifiedAddressSummary'
+                                                : 'Lat: ${selectedLat!.toStringAsFixed(5)}, Lng: ${selectedLng!.toStringAsFixed(5)}')
+                                            : 'Click below to detect your current location and verify on the map.',
+                                        style: TextStyle(
+                                          fontSize: 11,
+                                          fontWeight: selectedLat != null
+                                              ? FontWeight.w600
+                                              : FontWeight.normal,
+                                          color: selectedLat != null
+                                              ? AppColors.primaryDark
+                                              : AppColors.textSecondary,
+                                        ),
+                                      ),
+                                    ],
                                   ),
-                                );
-                              }).toList(),
-                              onChanged: (b) {
-                                if (b != null) {
-                                  applyStoreBranch(b);
-                                }
-                              },
+                                ),
+                              ],
                             ),
 
-                            // Active Coordinates Info Banner
                             if (selectedLat != null && selectedLng != null) ...[
-                              const SizedBox(height: 8),
+                              const SizedBox(height: 10),
                               Container(
                                 padding: const EdgeInsets.symmetric(
                                   horizontal: 10,
@@ -1053,26 +1068,25 @@ class _BranchSelectionScreenState extends ConsumerState<BranchSelectionScreen> {
                                 ),
                                 decoration: BoxDecoration(
                                   color: Colors.white,
-                                  borderRadius: BorderRadius.circular(6),
+                                  borderRadius: BorderRadius.circular(8),
                                   border: Border.all(
-                                    color: AppColors.primary.withValues(
-                                      alpha: 0.3,
-                                    ),
+                                    color: AppColors.primary.withValues(alpha: 0.25),
                                   ),
                                 ),
                                 child: Row(
                                   children: [
                                     const Icon(
                                       Icons.gps_fixed_rounded,
-                                      size: 14,
+                                      size: 13,
                                       color: AppColors.primary,
                                     ),
                                     const SizedBox(width: 6),
                                     Expanded(
                                       child: Text(
-                                        'Lat: ${selectedLat!.toStringAsFixed(6)} | Long: ${selectedLng!.toStringAsFixed(6)}',
+                                        'GPS: ${selectedLat!.toStringAsFixed(6)}° N, ${selectedLng!.toStringAsFixed(6)}° E',
                                         style: const TextStyle(
-                                          fontSize: 11,
+                                          fontSize: 10.5,
+                                          fontFamily: 'monospace',
                                           fontWeight: FontWeight.bold,
                                           color: AppColors.primaryDark,
                                         ),
@@ -1084,6 +1098,7 @@ class _BranchSelectionScreenState extends ConsumerState<BranchSelectionScreen> {
                                           selectedDbBranch = null;
                                           selectedLat = null;
                                           selectedLng = null;
+                                          mapVerifiedAddressSummary = null;
                                         });
                                       },
                                       child: const Text(
@@ -1097,6 +1112,240 @@ class _BranchSelectionScreenState extends ConsumerState<BranchSelectionScreen> {
                                     ),
                                   ],
                                 ),
+                              ),
+                            ],
+
+                            const SizedBox(height: 12),
+
+                            // Dual Action Buttons: GPS Detect & Map Verification
+                            Row(
+                              children: [
+                                // 1. Main Get Current Location Button
+                                Expanded(
+                                  flex: 6,
+                                  child: ElevatedButton.icon(
+                                    onPressed: isLocatingGps
+                                        ? null
+                                        : () => openMapLocationPicker(fetchGpsFirst: true),
+                                    icon: isLocatingGps
+                                        ? const SizedBox(
+                                            width: 14,
+                                            height: 14,
+                                            child: CircularProgressIndicator(
+                                              strokeWidth: 2,
+                                              color: Colors.white,
+                                            ),
+                                          )
+                                        : const Icon(
+                                            Icons.near_me_rounded,
+                                            size: 16,
+                                            color: Colors.white,
+                                          ),
+                                    label: Text(
+                                      selectedLat != null
+                                          ? 'Re-Detect GPS'
+                                          : 'Get Current Location',
+                                      style: const TextStyle(
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: AppColors.primary,
+                                      elevation: 0,
+                                      padding: const EdgeInsets.symmetric(
+                                        vertical: 10,
+                                        horizontal: 8,
+                                      ),
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(8),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(width: 8),
+
+                                // 2. Interactive Map View Button
+                                Expanded(
+                                  flex: 5,
+                                  child: OutlinedButton.icon(
+                                    onPressed: isLocatingGps
+                                        ? null
+                                        : () => openMapLocationPicker(fetchGpsFirst: false),
+                                    icon: const Icon(
+                                      Icons.map_outlined,
+                                      size: 16,
+                                      color: AppColors.primaryDark,
+                                    ),
+                                    label: Text(
+                                      selectedLat != null ? 'Adjust on Map' : 'View on Map',
+                                      style: const TextStyle(
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.bold,
+                                        color: AppColors.primaryDark,
+                                      ),
+                                    ),
+                                    style: OutlinedButton.styleFrom(
+                                      side: const BorderSide(
+                                        color: AppColors.primary,
+                                        width: 1.2,
+                                      ),
+                                      backgroundColor: Colors.white,
+                                      padding: const EdgeInsets.symmetric(
+                                        vertical: 10,
+                                        horizontal: 8,
+                                      ),
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(8),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+
+                            const SizedBox(height: 8),
+
+                            // Collapsible Option: Select Store Branch Coordinates
+                            InkWell(
+                              onTap: () => setSheetState(
+                                () => showStorePicker = !showStorePicker,
+                              ),
+                              borderRadius: BorderRadius.circular(6),
+                              child: Padding(
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 4,
+                                  horizontal: 2,
+                                ),
+                                child: Row(
+                                  children: [
+                                    Icon(
+                                      showStorePicker
+                                          ? Icons.keyboard_arrow_down_rounded
+                                          : Icons.keyboard_arrow_right_rounded,
+                                      size: 16,
+                                      color: AppColors.textSecondary,
+                                    ),
+                                    const SizedBox(width: 4),
+                                    const Text(
+                                      'Or select from store branch network',
+                                      style: TextStyle(
+                                        fontSize: 11,
+                                        fontWeight: FontWeight.w600,
+                                        color: AppColors.textSecondary,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+
+                            if (showStorePicker) ...[
+                              const SizedBox(height: 8),
+                              // Option A: 1-tap button to use CURRENT fulfillment store
+                              InkWell(
+                                onTap: () => applyStoreBranch(currentBranch),
+                                borderRadius: BorderRadius.circular(8),
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 10,
+                                    vertical: 8,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    borderRadius: BorderRadius.circular(8),
+                                    border: Border.all(
+                                      color: selectedDbBranch?.id == currentBranch.id
+                                          ? AppColors.primary
+                                          : AppColors.border,
+                                      width: selectedDbBranch?.id == currentBranch.id ? 1.5 : 1,
+                                    ),
+                                  ),
+                                  child: Row(
+                                    children: [
+                                      const Icon(
+                                        Icons.store_rounded,
+                                        size: 16,
+                                        color: AppColors.primary,
+                                      ),
+                                      const SizedBox(width: 8),
+                                      Expanded(
+                                        child: Column(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              'Current Store: ${currentBranch.name}',
+                                              style: const TextStyle(
+                                                fontSize: 12,
+                                                fontWeight: FontWeight.bold,
+                                                color: AppColors.textPrimary,
+                                              ),
+                                            ),
+                                            if (currentBranch.latitude != null &&
+                                                currentBranch.longitude != null)
+                                              Text(
+                                                'GPS: ${currentBranch.latitude!.toStringAsFixed(4)}° N, ${currentBranch.longitude!.toStringAsFixed(4)}° E',
+                                                style: const TextStyle(
+                                                  fontSize: 10,
+                                                  color: AppColors.textSecondary,
+                                                ),
+                                              ),
+                                          ],
+                                        ),
+                                      ),
+                                      const Icon(
+                                        Icons.touch_app_rounded,
+                                        size: 16,
+                                        color: AppColors.primary,
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(height: 8),
+
+                              // Option B: Dropdown to pick ANY branch from the database
+                              DropdownButtonFormField<Branch>(
+                                initialValue: selectedDbBranch,
+                                isExpanded: true,
+                                decoration: InputDecoration(
+                                  labelText: 'Select Store Network DB',
+                                  labelStyle: const TextStyle(fontSize: 12),
+                                  contentPadding: const EdgeInsets.symmetric(
+                                    horizontal: 10,
+                                    vertical: 10,
+                                  ),
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                  filled: true,
+                                  fillColor: Colors.white,
+                                  prefixIcon: const Icon(
+                                    Icons.hub_outlined,
+                                    size: 18,
+                                    color: AppColors.primary,
+                                  ),
+                                ),
+                                hint: const Text(
+                                  'Choose store branch...',
+                                  style: TextStyle(fontSize: 12),
+                                ),
+                                items: branches.map((b) {
+                                  return DropdownMenuItem<Branch>(
+                                    value: b,
+                                    child: Text(
+                                      '${b.name} (${b.area})',
+                                      overflow: TextOverflow.ellipsis,
+                                      style: const TextStyle(fontSize: 12),
+                                    ),
+                                  );
+                                }).toList(),
+                                onChanged: (b) {
+                                  if (b != null) {
+                                    applyStoreBranch(b);
+                                  }
+                                },
                               ),
                             ],
                           ],

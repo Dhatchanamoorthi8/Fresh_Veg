@@ -54,6 +54,9 @@ dependencies:
     path: packages/vegora_ui
   vegora_admin_web:
     path: apps/vegora_admin_web
+  flutter_map: ^8.3.2
+  latlong2: ^0.10.1
+  geolocator: ^14.1.2
 
 dev_dependencies:
   flutter_test:
@@ -72,6 +75,7 @@ flutter:
   assets:
     - assets/branding/
     - assets/fonts/
+    - assets/images/products/
 
   fonts:
     - family: Poppins

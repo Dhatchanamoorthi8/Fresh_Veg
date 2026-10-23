@@ -252,10 +252,11 @@ class _CatalogScreenState extends ConsumerState<CatalogScreen> {
                 }
 
                 return GridView.builder(
-                  padding: const EdgeInsets.all(16),
+                  padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
+                  physics: const BouncingScrollPhysics(),
                   gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                     crossAxisCount: 2,
-                    childAspectRatio: 0.68,
+                    childAspectRatio: 0.63,
                     crossAxisSpacing: 12,
                     mainAxisSpacing: 12,
                   ),
