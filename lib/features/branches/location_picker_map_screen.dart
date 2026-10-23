@@ -92,7 +92,7 @@ class _LocationPickerMapScreenState extends State<LocationPickerMapScreen>
     _geocodeDebounceTimer?.cancel();
     _pinAnimController.dispose();
     _searchController.dispose();
-    _mapController.dispose();
+    // Do NOT call _mapController.dispose() - FlutterMap manages internal MapInheritedModel
     super.dispose();
   }
 
@@ -118,6 +118,10 @@ class _LocationPickerMapScreenState extends State<LocationPickerMapScreen>
   void _onCameraMoved(LatLng newCenter, bool hasGesture) {
     _currentCenter = newCenter;
     if (hasGesture) {
+      if (_showSearchResults) {
+        setState(() => _showSearchResults = false);
+      }
+      FocusScope.of(context).unfocus();
       if (!_isMapMoving) {
         setState(() => _isMapMoving = true);
         _pinAnimController.forward();
@@ -135,12 +139,12 @@ class _LocationPickerMapScreenState extends State<LocationPickerMapScreen>
 
   Future<void> _locateUserGps() async {
     setState(() => _isLocating = true);
-    final pos = await LocationService.instance.getCurrentPosition();
+    final result = await LocationService.instance.getDeviceLocation();
     if (!mounted) return;
     setState(() => _isLocating = false);
 
-    if (pos != null) {
-      final target = LatLng(pos.latitude, pos.longitude);
+    if (result.isSuccess && result.position != null) {
+      final target = LatLng(result.position!.latitude, result.position!.longitude);
       _currentCenter = target;
       _mapController.move(target, 17.5);
       _triggerReverseGeocode(target);
@@ -152,13 +156,40 @@ class _LocationPickerMapScreenState extends State<LocationPickerMapScreen>
           behavior: SnackBarBehavior.floating,
         ),
       );
+    } else if (result.isServiceDisabled) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: const Text('Device GPS is turned off. Please turn on Location.'),
+          duration: const Duration(seconds: 4),
+          behavior: SnackBarBehavior.floating,
+          action: SnackBarAction(
+            label: 'Settings',
+            textColor: Colors.amber,
+            onPressed: () => LocationService.instance.openLocationSettings(),
+          ),
+        ),
+      );
+    } else if (result.isPermissionDenied) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: const Text('Location permission is needed to locate you.'),
+          duration: const Duration(seconds: 4),
+          behavior: SnackBarBehavior.floating,
+          action: SnackBarAction(
+            label: 'Enable',
+            textColor: Colors.amber,
+            onPressed: () => LocationService.instance.openAppSettings(),
+          ),
+        ),
+      );
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
+        SnackBar(
           content: Text(
-            'GPS service unavailable. You can drag the map to select your exact location.',
+            result.statusMessage ??
+                'GPS service unavailable. You can drag the map to select your exact location.',
           ),
-          duration: Duration(seconds: 3),
+          duration: const Duration(seconds: 3),
           behavior: SnackBarBehavior.floating,
         ),
       );
@@ -217,6 +248,7 @@ class _LocationPickerMapScreenState extends State<LocationPickerMapScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       backgroundColor: Colors.white,
       body: Stack(
         children: [
@@ -439,22 +471,16 @@ class _LocationPickerMapScreenState extends State<LocationPickerMapScreen>
                   if (_showSearchResults)
                     Container(
                       margin: const EdgeInsets.only(top: 8),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(16),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withValues(alpha: 0.12),
-                            blurRadius: 10,
-                            offset: const Offset(0, 4),
-                          ),
-                        ],
-                      ),
                       constraints: const BoxConstraints(maxHeight: 220),
-                      child: ListView.separated(
-                        shrinkWrap: true,
-                        padding: const EdgeInsets.symmetric(vertical: 4),
-                        itemCount: _searchResults.length,
+                      child: Material(
+                        color: Colors.white,
+                        elevation: 4,
+                        borderRadius: BorderRadius.circular(16),
+                        clipBehavior: Clip.antiAlias,
+                        child: ListView.separated(
+                          shrinkWrap: true,
+                          padding: const EdgeInsets.symmetric(vertical: 4),
+                          itemCount: _searchResults.length,
                         separatorBuilder: (context, index) =>
                             const Divider(height: 1, indent: 44),
                         itemBuilder: (context, index) {
@@ -491,6 +517,7 @@ class _LocationPickerMapScreenState extends State<LocationPickerMapScreen>
                         },
                       ),
                     ),
+                  ),
                 ],
               ),
             ),

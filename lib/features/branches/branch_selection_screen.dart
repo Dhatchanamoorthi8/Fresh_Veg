@@ -803,18 +803,35 @@ class _BranchSelectionScreenState extends ConsumerState<BranchSelectionScreen> {
 
               if (fetchGpsFirst) {
                 setSheetState(() => isLocatingGps = true);
-                final pos = await LocationService.instance.getCurrentPosition();
-                setSheetState(() => isLocatingGps = false);
-                if (pos != null) {
-                  targetLat = pos.latitude;
-                  targetLng = pos.longitude;
+                final locResult = await LocationService.instance.getDeviceLocation();
+                if (sheetContext.mounted) {
+                  setSheetState(() => isLocatingGps = false);
+                }
+                if (locResult.isSuccess && locResult.position != null) {
+                  targetLat = locResult.position!.latitude;
+                  targetLng = locResult.position!.longitude;
+                } else if (locResult.isServiceDisabled && context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: const Text('Device GPS is off. Opening map with store coordinates...'),
+                      duration: const Duration(seconds: 3),
+                      behavior: SnackBarBehavior.floating,
+                      action: SnackBarAction(
+                        label: 'Settings',
+                        textColor: Colors.amber,
+                        onPressed: () => LocationService.instance.openLocationSettings(),
+                      ),
+                    ),
+                  );
                 }
               }
 
-              if (!sheetContext.mounted) return;
+              if (!context.mounted) return;
 
+              // Use rootNavigator: true to push cleanly on the application root,
+              // avoiding nested ModalBottomSheet route deactivation collisions.
               final SelectedLocationResult? result =
-                  await Navigator.of(sheetContext).push<SelectedLocationResult>(
+                  await Navigator.of(context, rootNavigator: true).push<SelectedLocationResult>(
                 MaterialPageRoute(
                   builder: (_) => LocationPickerMapScreen(
                     initialLatitude: targetLat,
@@ -826,7 +843,7 @@ class _BranchSelectionScreenState extends ConsumerState<BranchSelectionScreen> {
                 ),
               );
 
-              if (result != null) {
+              if (result != null && sheetContext.mounted) {
                 setSheetState(() {
                   selectedLat = result.latitude;
                   selectedLng = result.longitude;

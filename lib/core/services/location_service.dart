@@ -25,17 +25,37 @@ class GeocodedAddress {
     required this.fullDisplayName,
   });
 
-  /// Formatted short location title e.g. "Whitefield, Bengaluru"
+  /// Formatted short location title e.g. "Bhavani, Erode"
   String get shortTitle {
     if (areaLocality.isNotEmpty && city.isNotEmpty) {
+      if (areaLocality.toLowerCase() == city.toLowerCase()) {
+        return areaLocality;
+      }
       return '$areaLocality, $city';
     } else if (areaLocality.isNotEmpty) {
       return areaLocality;
     } else if (city.isNotEmpty) {
       return city;
     }
-    return 'Pinpoint Location';
+    return 'Doorstep Location';
   }
+}
+
+/// Result of querying device GPS with explicit diagnostic status
+class DeviceLocationResult {
+  final Position? position;
+  final String? statusMessage;
+  final bool isServiceDisabled;
+  final bool isPermissionDenied;
+
+  const DeviceLocationResult({
+    this.position,
+    this.statusMessage,
+    this.isServiceDisabled = false,
+    this.isPermissionDenied = false,
+  });
+
+  bool get isSuccess => position != null;
 }
 
 /// Search prediction for search bar in map picker
@@ -63,42 +83,101 @@ class LocationService {
   static const double defaultLat = 12.9716;
   static const double defaultLng = 77.5946;
 
-  /// Request permission and obtain current high-accuracy device GPS position.
-  /// Gracefully catches errors or permission rejections and returns null.
-  Future<Position?> getCurrentPosition() async {
+  /// Open device GPS system settings toggle
+  Future<bool> openLocationSettings() async {
     try {
-      bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
+      return await Geolocator.openLocationSettings();
+    } catch (_) {
+      return false;
+    }
+  }
+
+  /// Open app permissions settings in Android/iOS
+  Future<bool> openAppSettings() async {
+    try {
+      return await Geolocator.openAppSettings();
+    } catch (_) {
+      return false;
+    }
+  }
+
+  /// High-reliability device location retriever.
+  /// Combines cached last-known position with live medium/high accuracy fix
+  /// so it works reliably indoors, outdoors, and across mobile network states.
+  Future<DeviceLocationResult> getDeviceLocation() async {
+    try {
+      final bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
       if (!serviceEnabled) {
-        debugPrint('[LocationService] Location services are disabled.');
-        return null;
+        return const DeviceLocationResult(
+          isServiceDisabled: true,
+          statusMessage: 'Location/GPS is turned off on your device.',
+        );
       }
 
       LocationPermission permission = await Geolocator.checkPermission();
       if (permission == LocationPermission.denied) {
         permission = await Geolocator.requestPermission();
         if (permission == LocationPermission.denied) {
-          debugPrint('[LocationService] Location permissions denied.');
-          return null;
+          return const DeviceLocationResult(
+            isPermissionDenied: true,
+            statusMessage: 'Location permission denied.',
+          );
         }
       }
 
       if (permission == LocationPermission.deniedForever) {
-        debugPrint('[LocationService] Location permissions permanently denied.');
-        return null;
+        return const DeviceLocationResult(
+          isPermissionDenied: true,
+          statusMessage: 'Location permission permanently blocked in system settings.',
+        );
       }
 
-      final position = await Geolocator.getCurrentPosition(
-        locationSettings: const LocationSettings(
-          accuracy: LocationAccuracy.high,
-          timeLimit: Duration(seconds: 10),
-        ),
-      );
+      // Step 1: Immediately fetch last known position (cached fast-path)
+      Position? fallbackPosition;
+      try {
+        fallbackPosition = await Geolocator.getLastKnownPosition();
+      } catch (e) {
+        debugPrint('[LocationService] LastKnownPosition warning: $e');
+      }
 
-      return position;
+      // Step 2: Attempt fresh position with balanced accuracy and generous timeout
+      try {
+        final freshPosition = await Geolocator.getCurrentPosition(
+          locationSettings: const LocationSettings(
+            accuracy: LocationAccuracy.medium,
+            timeLimit: Duration(seconds: 12),
+          ),
+        );
+        return DeviceLocationResult(position: freshPosition);
+      } catch (e) {
+        debugPrint('[LocationService] Fresh fix timed out or failed: $e');
+        if (fallbackPosition != null) {
+          return DeviceLocationResult(
+            position: fallbackPosition,
+            statusMessage: 'Using recent cached location.',
+          );
+        }
+      }
+
+      if (fallbackPosition != null) {
+        return DeviceLocationResult(position: fallbackPosition);
+      }
+
+      return const DeviceLocationResult(
+        statusMessage: 'Unable to acquire GPS fix. Please adjust pin on map.',
+      );
     } catch (e) {
-      debugPrint('[LocationService] Error getting current position: $e');
-      return null;
+      debugPrint('[LocationService] Error getting device location: $e');
+      return DeviceLocationResult(
+        statusMessage: 'GPS error: $e',
+      );
     }
+  }
+
+  /// Legacy helper for quick position acquisition
+  Future<Position?> getCurrentPosition() async {
+    final result = await getDeviceLocation();
+    return result.position;
   }
 
   /// Reverse geocode latitude and longitude using OpenStreetMap Nominatim
@@ -160,9 +239,9 @@ class LocationService {
           address['town'] as String? ??
           address['state_district'] as String? ??
           address['county'] as String? ??
-          'Bengaluru';
+          '';
 
-      final state = address['state'] as String? ?? 'Karnataka';
+      final state = address['state'] as String? ?? 'Tamil Nadu';
       final pincode = address['postcode'] as String? ?? '';
       final fullDisplayName = data['display_name'] as String? ?? '';
 
